@@ -9,5 +9,8 @@
             "database": "thedatabase",
             "username": "postgres"
         }
-    ]
+    ],
+    "sqltools.languageServerEnv": {
+        
+    }
 }
