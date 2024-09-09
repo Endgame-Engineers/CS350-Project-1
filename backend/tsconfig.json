@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",       // Output directory
+    "rootDir": "./src",       // Source directory
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
@@ -104,5 +106,7 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
-  }
+  },
+  "include": ["src/**/*"],    // Include all TypeScript files in src
+  "exclude": ["node_modules"] // Exclude node_modules
 }
