@@ -16,7 +16,10 @@ app.get('/goodbye', (req, res) => {
     res.send('Goodbye World!!');
 });
 app.get('/test', (req, res) => {
-    res.send('Test World!!');
+    res.send('Test World For sure!!!___!!');
+});
+app.get('/test2', (req, res) => {
+    res.send('Test World For sure!!_(((99)))!');
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
