@@ -1,9 +1,11 @@
 import express from 'express';
 const app = express();
 import FoodItem from './models/FoodItems';
+import User from './models/Users';
 
 app.use(express.json());
 const foodItems = new FoodItem();
+const Users = new User();
 
 app.get('/food_items', async (req, res) => {
     const items = await foodItems.getFoodItems();
@@ -30,5 +32,45 @@ app.delete('/food_items/:barcode', async (req, res) => {
     res.status(200).send();
 });
 
+app.get('/users', async (req, res) => {
+    const users = await Users.getUsers();
+    res.json(users);
+});
+
+app.get('/users/:username', async (req, res) => {
+    const user = await Users.getUser(req.params.username);
+    res.json(user);
+});
+
+app.post('/users', async (req, res) => {
+    await Users.addUser(req.body);
+    res.status(201).send();
+});
+
+app.put('/users', async (req, res) => {
+    await Users.updateUser(req.body);
+    res.status(200).send();
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+
+
+INSERT INTO Users (
+    id,
+    username,
+    firstname,
+    lastname,
+    email,
+    uuid,
+    lastlogin
+  )
+VALUES (
+    id:integer,
+    'username:character varying',
+    'firstname:character varying',
+    'lastname:character varying',
+    'email:character varying',
+    'uuid:uuid',
+    'lastlogin:timestamp with time zone'
+  );
