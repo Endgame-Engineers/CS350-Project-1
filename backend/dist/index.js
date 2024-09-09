@@ -57,7 +57,3 @@ app.put('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
-INSERT;
-INTO;
-Users(id, username, firstname, lastname, email, uuid, lastlogin);
-VALUES(id, integer, 'username:character varying', 'firstname:character varying', 'lastname:character varying', 'email:character varying', 'uuid:uuid', 'lastlogin:timestamp with time zone');
