@@ -16,7 +16,12 @@ app.get('/goodbye', (req, res) => {
 })
 
 app.get('/test', (req, res) => {
-    res.send('Test World!!');
+    res.send('Test World For sure!!!___!!');
+})
+
+
+app.get('/test2', (req, res) => {
+    res.send('Test World For sure!!_(((99)))!');
 })
 
 const PORT = process.env.PORT || 3000;
