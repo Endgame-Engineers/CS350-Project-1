@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import { config } from 'dotenv';
 import { getRoutes } from './routes/index';
 
@@ -13,4 +14,9 @@ routes.forEach((route) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+// app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+
+const server = http.createServer(app);
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
