@@ -3,12 +3,14 @@ import { config } from 'dotenv';
 
 config();
 
-class  ConnectToDB {
-    static close(client: Promise<Client>) {
-        throw new Error('Method not implemented.');
-    }
-  constructor() {}
-
+/**
+ * Class to connect to the database
+ */
+class ConnectToDB {
+    /**
+     * Connect to the database
+     * @returns Client
+     */
     async connect(): Promise<Client> {
         const client = new Client({
             user: process.env.DB_USER,
@@ -21,6 +23,10 @@ class  ConnectToDB {
         return client;
     }
 
+    /**
+     * Close the connection to the database
+     * @param client 
+     */
     async close(client: Client): Promise<void> {
         client.end();
     }

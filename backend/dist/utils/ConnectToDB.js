@@ -12,11 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const pg_1 = require("pg");
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)();
+/**
+ * Class to connect to the database
+ */
 class ConnectToDB {
-    static close(client) {
-        throw new Error('Method not implemented.');
-    }
-    constructor() { }
+    /**
+     * Connect to the database
+     * @returns Client
+     */
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
             const client = new pg_1.Client({
@@ -30,6 +33,10 @@ class ConnectToDB {
             return client;
         });
     }
+    /**
+     * Close the connection to the database
+     * @param client
+     */
     close(client) {
         return __awaiter(this, void 0, void 0, function* () {
             client.end();

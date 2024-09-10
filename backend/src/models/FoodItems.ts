@@ -1,6 +1,5 @@
 import { config } from 'dotenv';
 import ConnectToDB from '../utils/ConnectToDB';
-// import OpenFoodFacts from 'openfoodfacts-nodejs';
 
 interface FoodItem {
     foodname: string;
