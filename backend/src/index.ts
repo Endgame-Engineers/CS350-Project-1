@@ -1,6 +1,10 @@
 import express from 'express';
 import http from 'http';
+import { config } from 'dotenv';
 import { getRoutes } from './routes/index';
+
+config();
+
 const app = express();
 app.use(express.json());
 
