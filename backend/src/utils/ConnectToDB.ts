@@ -7,6 +7,7 @@ config();
  * Class to connect to the database
  */
 class ConnectToDB {
+    static close: any;
     /**
      * Connect to the database
      * @returns Client
@@ -17,21 +18,19 @@ class ConnectToDB {
             host: process.env.DB_HOST,
             database: process.env.DB_DATABASE,
             password: process.env.DB_PASSWORD,
-            port: process.env.DB_PORT,
+            port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
         });
         client.connect();
         return client;
     }
 
     /**
-     * Close the connection to the database
-     * @param client 
+     * Disconnect from the database
+     * @param client Client
      */
-    async close(client: Client): Promise<void> {
+    async disconnect(client: any): Promise<void> {
         client.end();
     }
-
-
 }
 
 export default ConnectToDB;

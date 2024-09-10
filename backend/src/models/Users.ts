@@ -1,7 +1,4 @@
 import ConnectToDB from '../utils/ConnectToDB';
-import { config } from 'dotenv';
-
-config();
 
 interface User {
     username: string;

@@ -27,17 +27,17 @@ class ConnectToDB {
                 host: process.env.DB_HOST,
                 database: process.env.DB_DATABASE,
                 password: process.env.DB_PASSWORD,
-                port: process.env.DB_PORT,
+                port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
             });
             client.connect();
             return client;
         });
     }
     /**
-     * Close the connection to the database
-     * @param client
+     * Disconnect from the database
+     * @param client Client
      */
-    close(client) {
+    disconnect(client) {
         return __awaiter(this, void 0, void 0, function* () {
             client.end();
         });

@@ -1,7 +1,7 @@
-import { config } from 'dotenv';
+import { json } from 'express';
 import ConnectToDB from '../utils/ConnectToDB';
 
-interface FoodItem {
+export interface FoodItem {
     foodname: string;
     barcode: string;
     protein_per_serv: number;
@@ -24,11 +24,13 @@ class FoodItems {
         return result.rows[0];
     }
 
-    async addFoodItem(foodItem: FoodItem): Promise<void> {
+    async addFoodItem(foodItem: FoodItem): Promise<FoodItem> {
         await (await this.client).query(
             'INSERT INTO "FoodItems" (FoodName, Barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv) VALUES ($1, $2, $3, $4, $5, $6, $7)',
             [foodItem.foodname, foodItem.barcode, foodItem.protein_per_serv, foodItem.carb_per_serv, foodItem.fat_per_serv, foodItem.grams_per_serv, foodItem.calories_per_serv]
         );
+
+        return foodItem;
     }
 
     async updateFoodItem(foodItem: FoodItem): Promise<void> {
@@ -47,4 +49,18 @@ class FoodItems {
     }
 }
 
-export default FoodItems;
+export function addFoodItem(foodItem: FoodItem): void {
+    new FoodItems().addFoodItem(foodItem);
+}
+export function updateFoodItem(foodItem: FoodItem): void {
+    new FoodItems().updateFoodItem(foodItem);
+}
+export function deleteFoodItem(barcode: string): void {
+    new FoodItems().deleteFoodItem(barcode);
+}
+export function getFoodItems(): Promise<FoodItem[]> {
+    return new FoodItems().getFoodItems();
+}
+export function getFoodItem(barcode: string): Promise<FoodItem> {
+    return new FoodItems().getFoodItem(barcode);
+}

@@ -13,8 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ConnectToDB_1 = __importDefault(require("../utils/ConnectToDB"));
-const dotenv_1 = require("dotenv");
-(0, dotenv_1.config)();
 class Users {
     constructor() {
         this.client = new ConnectToDB_1.default().connect();

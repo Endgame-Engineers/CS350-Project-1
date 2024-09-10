@@ -12,6 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.addFoodItem = addFoodItem;
+exports.updateFoodItem = updateFoodItem;
+exports.deleteFoodItem = deleteFoodItem;
+exports.getFoodItems = getFoodItems;
+exports.getFoodItem = getFoodItem;
 const ConnectToDB_1 = __importDefault(require("../utils/ConnectToDB"));
 class FoodItems {
     constructor() {
@@ -32,6 +37,7 @@ class FoodItems {
     addFoodItem(foodItem) {
         return __awaiter(this, void 0, void 0, function* () {
             yield (yield this.client).query('INSERT INTO "FoodItems" (FoodName, Barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv) VALUES ($1, $2, $3, $4, $5, $6, $7)', [foodItem.foodname, foodItem.barcode, foodItem.protein_per_serv, foodItem.carb_per_serv, foodItem.fat_per_serv, foodItem.grams_per_serv, foodItem.calories_per_serv]);
+            return foodItem;
         });
     }
     updateFoodItem(foodItem) {
@@ -48,4 +54,18 @@ class FoodItems {
         ConnectToDB_1.default.close(this.client);
     }
 }
-exports.default = FoodItems;
+function addFoodItem(foodItem) {
+    new FoodItems().addFoodItem(foodItem);
+}
+function updateFoodItem(foodItem) {
+    new FoodItems().updateFoodItem(foodItem);
+}
+function deleteFoodItem(barcode) {
+    new FoodItems().deleteFoodItem(barcode);
+}
+function getFoodItems() {
+    return new FoodItems().getFoodItems();
+}
+function getFoodItem(barcode) {
+    return new FoodItems().getFoodItem(barcode);
+}
