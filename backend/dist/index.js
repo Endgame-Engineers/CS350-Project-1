@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const http_1 = __importDefault(require("http"));
 const index_1 = require("./routes/index");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -12,4 +13,8 @@ routes.forEach((route) => {
     app.use('/api', route);
 });
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+// app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+const server = http_1.default.createServer(app);
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
