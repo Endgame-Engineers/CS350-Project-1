@@ -12,7 +12,7 @@ router.get('/food-items', (req, res) => {
 router.get('/food-items/:barcode', (req, res) => {
     getFoodItem(req.params.barcode)
         .then((foodItem) => {
-        if (foodItem) {
+        if (foodItem !== undefined) {
             console.log('Food item found in database');
             res.json(foodItem);
         }

@@ -21,16 +21,7 @@ class FoodItems {
 
     async getFoodItem(barcode: string): Promise<FoodItem> {
         const result = await (await this.client).query('SELECT * FROM "FoodItems" WHERE barcode = $1', [barcode]);
-        const foodItem: FoodItem = {
-            foodname: result.rows[0].foodname,
-            barcode: result.rows[0].barcode,
-            protein_per_serv: result.rows[0].protein_per_serv,
-            carb_per_serv: result.rows[0].carb_per_serv,
-            fat_per_serv: result.rows[0].fat_per_serv,
-            grams_per_serv: result.rows[0].grams_per_serv,
-            calories_per_serv: result.rows[0].calories_per_serv
-        }
-        return foodItem;
+        return result.rows[0];
     }
 
     async addFoodItem(foodItem: FoodItem): Promise<FoodItem> {

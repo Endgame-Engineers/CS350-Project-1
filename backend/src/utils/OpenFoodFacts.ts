@@ -13,20 +13,7 @@ class OpenFoodFactsAPI {
     constructor() {
         this.db = new ConnectToDB();
     }
-
-    /**
-     * Check if the barcode exists in the database
-     * @param barcode string
-     * @returns boolean
-     */ 
-    // TODO: remove this function. this should live in FoodItems.ts
-    async barcodeExists(barcode: string): Promise<boolean> {
-        const client = await this.db.connect();
-        const res = await client.query('SELECT 1 FROM products WHERE barcode = $1', [barcode]);
-        await this.db.disconnect(client);
-        return (res.rowCount ?? 0) > 0;
-    }
-
+    
     /**
      * Fetch product information from OpenFoodFacts API
      * @param barcode string
