@@ -9,6 +9,7 @@ export interface FoodItem {
     fat_per_serv: number;
     grams_per_serv: number;
     calories_per_serv: number;
+    image: string;
 }
 
 class FoodItems {
@@ -19,7 +20,7 @@ class FoodItems {
      * @returns Promise<FoodItem[]>
      */
     async getFoodItems(): Promise<FoodItem[]> {
-        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv FROM "FoodItems"');
+        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems"');
         return result.rows;
     }
 
@@ -29,7 +30,7 @@ class FoodItems {
      * @returns 
      */
     async getFoodItem(barcode: string): Promise<FoodItem> {
-        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv FROM "FoodItems" WHERE barcode = $1', [barcode]);
+        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
         return result.rows[0];
     }
 
@@ -40,8 +41,8 @@ class FoodItems {
      */
     async addFoodItem(foodItem: FoodItem): Promise<FoodItem> {
         await (await this.client).query(
-            'INSERT INTO "FoodItems" (FoodName, Barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            [foodItem.foodname, foodItem.barcode, foodItem.protein_per_serv, foodItem.carb_per_serv, foodItem.fat_per_serv, foodItem.grams_per_serv, foodItem.calories_per_serv]
+            'INSERT INTO "FoodItems" (FoodName, Barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+            [foodItem.foodname, foodItem.barcode, foodItem.protein_per_serv, foodItem.carb_per_serv, foodItem.fat_per_serv, foodItem.grams_per_serv, foodItem.calories_per_serv, foodItem.image]
         );
 
         return foodItem;

@@ -30,7 +30,8 @@ class OpenFoodFactsAPI {
             carb_per_serv: parseFloat(response.data.product.nutriments.carbohydrates_serving),
             fat_per_serv: parseFloat(response.data.product.nutriments.fat_serving),
             grams_per_serv: parseFloat(response.data.product.serving_quantity),
-            calories_per_serv: parseFloat(response.data.product.nutriments['energy-kcal'])
+            calories_per_serv: parseFloat(response.data.product.nutriments['energy-kcal']),
+            image: response.data.product.image_url
         };
         return product;
     }
