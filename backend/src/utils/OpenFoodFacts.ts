@@ -17,7 +17,8 @@ class OpenFoodFactsAPI {
      * Check if the barcode exists in the database
      * @param barcode string
      * @returns boolean
-     */
+     */ 
+    // TODO: remove this function. this should live in FoodItems.ts
     async barcodeExists(barcode: string): Promise<boolean> {
         const client = await this.db.connect();
         const res = await client.query('SELECT 1 FROM products WHERE barcode = $1', [barcode]);
@@ -30,6 +31,8 @@ class OpenFoodFactsAPI {
      * @param barcode string
      * @returns any
      */
+
+    // this stays of course
     async fetchProductFromAPI(barcode: string): Promise<any> {
         const response = await axios.get(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
         return response.data;
@@ -39,6 +42,8 @@ class OpenFoodFactsAPI {
      * Save product information to the database
      * @param product any
      */
+
+    // TODO: remove this function. this should live in FoodItems.ts
     async saveProductToDB(product: any): Promise<void> {
         const client = await this.db.connect();
         const query = `
@@ -60,6 +65,8 @@ class OpenFoodFactsAPI {
      * @param barcode string
      * @returns any
      */
+
+    // TODO: remove this function. this should live in FoodItems.ts
     async getProductByBarcode(barcode: string): Promise<any> {
         if (await this.barcodeExists(barcode)) {
             const client = await this.db.connect();
