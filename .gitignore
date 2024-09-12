@@ -1,4 +1,5 @@
 backend/package-lock.json
 backend/node_modules/
+backend/dist/*
 dist/
 .env
