@@ -4,22 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const http_1 = __importDefault(require("http"));
+const dotenv_1 = require("dotenv");
+const index_1 = require("./routes/index");
+(0, dotenv_1.config)();
 const app = (0, express_1.default)();
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-    console.log(`Request received: ${req.url}`);
-});
-app.get('/hello', (req, res) => {
-    res.send('Hello World!!');
-});
-app.get('/goodbye', (req, res) => {
-    res.send('Goodbye World!!');
-});
-app.get('/test', (req, res) => {
-    res.send('Test World For sure!!!___!!');
-});
-app.get('/test2', (req, res) => {
-    res.send('Test World For sure!!_(((99)))!');
+app.use(express_1.default.json());
+const routes = (0, index_1.getRoutes)();
+routes.forEach((route) => {
+    app.use('/api', route);
 });
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+// app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
+const server = http_1.default.createServer(app);
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

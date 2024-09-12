@@ -1,14 +1,19 @@
 {
   "dependencies": {
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
     "nodemon": "^3.1.4",
+    "openfoodfacts-nodejs": "github:openfoodfacts/openfoodfacts-nodejs",
     "openid-client": "^5.6.5",
     "pg": "^8.12.0",
     "typescript": "^5.5.4"
   },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.21",
+    "@types/pg": "^8.11.8",
     "concurrently": "^9.0.0"
   },
   "scripts": {
