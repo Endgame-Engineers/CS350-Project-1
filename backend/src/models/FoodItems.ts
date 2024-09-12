@@ -19,7 +19,7 @@ class FoodItems {
      * @returns Promise<FoodItem[]>
      */
     async getFoodItems(): Promise<FoodItem[]> {
-        const result = await (await this.client).query('SELECT * FROM "FoodItems"');
+        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv FROM "FoodItems"');
         return result.rows;
     }
 
@@ -29,7 +29,8 @@ class FoodItems {
      * @returns 
      */
     async getFoodItem(barcode: string): Promise<FoodItem> {
-        const result = await (await this.client).query('SELECT * FROM "FoodItems" WHERE barcode = $1', [barcode]);
+        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv FROM "FoodItems" WHERE barcode = $1', [barcode]);
+
         return result.rows[0];
     }
 
