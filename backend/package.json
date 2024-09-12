@@ -5,7 +5,6 @@
     "express": "^4.19.2",
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.4",
-    "openfoodfacts-nodejs": "github:openfoodfacts/openfoodfacts-nodejs",
     "openid-client": "^5.6.5",
     "pg": "^8.12.0",
     "typescript": "^5.5.4"
