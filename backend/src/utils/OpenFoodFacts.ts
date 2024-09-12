@@ -5,6 +5,7 @@
 // OpenFoodFactsAPI.ts
 import axios from 'axios';
 import ConnectToDB from './ConnectToDB';
+import { FoodItem } from '../models/FoodItems';
 
 class OpenFoodFactsAPI {
     private db: ConnectToDB;
@@ -33,56 +34,22 @@ class OpenFoodFactsAPI {
      */
 
     // this stays of course
-    async fetchProductFromAPI(barcode: string): Promise<any> {
-        const response = await axios.get(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-        return response.data;
-    }
-
-    /**
-     * Save product information to the database
-     * @param product any
-     */
-
-    // TODO: remove this function. this should live in FoodItems.ts
-    async saveProductToDB(product: any): Promise<void> {
-        const client = await this.db.connect();
-        const query = `
-            INSERT INTO products (barcode, product_name, ingredients_text, nutrients)
-            VALUES ($1, $2, $3, $4)
-        `;
-        const values = [
-            product.code,
-            product.product_name,
-            product.ingredients_text,
-            JSON.stringify(product.nutriments),
-        ];
-        await client.query(query, values);
-        await this.db.disconnect(client);
-    }
-
-    /**
-     * Get product information by barcode
-     * @param barcode string
-     * @returns any
-     */
-
-    // TODO: remove this function. this should live in FoodItems.ts
-    async getProductByBarcode(barcode: string): Promise<any> {
-        if (await this.barcodeExists(barcode)) {
-            const client = await this.db.connect();
-            const res = await client.query('SELECT * FROM products WHERE barcode = $1', [barcode]);
-            await this.db.disconnect(client);
-            return res.rows[0];
-        } else {
-            const product = await this.fetchProductFromAPI(barcode);
-            if (product.status === 1) {
-                await this.saveProductToDB(product.product);
-                return product.product;
-            } else {
-                throw new Error('Product not found');
-            }
-        }
+    async fetchProductFromAPI(barcode: string): Promise<FoodItem> {
+        const response = await axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+        const product: FoodItem = {
+            foodname: response.data.product.product_name,
+            barcode: response.data.product.id,
+            protein_per_serv: response.data.product.nutriments.proteins_serving,
+            carb_per_serv: response.data.product.nutriments.carbohydrates_serving,
+            fat_per_serv: response.data.product.nutriments.fat_serving,
+            grams_per_serv: response.data.product.nutriments.serving_size,
+            calories_per_serv: response.data.product.nutriments['energy-kcal']
+        };
+        return product;
     }
 }
 
 export default OpenFoodFactsAPI;
+export function fetchProductFromAPI(barcode: string): Promise<any> {
+    return new OpenFoodFactsAPI().fetchProductFromAPI(barcode);
+}
