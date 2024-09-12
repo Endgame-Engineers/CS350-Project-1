@@ -1,78 +1,40 @@
 <template>
-  <div class="container">
-    <div class="search-bar">
-      <input type="text" v-model="searchBar" placeholder="Search">
-      <button class="camera-btn">
-        <!---<img src="@/assets/camera-icon.png" alt="Camera">-->
-      </button>
-    </div>
-    <div class="button-container">
-      <button @click="clearSearchBar">Clear</button>
-      <button @click="search">Search</button>
-    </div>
-    <div v-if="foodData">
-      <h2>{{ foodData?.foodname }}</h2>
-      <p>Protein per serving: {{ foodData?.protein_per_serv }}g</p>
-      <p>Carbs per serving: {{ foodData?.carb_per_serv }}g</p>
-      <p>Fat per serving: {{ foodData?.fat_per_serv }}g</p>
-      <p>Grams per serving: {{ foodData?.grams_per_serv }}g</p>
-      <p>Calories per serving: {{ foodData?.calories_per_serv }} kcal</p>
-    </div>
+  <div id="app">
+    <footer class="footer bg-light mt-auto py-3">
+      <router-link to="/">
+        <button class="btn btn-secondary">Home</button>
+      </router-link>
+      <router-link to="/diary">
+        <button class="btn btn-secondary">Diary</button>
+      </router-link>
+      <router-link to="/history">
+        <button class="btn btn-secondary">History</button>
+      </router-link>
+      <router-link to="/search">
+        <button class="btn btn-secondary">Barcode Scan</button>
+      </router-link>
+    </footer>
+    <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-
-interface FoodItem {
-  id: number;
-  foodname: string;
-  barcode: string;
-  protein_per_serv: number;
-  carb_per_serv: number;
-  fat_per_serv: number;
-  grams_per_serv: number;
-  calories_per_serv: number;
-}
-
-export default defineComponent({
+export default {
   name: 'App',
-  data() {
-    return{
-      searchBar: '',
-      foodData: null as FoodItem | null,
-      foodList: [] as FoodItem[],
-    };
-  },
-  methods: {
-    async search(){
-      //const resp = await fetch(`https://3000--main--cs350-test--sirbomble.coder.galifrey.dev/api/food-items/${this.searchBar}`);
-      const resp : FoodItem = 
-        {
-          id: 8,
-          foodname: "Peach",
-          barcode: "382538093985",
-          protein_per_serv: 1.67,
-          carb_per_serv: 40.4,
-          fat_per_serv: 27.15,
-          grams_per_serv: 286.78,
-          calories_per_serv: 148.93
-        };
-      
-      //const data = await resp.json();
-      //this.foodList = resp
-      this.foodData = resp
-    },
-    clearSearchBar(){
-      this.searchBar = '';
-      this.foodData = null;
-    }
-  },
-  components: {
-}
-});
+};
 </script>
 
-<style>
-
+<style scoped>
+nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+.footer {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    bottom: 0;
+  }
 </style>
