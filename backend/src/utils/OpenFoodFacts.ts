@@ -26,11 +26,11 @@ class OpenFoodFactsAPI {
         const product: FoodItem = {
             foodname: response.data.product.product_name,
             barcode: barcode,
-            protein_per_serv: response.data.product.nutriments.proteins_serving,
-            carb_per_serv: response.data.product.nutriments.carbohydrates_serving,
-            fat_per_serv: response.data.product.nutriments.fat_serving,
-            grams_per_serv: response.data.product.nutriments.serving_quantity,
-            calories_per_serv: response.data.product.nutriments['energy-kcal']
+            protein_per_serv: parseFloat(response.data.product.nutriments.proteins_serving),
+            carb_per_serv: parseFloat(response.data.product.nutriments.carbohydrates_serving),
+            fat_per_serv: parseFloat(response.data.product.nutriments.fat_serving),
+            grams_per_serv: parseFloat(response.data.product.nutriments.serving_quantity),
+            calories_per_serv: parseFloat(response.data.product.nutriments['energy-kcal'])
         };
         return product;
     }
