@@ -29,7 +29,7 @@ class OpenFoodFactsAPI {
             protein_per_serv: response.data.product.nutriments.proteins_serving,
             carb_per_serv: response.data.product.nutriments.carbohydrates_serving,
             fat_per_serv: response.data.product.nutriments.fat_serving,
-            grams_per_serv: response.data.product.nutriments.serving_size,
+            grams_per_serv: response.data.product.nutriments.serving_quantity,
             calories_per_serv: response.data.product.nutriments['energy-kcal']
         };
         return product;
