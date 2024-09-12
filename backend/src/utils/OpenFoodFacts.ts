@@ -13,7 +13,7 @@ class OpenFoodFactsAPI {
     constructor() {
         this.db = new ConnectToDB();
     }
-    
+
     /**
      * Fetch product information from OpenFoodFacts API
      * @param barcode string
@@ -25,7 +25,7 @@ class OpenFoodFactsAPI {
         const response = await axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
         const product: FoodItem = {
             foodname: response.data.product.product_name,
-            barcode: response.data.product.id,
+            barcode: barcode,
             protein_per_serv: response.data.product.nutriments.proteins_serving,
             carb_per_serv: response.data.product.nutriments.carbohydrates_serving,
             fat_per_serv: response.data.product.nutriments.fat_serving,
