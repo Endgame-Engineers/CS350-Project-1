@@ -4,15 +4,9 @@
 
 // OpenFoodFactsAPI.ts
 import axios from 'axios';
-import ConnectToDB from './ConnectToDB';
 import { FoodItem } from '../models/FoodItems';
 
 class OpenFoodFactsAPI {
-    private db: ConnectToDB;
-
-    constructor() {
-        this.db = new ConnectToDB();
-    }
 
     /**
      * Fetch product information from OpenFoodFacts API

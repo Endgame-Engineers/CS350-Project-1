@@ -1,20 +1,35 @@
-import { Router, Request, Response } from 'express';
-import User from '../models/Users';
+import { Router } from 'express';
+import { getUsers, getUser } from '../models/Users';
+
 const router = Router();
 
 class UserRoute {
     router: Router;
-    user: User;
 
     constructor() {
         this.router = Router();
-        this.user = new User();
-        this.router.get('/users', this.getUsers);
+        this.routes();
     }
 
-    getUsers = (req: Request, res: Response) => {
-        this.user.getUsers().then((users) => {
-            res.json(users);
+    public routes() {
+        this.router.get('/users', (req, res) => {
+            getUsers().then((users) => {
+                res.json(users);
+            });
+        });
+
+        this.router.get('/users/:uuid', (req, res) => {
+            getUser(req.params.uuid)
+                .then((user) => {
+                if (user !== undefined) {
+                    console.log('User found in database');
+                    res.json(user);
+                }
+                else {
+                    console.log('User not found in database');
+                    res.status(404).json({ message: 'User not found' });
+                }
+            });
         });
     }
 }
