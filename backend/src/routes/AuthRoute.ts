@@ -1,5 +1,5 @@
 import { Router } from 'express';
-
+import passport from 'passport';
 
 class AuthRoutes {
     router: Router;
@@ -10,9 +10,31 @@ class AuthRoutes {
     }
 
     public routes() {
-        this.router.get('/auth', (req, res) => {
-            res.json({ message: 'Auth route' });
+        this.router.get('/auth/google', 
+            passport.authenticate('google', { scope: ['profile', 'email'] })
+        );
+        
+        this.router.get('/auth/google/callback', (req, res) => {
+            passport.authenticate('google', { failureRedirect: '/' })(req, res, () => {
+                res.redirect('/');
+            });
         });
+
+        this.router.get('/auth/logout', (req, res) => {
+            req.logout((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Logout failed' });
+            }
+            req.session.destroy((err) => {
+                if (err) {
+                return res.status(500).json({ message: 'Failed to destroy session' });
+                }
+                res.clearCookie('connect.sid');
+                res.redirect('/'); 
+            });
+            });
+        });
+  
     }
 }
 

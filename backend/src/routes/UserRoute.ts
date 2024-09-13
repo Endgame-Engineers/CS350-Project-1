@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getUsers, getUser } from '../models/Users';
+import { isAuthenticated } from '../utils/AuthGoogle';
 
 const router = Router();
 
@@ -12,13 +13,13 @@ class UserRoute {
     }
 
     public routes() {
-        this.router.get('/users', (req, res) => {
+        this.router.get('/users', isAuthenticated, (req, res) => {
             getUsers().then((users) => {
                 res.json(users);
             });
         });
 
-        this.router.get('/users/:uuid', (req, res) => {
+        this.router.get('/users/:uuid', isAuthenticated, (req, res) => {
             getUser(req.params.uuid)
                 .then((user) => {
                 if (user !== undefined) {
