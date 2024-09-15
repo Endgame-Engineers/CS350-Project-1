@@ -10,10 +10,14 @@ class AuthRoutes {
     }
 
     public routes() {
+        // Google OAuth routes
+
+        // Redirect the user to Google for authentication.  When complete, Google will redirect the user back to the application at /auth/google/callback
         this.router.get('/auth/google', 
             passport.authenticate('google', { scope: ['profile', 'email'] })
         );
         
+        // Google OAuth callback route. This route will redirect the user to the home page after authentication.
         this.router.get('/auth/google/callback', (req, res) => {
             passport.authenticate('google', { failureRedirect: '/' })(req, res, () => {
                 res.redirect('/');

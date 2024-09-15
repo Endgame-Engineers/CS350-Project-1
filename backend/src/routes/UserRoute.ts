@@ -11,6 +11,10 @@ class UserRoute {
     }
 
     public routes() {
+        this.router.get('/user', isAuthenticated, (req, res) => {
+            res.json(req.user);
+        });
+        
         this.router.get('/users', isAuthenticated, (req, res) => {
             getUsers().then((users) => {
                 res.json(users);
