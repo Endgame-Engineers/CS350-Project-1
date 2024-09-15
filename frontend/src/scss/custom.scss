@@ -1,0 +1,32 @@
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+.calories-box {
+  background-color: #2c2c38;
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 20px;
+  margin: 20px 0;
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 10px solid #bbbbbb;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+
+    .remaining {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+  }
+}
+  
