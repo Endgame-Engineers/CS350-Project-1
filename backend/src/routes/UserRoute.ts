@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Users from '../models/Users';
+import Users, { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
@@ -20,12 +20,11 @@ class UserRoute {
         this.router.post('/user', isAuthenticated, async (req, res) => {
             // Check if the user is authenticated and exists in req.user
             if (req.user) {
-                const users = new Users();
                 const user = req.user as User;  // Cast req.user as the User interface
                 
                 try {
                     // Check if the user already exists in the database by UUID
-                    const existingUser = await users.getUser(user.uuid);
+                    const existingUser = await Users.getUser(user.uuid);
         
                     if (existingUser) {
                         // If the user exists, return a 400 status with a message
@@ -33,7 +32,7 @@ class UserRoute {
                     }
         
                     // If the user doesn't exist, create a new user
-                    await users.addUser(user);  // Call addUser function to insert the new user into the database
+                    await Users.addUser(user);  // Call addUser function to insert the new user into the database
         
                     // Return a success message with a 200 status
                     return res.status(200).json({ message: 'User successfully created' });
@@ -46,7 +45,18 @@ class UserRoute {
             // If req.user doesn't exist, return an unauthorized error
             return res.status(401).json({ message: 'Unauthorized: No user found in session' });
         });
-        
+
+        // replace with daniels isExistingUserAuthenticated
+        this.router.get('/user/logs', isAuthenticated, (req, res) => {
+            const { start, end } = req.query;
+            const startDate = start ? new Date(start as string) : new Date();
+            const endDate = end ? new Date(end as string) : new Date();
+            // TODO: get stored uuid from session
+            // MealLogs.getMealLog(req.user.uuid, startDate, endDate)
+            //     .then((mealLogs) => {
+            //     res.json(mealLogs);
+            // });
+        });
         
         this.router.get('/users', isAuthenticated, (req, res) => {
             Users.getUsers().then((users) => {
