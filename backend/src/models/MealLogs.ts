@@ -2,12 +2,10 @@ import ConnectToDB from "../utils/ConnectToDB";
 
 export interface MealLog {
     uuid: string;
-    meal_date: Date;
-    meal: string;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fats: number;
+    date_added: Date;
+    barcode: string;
+    userid: string;
+    servingconsumed: number;
 }
 
 class MealLogs {
@@ -20,26 +18,28 @@ class MealLogs {
         this.db = this.client;
     }
 
-    async getMealLogs(uuid: string): Promise<any> {
-        const result = (await this.db).query('SELECT * FROM "MealLogs" WHERE uuid = $1', [uuid]);
-        return result.rows[0];
+    async getMealLogs(userid: string): Promise<any> {
+        const result = (await this.db).query('SELECT * FROM "MealLogs" WHERE userid = $1', [userid]);
+        return result.rows;
     }
 
-    async getMealLog(uuid: string, start: Date, end: Date): Promise<any> {
-        const result = (await this.db).query('SELECT * FROM "MealLogs" WHERE uuid = $1 AND meal_date >= $2 AND meal_date <= $3', [uuid, start, end]);
+    async getMealLog(userid: string, start: Date, end: Date): Promise<any> {
+        const result = (await this.db).query('SELECT * FROM "MealLogs" WHERE userid = $1 AND date_added BETWEEN $2 AND $3', [userid, start, end]);
         return result.rows;
     }
 
     async addMealLog(mealLog: MealLog): Promise<void> {
         (await this.db).query(
-            'INSERT INTO "MealLogs" (uuid, meal_date, meal, calories, protein, carbs, fats) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            [mealLog.uuid, mealLog.meal_date, mealLog.meal, mealLog.calories, mealLog.protein, mealLog.carbs, mealLog.fats]
+            'INSERT INTO "MealLogs" (uuid, date_added, barcode, userid, servingconsumed) VALUES ($1, $2, $3, $4, $5)',
+            [mealLog.uuid, mealLog.date_added, mealLog.barcode, mealLog.userid, mealLog.servingconsumed]
         );
     }
 
-    async updateMealLog(uuid: string): Promise<void>  {
-        const result = (await this.db).query('UPDATE "MealLogs" SET uuid = $1 WHERE uuid = $2', [uuid, uuid]);
-        return result.rows[0];
+    async updateMealLogItem(userid: string, barcode: string, servingconsumed: number, date_added: Date): Promise<void> {
+        (await this.db).query(
+            'UPDATE "MealLogs" SET servingconsumed = $1 WHERE userid = $2 AND barcode = $3 AND date_added = $4',
+            [servingconsumed, userid, barcode, date_added]
+        );
     }
 }
 
