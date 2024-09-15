@@ -2,8 +2,6 @@ import { Router } from 'express';
 import { getUsers, getUser } from '../models/Users';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
-const router = Router();
-
 class UserRoute {
     router: Router;
 
