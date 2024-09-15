@@ -3,6 +3,7 @@ const path = require('path');
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  outputDir: 'dist',
   devServer: {
     proxy: {
       '/': {
@@ -19,9 +20,9 @@ module.exports = defineConfig({
   },
   css: {
     loaderOptions: {
-      scss: {
-        additionalData: `@import "~bootstrap/scss/bootstrap.scss";`,
-      },
+      sass: {
+        additionalData: `@import "@/assets/scss/custom.scss";`
+      }
     },
   },
 });
