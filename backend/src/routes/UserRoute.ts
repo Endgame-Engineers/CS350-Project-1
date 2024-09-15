@@ -14,6 +14,7 @@ class UserRoute {
     public routes() {
         this.router.get('/user', isAuthenticated, (req, res) => {
             // placeholder for now
+            // placeholder for now
             res.json(req.user);
         });
 
