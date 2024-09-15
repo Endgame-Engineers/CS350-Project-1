@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getFoodItems, getFoodItem, addFoodItem } from '../models/FoodItems';
+import FoodItems from '../models/FoodItems';
 import { fetchProductFromAPI } from '../utils/OpenFoodFacts';
 
 /**
@@ -15,13 +15,13 @@ class FoodItemsRoute {
 
     public routes() {
         this.router.get('/food-items', (req, res) => {
-            getFoodItems().then((foodItems) => {
+            FoodItems.getFoodItems().then((foodItems) => {
                 res.json(foodItems);
             });
         });
 
         this.router.get('/food-items/:barcode', (req, res) => {
-            getFoodItem(req.params.barcode)
+            FoodItems.getFoodItem(req.params.barcode)
                 .then((foodItem) => {
                 if (foodItem !== undefined) {
                     console.log('Food item found in database');
@@ -32,7 +32,7 @@ class FoodItemsRoute {
                     fetchProductFromAPI(req.params.barcode)
                         .then((product) => {
                         if (product) {
-                            addFoodItem(product);
+                            FoodItems.addFoodItem(product);
                             res.json(product);
                         }
                         else {
@@ -44,7 +44,7 @@ class FoodItemsRoute {
         });
 
         this.router.post('/food-items', (req, res) => {;
-            addFoodItem(req.body);
+            FoodItems.addFoodItem(req.body);
         });
     }
 }

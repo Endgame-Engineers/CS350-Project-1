@@ -1,4 +1,3 @@
-import { json } from 'express';
 import ConnectToDB from '../utils/ConnectToDB';
 
 export interface FoodItem {
@@ -13,14 +12,21 @@ export interface FoodItem {
 }
 
 class FoodItems {
-    private client = new ConnectToDB().connect();
+    private client: any;
+    private db: Promise<any>;
+
+   constructor() {
+        const dbConnection = new ConnectToDB();
+        this.client = dbConnection.getClient();
+        this.db = this.client;
+    }
 
     /**
      * Get all food items from db
      * @returns Promise<FoodItem[]>
      */
     async getFoodItems(): Promise<FoodItem[]> {
-        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems"');
+        const result = (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems"');
         return result.rows;
     }
 
@@ -30,7 +36,7 @@ class FoodItems {
      * @returns 
      */
     async getFoodItem(barcode: string): Promise<FoodItem> {
-        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
+        const result = (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
         return result.rows[0];
     }
 
@@ -66,27 +72,6 @@ class FoodItems {
     async deleteFoodItem(barcode: string): Promise<void> {
         await (await this.client).query('DELETE FROM "FoodItems" WHERE Barcode = $1', [barcode]);
     }
-
-    /**
-     * Close the db connection
-     */
-    close(): void {
-        ConnectToDB.close(this.client);
-    }
 }
 
-export function addFoodItem(foodItem: FoodItem): void {
-    new FoodItems().addFoodItem(foodItem);
-}
-export function updateFoodItem(foodItem: FoodItem): void {
-    new FoodItems().updateFoodItem(foodItem);
-}
-export function deleteFoodItem(barcode: string): void {
-    new FoodItems().deleteFoodItem(barcode);
-}
-export function getFoodItems(): Promise<FoodItem[]> {
-    return new FoodItems().getFoodItems();
-}
-export function getFoodItem(barcode: string): Promise<FoodItem> {
-    return new FoodItems().getFoodItem(barcode);
-}
+export default new FoodItems();

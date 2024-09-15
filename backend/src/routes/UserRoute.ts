@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { getUsers, getUser } from '../models/Users';
+import Users from '../models/Users';
+import MealLogs from '../models/MealLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
 class UserRoute {
@@ -14,15 +15,27 @@ class UserRoute {
         this.router.get('/user', isAuthenticated, (req, res) => {
             res.json(req.user);
         });
+
+        // replace with daniels isExistingUserAuthenticated
+        this.router.get('/user/logs', isAuthenticated, (req, res) => {
+            const { start, end } = req.query;
+            const startDate = start ? new Date(start as string) : new Date();
+            const endDate = end ? new Date(end as string) : new Date();
+            // TODO: get stored uuid from session
+            // MealLogs.getMealLog(req.user.uuid, startDate, endDate)
+            //     .then((mealLogs) => {
+            //     res.json(mealLogs);
+            // });
+        });
         
         this.router.get('/users', isAuthenticated, (req, res) => {
-            getUsers().then((users) => {
+            Users.getUsers().then((users) => {
                 res.json(users);
             });
         });
 
         this.router.get('/users/:uuid', isAuthenticated, (req, res) => {
-            getUser(req.params.uuid)
+            Users.getUser(req.params.uuid)
                 .then((user) => {
                 if (user !== undefined) {
                     console.log('User found in database');
