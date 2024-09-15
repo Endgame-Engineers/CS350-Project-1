@@ -1,6 +1,6 @@
 import ConnectToDB from '../utils/ConnectToDB';
 
-interface User {
+export interface User {
     username: string;
     email: string;
     firstname: string;
