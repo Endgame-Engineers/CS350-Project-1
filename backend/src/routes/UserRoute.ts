@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import Users, { User, addUser, getUsers, getUser } from '../models/Users';
+import Users from '../models/Users';
+import MealLogs from '../models/MealLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
 class UserRoute {
