@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { NextFunction, Response, Request } from 'express';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import Users, { User as User } from '../models/Users';  // Corrected import
+import Users, { User } from '../models/Users';  // Corrected import
 
 class AuthGoogle {
     constructor() {
@@ -10,34 +10,41 @@ class AuthGoogle {
                 {
                     clientID: process.env.GOOGLE_CLIENT_ID!,
                     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-                    callbackURL: 'https://3000--main--yaydanielmadethis--ssjdan27.coder.galifrey.dev/auth/google/callback',
+                    callbackURL: '/api/auth/google/callback',
+                    passReqToCallback: true, 
                 },
-                async (accessToken, refreshToken, profile, done) => {
-                    // Here, you'd typically look up the user in your database
-                    done(null, profile);
+                async (req, accessToken, refreshToken, profile, done) => {
+                    try {
+                        if (req.user) {
+                            const user = req.user as User;
+
+                            const existingUser = await Users.getUser(user.uuid);
+
+                            if (existingUser) {
+                                console.log('User found in database');
+                                return done(null, user);
+                            } else {
+                                console.log('User not found in database');
+                                return done(null, false);
+                            }
+                        } else {
+                            console.log('No user found in session');
+                            return done(null, false);
+                        }
+                    } catch (error) {
+                        console.error('Error handling Google OAuth callback:', error);
+                        return done(error);
+                    }
                 }
             )
         );
 
-        // Serializing user by UUID
-        passport.serializeUser((user: any, done) => {
-            if (user && user.uuid) {
-                done(null, user.uuid);  // Using user.uuid
-            } else {
-                console.error("User object is missing 'uuid'");
-                done(new Error("User object is missing 'uuid'"));
-            }
+        passport.serializeUser((user, done) => {
+            done(null, user as Express.User);
         });
 
-        // Deserializing user from UUID
-        passport.deserializeUser(async (uuid: string, done) => {
-            try {
-                const users = new Users();
-                const user = await users.getUser(uuid);  // Get full user object
-                done(null, user);  // req.user will now contain the full user object
-            } catch (err) {
-                done(err);
-            }
+        passport.deserializeUser((user, done) => {
+            done(null, user as Express.User);
         });
     }
 }
@@ -56,8 +63,6 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
 export async function isExistingAuthenticatedUser(req: Request, res: Response, next: NextFunction) {
     if (req.isAuthenticated()) {
         try {
-            const users = new Users();
-
             // Type assertion - assuming req.user is defined
             if (!req.user) {
                 return res.status(401).json({ message: 'Unauthorized: No user found in session' });
@@ -68,7 +73,7 @@ export async function isExistingAuthenticatedUser(req: Request, res: Response, n
                 return res.status(400).json({ message: 'Bad request: Missing username in user object' });
             }
 
-            const foundUser = await users.getUser(user.username);  // Accessing username from User interface
+            const foundUser = await Users.getUser(user.username);  // Accessing username from User interface
 
             if (foundUser) {
                 console.log('User found in database');

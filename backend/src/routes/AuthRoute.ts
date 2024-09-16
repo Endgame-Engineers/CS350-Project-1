@@ -22,14 +22,12 @@ class AuthRoutes {
         // Google OAuth callback route
         this.router.get('/auth/google/callback', (req: Request, res: Response) => {
             passport.authenticate('google', { failureRedirect: '/' })(req, res, async () => {
-                const users = new Users();
-
                 // Check if the user exists in the database using the UUID from req.user
                 if (req.user) {
                     const profile = req.user as User;
 
                     try {
-                        const user = await users.getUser(profile.uuid);  // Assuming uuid is used as the identifier
+                        const user = await Users.getUser(profile.uuid);  // Assuming uuid is used as the identifier
 
                         if (user) {
                             // If the user exists, log them in and redirect
