@@ -4,7 +4,7 @@ export interface MealLog {
     mealtype: string;
     dateadded: Date;
     barcode: string;
-    userid: string;
+    userid: number;
     servingconsumed: number;
 }
 
