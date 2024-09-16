@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Users, { User } from '../models/Users';
+import { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
