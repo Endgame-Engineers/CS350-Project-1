@@ -13,12 +13,9 @@ export interface FoodItem {
 
 class FoodItems {
     private client: any;
-    private db: Promise<any>;
 
    constructor() {
-        const dbConnection = new ConnectToDB();
-        this.client = dbConnection.getClient();
-        this.db = this.client;
+        this.client = ConnectToDB.getClient();
     }
 
     /**
@@ -26,7 +23,7 @@ class FoodItems {
      * @returns Promise<FoodItem[]>
      */
     async getFoodItems(): Promise<FoodItem[]> {
-        const result = (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems"');
+        const result = await (await this.client).query('SELECT * FROM "FoodItems"');
         return result.rows;
     }
 
@@ -36,7 +33,8 @@ class FoodItems {
      * @returns 
      */
     async getFoodItem(barcode: string): Promise<FoodItem> {
-        const result = (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
+        const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
+        console.log(result)
         return result.rows[0];
     }
 

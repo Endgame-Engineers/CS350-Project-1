@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { NextFunction, Response, Request } from 'express';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import Users, { User } from '../models/Users';  // Corrected import
+import Users, { User } from '../models/Users';
 
 class AuthGoogle {
     constructor() {
@@ -14,27 +14,39 @@ class AuthGoogle {
                     passReqToCallback: true, 
                 },
                 async (req, accessToken, refreshToken, profile, done) => {
-                    try {
-                        if (req.user) {
-                            const user = req.user as User;
+                    // try {
+                    //     if (profile) {
+                    //         const user: User = {
+                    //             username: profile.displayName,
+                    //             email: profile.emails ? profile.emails[0].value : '',
+                    //             firstname: profile.name ? profile.name.givenName : '',
+                    //             lastname: profile.name ? profile.name.familyName : '',
+                    //             uuid: profile.id,
+                    //             lastlogin: new Date(),
+                    //             providername: "Google",
+                    //             providerid: profile.id,
+                    //         }
 
-                            const existingUser = await Users.getUser(user.uuid);
+                    //         const existingUser = null;
+                    //         console.log(existingUser);
 
-                            if (existingUser) {
-                                console.log('User found in database');
-                                return done(null, user);
-                            } else {
-                                console.log('User not found in database');
-                                return done(null, false);
-                            }
-                        } else {
-                            console.log('No user found in session');
-                            return done(null, false);
-                        }
-                    } catch (error) {
-                        console.error('Error handling Google OAuth callback:', error);
-                        return done(error);
-                    }
+                    //         if (existingUser) {
+                    //             console.log('User found in database');
+                    //             return done(null, existingUser);
+                    //         } else {
+                    //             console.log('User not found in database, creating');
+                    //             await Users.addUser(user);
+                    //             return done(null, user);
+                    //         }
+                    //     } else {
+                    //         console.log('No user found in session');
+                    //         return done(null, false);
+                    //     }
+                    // } catch (error) {
+                    //     console.error('Error handling Google OAuth callback:', error);
+                    //     return done(error);
+                    // }
+                    done(null, profile);
                 }
             )
         );
@@ -57,36 +69,4 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
         return next();
     }
     res.status(401).send('Unauthorized');
-}
-
-// Check if the user exists in the database AND is authenticated
-export async function isExistingAuthenticatedUser(req: Request, res: Response, next: NextFunction) {
-    if (req.isAuthenticated()) {
-        try {
-            // Type assertion - assuming req.user is defined
-            if (!req.user) {
-                return res.status(401).json({ message: 'Unauthorized: No user found in session' });
-            }
-
-            const user = req.user as User;  // Type assertion -- probably a better way to do this ;-;
-            if (!user.username) {
-                return res.status(400).json({ message: 'Bad request: Missing username in user object' });
-            }
-
-            const foundUser = await Users.getUser(user.username);  // Accessing username from User interface
-
-            if (foundUser) {
-                console.log('User found in database');
-                return next();
-            } else {
-                console.log('User not found in database');
-                return res.status(404).json({ message: 'User not found' });
-            }
-        } catch (err) {
-            console.error('Error checking user in database:', err);
-            return res.status(500).json({ message: 'Internal Server Error' });
-        }
-    } else {
-        return res.status(401).send('Unauthorized');
-    }
 }

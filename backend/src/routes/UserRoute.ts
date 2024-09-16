@@ -14,7 +14,6 @@ class UserRoute {
     public routes() {
         this.router.get('/user', isAuthenticated, (req, res) => {
             // placeholder for now
-            // placeholder for now
             res.json(req.user);
         });
 
@@ -59,9 +58,16 @@ class UserRoute {
             // });
         });
         
-        this.router.get('/users', isAuthenticated, (req, res) => {
+        this.router.get('/users', (req, res) => {
             Users.getUsers().then((users) => {
-                res.json(users);
+                if (users !== undefined) {
+                    console.log('Users found in database');
+                    res.json(users);
+                }
+                else {
+                    console.log('Users not found in database');
+                    res.status(404).json({ message: 'Users not found' });
+                }
             });
         });
 
