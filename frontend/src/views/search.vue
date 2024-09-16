@@ -3,7 +3,7 @@
       <div class="search-bar">
         <input type="text" v-model="searchBar" placeholder="Search">
         <button class="camera-btn">
-          <!---<img src="@/assets/camera-icon.png" alt="Camera">-->
+          <font-awesome-icon :icon="['fas', 'barcode']" />
         </button>
       </div>
       <div class="button-container">

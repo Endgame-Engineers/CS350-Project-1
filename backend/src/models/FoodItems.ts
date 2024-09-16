@@ -34,7 +34,6 @@ class FoodItems {
      */
     async getFoodItem(barcode: string): Promise<FoodItem> {
         const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, grams_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
-        console.log(result)
         return result.rows[0];
     }
 
