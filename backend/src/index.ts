@@ -26,14 +26,13 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(vueJSStatic, 'index.html'));
-});
-
 const routes = getRoutes();
 routes.forEach((route) => {
     app.use('/api', route);
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(vueJSStatic, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;

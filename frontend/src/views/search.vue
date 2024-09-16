@@ -47,7 +47,7 @@
     methods: {
       async search(){
         try {
-          const resp = await fetch(`https://carbio.fit/api/food-items/${this.searchBar}`);
+          const resp = await fetch(`/api/food-items/${this.searchBar}`);
           
           if (!resp.ok) {
             throw new Error(`HTTP error! status: ${resp.status}`);
