@@ -19,8 +19,9 @@ class UserRoute {
             const { start, end } = req.query;
             const startDate = start ? new Date(start as string) : new Date();
             const endDate = end ? new Date(end as string) : new Date();
-            if (req.user) {
-                MealLogs.getMealLog(req.user.id, startDate, endDate)
+            const user = req.user as User;
+            if (user.id) {
+                MealLogs.getMealLog(user.id, startDate, endDate)
                     .then((mealLogs) => {
                     res.json(mealLogs);
                 });

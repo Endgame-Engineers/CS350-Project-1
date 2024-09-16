@@ -1,7 +1,7 @@
 import ConnectToDB from '../utils/ConnectToDB';
 
 export interface User {
-    id?: number;
+    id: number;
     username: string;
     email: string;
     firstname: string;

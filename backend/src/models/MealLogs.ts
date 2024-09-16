@@ -15,12 +15,12 @@ class MealLogs {
         this.client = ConnectToDB.getClient();
     }
 
-    async getMealLogs(userid: string): Promise<any> {
+    async getMealLogs(userid: number): Promise<any> {
         const result = await (await this.client).query('SELECT * FROM "MealLogs" WHERE userid = $1', [userid]);
         return result.rows;
     }
 
-    async getMealLog(userid: string, start: Date, end: Date): Promise<any> {
+    async getMealLog(userid: number, start: Date, end: Date): Promise<any> {
         const result =  await (await this.client).query('SELECT * FROM "MealLogs" WHERE userid = $1 AND dateadded BETWEEN $2 AND $3', [userid, start, end]);
         return result.rows;
     }
@@ -32,7 +32,7 @@ class MealLogs {
         );
     }
 
-    async updateMealLogItem(userid: string, barcode: string, servingconsumed: number, dateadded: Date): Promise<void> {
+    async updateMealLogItem(userid: number, barcode: string, servingconsumed: number, dateadded: Date): Promise<void> {
          await (await this.client).query(
             'UPDATE "MealLogs" SET servingconsumed = $1 WHERE userid = $2 AND barcode = $3 AND dateadded = $4',
             [servingconsumed, userid, barcode, dateadded]
