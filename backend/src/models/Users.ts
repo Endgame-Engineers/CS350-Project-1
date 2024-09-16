@@ -24,7 +24,7 @@ class Users {
         return result.rows;
     }
 
-    async getUser(providerid: string): Promise<User {
+    async getUser(providerid: string): Promise<User> {
         const result = await (await this.client).query('SELECT * FROM "Users" WHERE providerid = $1', [providerid]);
         return result.rows[0];
     }
