@@ -14,39 +14,37 @@ class AuthGoogle {
                     passReqToCallback: true, 
                 },
                 async (req, accessToken, refreshToken, profile, done) => {
-                    // try {
-                    //     if (profile) {
-                    //         const user: User = {
-                    //             username: profile.displayName,
-                    //             email: profile.emails ? profile.emails[0].value : '',
-                    //             firstname: profile.name ? profile.name.givenName : '',
-                    //             lastname: profile.name ? profile.name.familyName : '',
-                    //             uuid: profile.id,
-                    //             lastlogin: new Date(),
-                    //             providername: "Google",
-                    //             providerid: profile.id,
-                    //         }
-
-                    //         const existingUser = null;
-                    //         console.log(existingUser);
-
-                    //         if (existingUser) {
-                    //             console.log('User found in database');
-                    //             return done(null, existingUser);
-                    //         } else {
-                    //             console.log('User not found in database, creating');
-                    //             await Users.addUser(user);
-                    //             return done(null, user);
-                    //         }
-                    //     } else {
-                    //         console.log('No user found in session');
-                    //         return done(null, false);
-                    //     }
-                    // } catch (error) {
-                    //     console.error('Error handling Google OAuth callback:', error);
-                    //     return done(error);
-                    // }
-                    done(null, profile);
+                    try {
+                        if (profile) {
+                            const existingUser = await Users.getUser(profile.id);
+                            if (existingUser) {
+                                console.log('User found in database');
+                                req.user = existingUser;
+                                return done(null, existingUser);
+                            } else {
+                                console.log('User not found in database, creating');
+                                const user: User = {
+                                    username: profile.displayName,
+                                    email: profile.emails ? profile.emails[0].value : '',
+                                    firstname: profile.name ? profile.name.givenName : '',
+                                    lastname: profile.name ? profile.name.familyName : '',
+                                    uuid: require('crypto').randomUUID(),
+                                    lastlogin: new Date(),
+                                    providername: "Google",
+                                    providerid: profile.id,
+                                }
+                                await Users.addUser(user);
+                                req.user = user;
+                                return done(null, user);
+                            }
+                        } else {
+                            console.log('No user found in session');
+                            return done(null, false);
+                        }
+                    } catch (error) {
+                        console.error('Error handling Google OAuth callback:', error);
+                        return done(error);
+                    }
                 }
             )
         );
