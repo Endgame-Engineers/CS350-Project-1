@@ -66,6 +66,5 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     if (req.isAuthenticated()) {
         return next();
     }
-    res.contentType('application/json');
-    res.status(401).send({ message: 'Unauthorized' });
+    res.redirect('/login');
 }

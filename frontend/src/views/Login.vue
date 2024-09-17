@@ -7,7 +7,30 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+export default defineComponent({
   name: 'LoginPage',
-}
+  setup() {
+    const router = useRouter();
+
+    onMounted(() => {
+      if (localStorage.getItem('user')) {
+        router.push('/');
+      } else {
+        fetch('/api/auth/google/success', { credentials: 'include' })
+          .then(response => response.json())
+          .then(data => {
+            if (data.user) {
+              localStorage.setItem('user', JSON.stringify(data.user));
+              router.push('/');
+            }
+          });
+      }
+    });
+
+    return {};
+  }
+});
 </script>

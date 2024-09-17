@@ -45,6 +45,14 @@ class AuthRoutes {
                 });
             });
         });
+
+        this.router.get('/auth/google/success', (req, res) => {
+            if (req.user) {
+                res.json({ user: req.user });
+            } else {
+                res.status(401).json({ error: 'User not authenticated' });
+            }
+});
     }
 }
 

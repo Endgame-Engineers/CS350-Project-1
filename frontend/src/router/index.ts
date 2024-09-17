@@ -44,4 +44,21 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('user');
+
+  // Debugging logs
+  console.log('Navigating to:', to.path);
+  console.log('Coming from:', from.path);
+  console.log('Is authenticated:', isAuthenticated);
+
+  if (to.path !== '/login' && !isAuthenticated) {
+    console.log('Redirecting to /login');
+    next('/login');
+  } else {
+    console.log('Proceeding to:', to.path);
+    next();
+  }
+});
+
 export default router;
