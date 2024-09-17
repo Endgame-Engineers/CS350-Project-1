@@ -1,21 +1,22 @@
-import { BrowserQRCodeReader } from '@zxing/browser';
+import { BrowserMultiFormatReader, Result } from '@zxing/library';
 
-export async function barcodeReader(video:HTMLVideoElement): Promise<string | null> {
+
+export async function barcodeReader(video: HTMLVideoElement, selectedDeviceId: string, codeReader: BrowserMultiFormatReader ): Promise<string> {
     try{
-        const codeReader = new BrowserQRCodeReader();
         return new Promise((resolve, reject) => {
-            codeReader.decodeFromVideoDevice(undefined, video, (result, error, controls) => {
+            codeReader.decodeFromVideoDevice(selectedDeviceId, video, (result: Result | null, error: any) => {
+                
             if(result){
-                resolve(result.getText());
+                console.log('Found barcode:', result.getText());
+                return resolve(result.getText());
             }
             else if (error){
-                console.error('Error during scanning:', error);
-                reject(error);
+                return reject(error);
             }
             });
         });
     } catch (error) {
         console.error('Error initializing the barcode reader:', error);
-        return null;
+        return '';
     }
 }
