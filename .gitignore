@@ -3,3 +3,7 @@ backend/node_modules/
 backend/dist/*
 dist/
 .env
+backend/core
+backend/core.*
+frontend/core
+frontend/core.*

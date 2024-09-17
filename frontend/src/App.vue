@@ -24,17 +24,6 @@ export default {
 };
 </script>
 
-<style scoped>
-nav {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  justify-content: center;
-}
-.footer {
-    display: flex;
-    justify-content: space-around;
-    padding: 16px;
-    bottom: 0;
-  }
+<style lang="scss">
+@import "@/assets/scss/custom.scss";
 </style>

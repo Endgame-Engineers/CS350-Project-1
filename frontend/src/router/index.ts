@@ -1,29 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/home.vue';
-import search from '../views/search.vue';
-import diary from '../views/diary.vue';
-import history from '../views/history.vue';
+import home from '../views/Home.vue';
+import search from '../views/Search.vue';
+import diary from '../views/Diary.vue';
+import history from '../views/History.vue';
+import barscanner from '../views/BarScanner.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    component: home,
   },
   {
-    path: '/search',
+    path: '/Search',
     name: 'Search',
     component: search,
   },
   {
-    path: '/history',
+    path: '/History',
     name: 'History',
     component: history,
   },
   {
-    path: '/diary',
+    path: '/Diary',
     name: 'Diary',
     component: diary,
+  },
+  {
+    path: '/BarScanner',
+    name: 'BarScanner',
+    component: barscanner,
   },
 ];
 
