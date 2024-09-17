@@ -19,6 +19,7 @@ class AuthGoogle {
                             const existingUser = await Users.getUser(profile.id);
                             if (existingUser) {
                                 console.log('User found in database');
+                                await Users.updateUserLastLogin(existingUser.uuid);
                                 req.user = existingUser;
                                 return done(null, existingUser);
                             } else {
@@ -66,6 +67,5 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     if (req.isAuthenticated()) {
         return next();
     }
-    res.contentType('application/json');
-    res.status(401).send({ message: 'Unauthorized' });
+    res.redirect('/login');
 }

@@ -17,14 +17,15 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 new AuthGoogle();
 
 const vueJSStatic = path.join(__dirname, 'public');
 
 app.use(express.static(vueJSStatic));
 app.use(express.json());
-app.use(passport.initialize());
-app.use(passport.session());
 
 const routes = getRoutes();
 routes.forEach((route) => {

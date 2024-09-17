@@ -36,6 +36,10 @@ class Users {
         );
     }
 
+    async updateUserLastLogin(uuid: string): Promise<void> {
+        await (await this.client).query('UPDATE "Users" SET lastlogin = $1 WHERE uuid = $2', [new Date(), uuid]);
+    }
+
     async updateUser(user: User): Promise<void> {
         await (await this.client).query(
             'UPDATE "Users" SET email = $1, firstname = $2, lastname = $3, uuid = $4, lastlogin = $5 WHERE username = $6',

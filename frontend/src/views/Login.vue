@@ -7,7 +7,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent, onMounted } from 'vue';
+
+export default defineComponent({
   name: 'LoginPage',
-}
+});
 </script>
