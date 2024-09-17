@@ -4,6 +4,7 @@ import search from '../views/Search.vue';
 import diary from '../views/Diary.vue';
 import history from '../views/History.vue';
 import barscanner from '../views/BarScanner.vue';
+import login from '../views/Login.vue';
 
 const routes = [
   {
@@ -31,6 +32,11 @@ const routes = [
     name: 'BarScanner',
     component: barscanner,
   },
+  {
+    path: '/Login',
+    name: 'Login',
+    component: login,
+  }
 ];
 
 const router = createRouter({
