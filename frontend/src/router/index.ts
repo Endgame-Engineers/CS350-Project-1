@@ -45,31 +45,23 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  let isAuthenticated = false;
-  fetch('/api/auth/google/success', { credentials: 'include' })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('Data:', data);
-      if (data.isAuthenticated) {
-        isAuthenticated = true;
+  const isAuthenticated = fetch('/api/auth/google/success', { credentials: 'include' })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
       } else {
-        isAuthenticated = false;
+        throw new Error('Failed to authenticate');
       }
-    })
-    .catch((error) => {
-      console.error('Error fetching /api/auth/google/success:', error);
+    }).then((data) => {
+      return data.isAuthenticated;
+    }).catch((error) => {
+      console.error('Error checking authentication status:', error);
+      return
     });
 
-  // Debugging logs
-  console.log('Navigating to:', to.path);
-  console.log('Coming from:', from.path);
-  console.log('Is authenticated:', isAuthenticated);
-
   if (to.path !== '/login' && !isAuthenticated) {
-    console.log('Redirecting to /login');
     next('/login');
   } else {
-    console.log('Proceeding to:', to.path);
     next();
   }
 });

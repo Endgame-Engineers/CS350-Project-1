@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
-import Users, { User } from '../models/Users';  // Import User model
 
 class AuthRoutes {
     router: Router;
@@ -48,11 +47,11 @@ class AuthRoutes {
 
         this.router.get('/auth/google/success', (req, res) => {
             if (req.user) {
-                res.json({ user: req.user });
+                res.json({ isAuthenticated: true });
             } else {
-                res.status(401).json({ error: 'User not authenticated' });
+                res.json({ isAuthenticated: false });
             }
-});
+        });
     }
 }
 

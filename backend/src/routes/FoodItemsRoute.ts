@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import FoodItems from '../models/FoodItems';
 import { fetchProductFromAPI } from '../utils/OpenFoodFacts';
+import { isAuthenticated } from '../utils/AuthGoogle';
 
 /**
  * FoodItemsRoute
@@ -14,13 +15,13 @@ class FoodItemsRoute {
     }
 
     public routes() {
-        this.router.get('/food-items', (req, res) => {
+        this.router.get('/food-items', isAuthenticated, (req, res) => {
             FoodItems.getFoodItems().then((foodItems) => {
                 res.json(foodItems);
             });
         });
 
-        this.router.get('/food-items/:barcode', (req, res) => {
+        this.router.get('/food-items/:barcode', isAuthenticated, (req, res) => {
             FoodItems.getFoodItem(req.params.barcode)
                 .then((foodItem) => {
                 if (foodItem !== undefined) {
@@ -43,7 +44,7 @@ class FoodItemsRoute {
             });
         });
 
-        this.router.post('/food-items', (req, res) => {;
+        this.router.post('/food-items', isAuthenticated, (req, res) => {;
             FoodItems.addFoodItem(req.body);
         });
     }
