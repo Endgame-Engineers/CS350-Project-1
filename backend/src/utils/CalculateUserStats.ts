@@ -42,6 +42,7 @@ interface UserStats {
     gender: 'male' | 'female';
     activityLevel: 'sedentary' | 'lightly active' | 'moderately active' | 'very active' | 'super active';
     goal: 'weight loss' | 'maintenance' | 'weight gain';
+    calorieGoal: number; // this would be the adjusted calories based on the goal
     proteinPercentage?: number;
     fatPercentage?: number;
     carbPercentage?: number;
@@ -54,6 +55,7 @@ class CalculateUserStats {
     private gender: 'male' | 'female';
     private activityLevel: 'sedentary' | 'lightly active' | 'moderately active' | 'very active' | 'super active';
     private goal: 'weight loss' | 'maintenance' | 'weight gain';
+    private calorieGoal: number;
     private proteinPercentage: number;
     private fatPercentage: number;
     private carbPercentage: number;
@@ -68,6 +70,7 @@ class CalculateUserStats {
         this.proteinPercentage = userStats.proteinPercentage || 15;
         this.fatPercentage = userStats.fatPercentage || 30;
         this.carbPercentage = userStats.carbPercentage || 55;
+        this.calorieGoal = userStats.calorieGoal;
     }
 
     // this would be used to calculate the Basal Metabolic Rate (BMR) using the Mifflin-St Jeor Equation and after calculating it initially we can store this in the DB and update it only when the user updates their weight, height, or age.
