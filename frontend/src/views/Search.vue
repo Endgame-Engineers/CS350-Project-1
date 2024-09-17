@@ -11,7 +11,7 @@
       />
       <router-link to="/BarScanner">
         <button class="btn btn-outline-primary" type="button">
-          <i class="bi bi-upc-scan"></i> Scan
+          <font-awesome-icon :icon="['fas', 'barcode']" />
         </button>
       </router-link>
     </div>
