@@ -1,6 +1,10 @@
 @import "~bootstrap/scss/bootstrap";
 @import '~@fortawesome/fontawesome-svg-core/styles';
 
+.login-page {
+  height: 100vh;
+}
+
 .calories-box {
   background-color: #2c2c38;
   color: #ffffff;
