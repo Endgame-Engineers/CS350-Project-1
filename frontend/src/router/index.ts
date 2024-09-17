@@ -45,14 +45,19 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = fetch('/api/auth/google/success', { credentials: 'include' })
-    .then(response => response.json())
-    .then(data => {
-      if (data.user) {
-        return true;
+  let isAuthenticated = false;
+  fetch('/api/auth/google/success', { credentials: 'include' })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Data:', data);
+      if (data.isAuthenticated) {
+        isAuthenticated = true;
       } else {
-        return false;
+        isAuthenticated = false;
       }
+    })
+    .catch((error) => {
+      console.error('Error fetching /api/auth/google/success:', error);
     });
 
   // Debugging logs
