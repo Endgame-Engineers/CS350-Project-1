@@ -19,6 +19,7 @@ class AuthGoogle {
                             const existingUser = await Users.getUser(profile.id);
                             if (existingUser) {
                                 console.log('User found in database');
+                                await Users.updateUserLastLogin(existingUser.uuid);
                                 req.user = existingUser;
                                 return done(null, existingUser);
                             } else {

@@ -45,7 +45,15 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('user');
+  const isAuthenticated = fetch('/api/auth/google/success', { credentials: 'include' })
+    .then(response => response.json())
+    .then(data => {
+      if (data.user) {
+        return true;
+      } else {
+        return false;
+      }
+    });
 
   // Debugging logs
   console.log('Navigating to:', to.path);
