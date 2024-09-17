@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router'; // Import the router
+import router from './router'; 
 import './assets/global.css';
 
 // Font Awesome imports
@@ -18,6 +18,7 @@ createApp(App)
   .use(router)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');
+
 
 function mount(arg0: string) {
     throw new Error('Function not implemented.');
