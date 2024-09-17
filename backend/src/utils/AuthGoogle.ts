@@ -66,5 +66,6 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     if (req.isAuthenticated()) {
         return next();
     }
-    res.status(401).send('Unauthorized');
+    res.contentType('application/json');
+    res.status(401).send({ message: 'Unauthorized' });
 }

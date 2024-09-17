@@ -1,7 +1,3 @@
-// https://github.com/openfoodfacts/openfoodfacts-nodejs
-// I need to install the package openfoodfacts-nodejs and create an interface for the api so that we can use it in the backend
-// I will create a function to get the product information by barcode and return the product information
-
 // OpenFoodFactsAPI.ts
 import axios from 'axios';
 import { FoodItem } from '../models/FoodItems';
@@ -14,9 +10,12 @@ class OpenFoodFactsAPI {
      * @returns any
      */
 
-    // this stays of course
     async fetchProductFromAPI(barcode: string): Promise<FoodItem> {
-        const response = await axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+        const response = await axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`, {
+            headers: {
+                'User-Agent': 'Carbio.fit - Web - Version 1.0.0 - https://carbio.fit'
+            }
+        });
         const product: FoodItem = {
             foodname: response.data.product.product_name,
             barcode: barcode,
