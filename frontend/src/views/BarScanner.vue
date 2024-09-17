@@ -19,13 +19,13 @@ import { useRouter } from 'vue-router';
 export default {
     name: 'ScannerPage',
     setup() {
-        const scannedInfo = ref(null);
+        const scannedInfo = ref<string>('');
         const videoRef = ref<HTMLVideoElement | null>(null);
         const router = useRouter();
         const codeReader = new BrowserMultiFormatReader();
         const videoInputDevices = ref<MediaDeviceInfo[]>([]);
         const error = ref<string>('');
-        const selectedDeviceId = ref<string>('');  // Use ref for reactivity
+        const selectedDeviceId = ref<string>('');
 
         const listVideoInputDevices = async () => {
             try {
@@ -56,15 +56,14 @@ export default {
 
         async function loadCamera(videoRef: HTMLVideoElement | null, selectedDeviceId: string) {
             if (videoRef) {
-                try {
-                    const scannedInfo = await barcodeReader(videoRef, selectedDeviceId, codeReader);
-                    if (scannedInfo) {
+                barcodeReader(videoRef, selectedDeviceId, codeReader)
+                    .then((scannedInfo) => {
                         console.log("Scanned info:", scannedInfo);
                         router.push({ path: '/Search', query: { code: scannedInfo } });
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
             }
         }          
         
@@ -72,14 +71,14 @@ export default {
             const target = event.target as HTMLSelectElement;
             const selectedDeviceId = target.value;
             if (videoRef.value) {
-                try {
-                    const scannedInfo = await barcodeReader(videoRef.value, selectedDeviceId, codeReader);
-                    if (scannedInfo) {
+                barcodeReader(videoRef.value, selectedDeviceId, codeReader)
+                    .then((scannedInfo) => {
+                        console.log("Scanned info:", scannedInfo);
                         router.push({ path: '/Search', query: { code: scannedInfo } });
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
             }
         }
 

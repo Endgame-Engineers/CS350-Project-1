@@ -8,15 +8,14 @@ export async function barcodeReader(video: HTMLVideoElement, selectedDeviceId: s
                 
             if(result){
                 console.log('Found barcode:', result.getText());
-                return resolve(result.getText());
+                resolve(result.getText());
             }
             else if (error){
-                return reject(error);
+                reject(error);
             }
             });
         });
     } catch (error) {
-        console.error('Error initializing the barcode reader:', error);
         return '';
     }
 }
