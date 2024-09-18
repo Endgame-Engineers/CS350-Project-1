@@ -24,25 +24,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Footer Navigation -->
-    <footer class="footer bg-light mt-auto py-3">
-      <div class="btn-group d-flex justify-content-between" role="group">
-        <router-link to="/">
-          <button class="btn btn-outline-secondary">Home</button>
-        </router-link>
-        <router-link to="/Diary">
-          <button class="btn btn-outline-secondary">Diary</button>
-        </router-link>
-        <router-link to="/History">
-          <button class="btn btn-outline-secondary">History</button>
-        </router-link>
-        <router-link to="/Search">
-          <button class="btn btn-outline-secondary">Barcode Scan</button>
-        </router-link>
-      </div>
-    </footer>
-
   </div>
 </template>
 
