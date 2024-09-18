@@ -1,21 +1,25 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <h1>
-        Welcome to the Home Page {{ user?.username || 'Guest' }}
-      </h1>
+  <!-- Main Container -->
+  <div class="container d-flex flex-column min-vh-100 py-5">
+    
+    <!-- Welcome Row -->
+    <div class="row mb-4">
+      <div class="col text-center">
+        <h1 class="display-4">Welcome, {{ user?.username || 'Guest' }}</h1>
+        <p class="lead">Track your calories and manage your nutrition easily.</p>
+      </div>
     </div>
-  </div>
-  <div class="container my-5">
-    <!-- Row containing the box -->
-    <div class="row justify-content-center">
+
+    <!-- Calories Box -->
+    <div class="row justify-content-center flex-grow-1">
       <div class="col-md-6">
-        <!-- Calories box -->
-        <div class="calories-box text-center">
-          <h3>Calories</h3>
-          <div class="circle">
-            <p class="remaining">####</p>
-            <p>Remaining</p>
+        <div class="calories-box bg-dark p-4 rounded text-center shadow-sm">
+          <h3 class="mb-4">Calories</h3>
+          <div class="circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto mb-3">
+            <div>
+              <p class="remaining display-4">####</p>
+              <p>Remaining</p>
+            </div>
           </div>
         </div>
       </div>

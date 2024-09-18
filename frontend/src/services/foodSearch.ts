@@ -1,6 +1,6 @@
 export async function foodSearch(query: string): Promise<null> {
     try {
-      const resp = await fetch(`https://carbio.fit/api/food-items/${query}`);
+      const resp = await fetch(`/api/food-items/${query}`);
       
       if (!resp.ok) {
         throw new Error(`HTTP error! status: ${resp.status}`);

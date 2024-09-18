@@ -5,6 +5,7 @@ import diary from '../views/Diary.vue';
 import history from '../views/History.vue';
 import barscanner from '../views/BarScanner.vue';
 import login from '../views/Login.vue';
+import Profile from '@/views/Profile.vue';
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/Login',
     name: 'Login',
     component: login,
+  },
+  {
+    path: '/Profile',
+    name: 'Profile',
+    component: Profile,
   }
 ];
 

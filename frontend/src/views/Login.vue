@@ -1,5 +1,5 @@
 <template>
-  <div class="container d-flex justify-content-center align-items-center login-page">
+  <div class="container d-flex justify-content-center align-items-center">
     <a href="/api/auth/google" class="btn btn-primary">
       Login with <font-awesome-icon :icon="['fab', 'google']" />
     </a>
