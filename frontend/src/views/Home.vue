@@ -13,7 +13,7 @@
     <!-- Calories Box -->
     <div class="row justify-content-center flex-grow-1">
       <div class="col-md-6">
-        <div class="calories-box bg-light p-4 rounded text-center shadow-sm">
+        <div class="calories-box bg-dark p-4 rounded text-center shadow-sm">
           <h3 class="mb-4">Calories</h3>
           <div class="circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto mb-3">
             <div>

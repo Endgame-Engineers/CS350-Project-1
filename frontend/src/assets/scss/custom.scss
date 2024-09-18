@@ -4,15 +4,10 @@ $secondary: #6c757d;
 @import "~bootstrap/scss/bootstrap";
 @import '~@fortawesome/fontawesome-svg-core/styles';
 
-// Variables
-$primary-color: #007bff;
-$light-color: #f8f9fa;
-$white-color: #fff;
 $box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
 
 // General Styles
 .calories-box {
-  background-color: $light-color;
   border-radius: 10px;
   padding: 1.5rem;
   text-align: center;
@@ -23,67 +18,14 @@ $box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background-color: $primary-color;
-  color: $white-color;
+  background-color: $primary;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem; // Centers the circle and adds space below it
+  margin: 0 auto 1.5rem;
 }
 
 .remaining {
   font-size: 2.5rem;
   font-weight: bold;
-}
-
-// Footer Styles
-.footer {
-  background-color: $light-color;
-  padding: 1rem 0;
-}
-
-// Ensuring container takes full height for footer placement
-.container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.mt-auto {
-  margin-top: auto !important; // Pushes footer to bottom of the page
-}
-
-
-.login-page {
-  height: 100vh;
-}
-
-.calories-box {
-  background-color: #2c2c38;
-  color: #ffffff;
-  padding: 20px;
-  border-radius: 20px;
-  margin: 20px 0;
-
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-
-  .circle {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 10px solid #bbbbbb;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-
-    .remaining {
-      font-size: 1.8rem;
-      font-weight: bold;
-    }
-  }
 }
