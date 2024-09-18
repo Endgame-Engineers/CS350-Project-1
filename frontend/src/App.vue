@@ -25,7 +25,7 @@
             <router-link to="/profile" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'user']" />
             </router-link>
-            <router-link to="/settings" class="btn btn-outline-primary me-2" type="button">
+            <router-link to="/search" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'gear']" />
             </router-link>
           </div>
