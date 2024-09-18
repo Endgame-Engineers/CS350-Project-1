@@ -1,28 +1,48 @@
 <template>
-  <div class="row">
-    <div class="col-12 col-md-6 mb-3 text-center">
-      <h1>Welcome Back, {{ user?.username || 'Guest' }}</h1>
+  <!-- Main Container -->
+  <div class="container d-flex flex-column min-vh-100 py-5">
+    
+    <!-- Welcome Row -->
+    <div class="row mb-4">
+      <div class="col text-center">
+        <h1 class="display-4">Welcome, {{ user?.username || 'Guest' }}</h1>
+        <p class="lead">Track your calories and manage your nutrition easily.</p>
+      </div>
     </div>
-    <div class="col-12 col-md-6 mb-3 text-center">
-      <p>Monday, 1st January 2022</p>
-      <p>Calorie Goal: 2000</p>
-      <p>Calories Consumed: 1500</p>
-    </div>
-  </div>
-  <div class="container my-5">
-    <!-- Row containing the box -->
-    <div class="row justify-content-center">
+
+    <!-- Calories Box -->
+    <div class="row justify-content-center flex-grow-1">
       <div class="col-md-6">
-        <!-- Calories box -->
-        <div class="calories-box text-center">
-          <h3>Calories</h3>
-          <div class="circle">
-            <p class="remaining">####</p>
-            <p>Remaining</p>
+        <div class="calories-box bg-light p-4 rounded text-center shadow-sm">
+          <h3 class="mb-4">Calories</h3>
+          <div class="circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto mb-3">
+            <div>
+              <p class="remaining display-4">####</p>
+              <p>Remaining</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Footer Navigation -->
+    <footer class="footer bg-light mt-auto py-3">
+      <div class="btn-group d-flex justify-content-between" role="group">
+        <router-link to="/">
+          <button class="btn btn-outline-secondary">Home</button>
+        </router-link>
+        <router-link to="/Diary">
+          <button class="btn btn-outline-secondary">Diary</button>
+        </router-link>
+        <router-link to="/History">
+          <button class="btn btn-outline-secondary">History</button>
+        </router-link>
+        <router-link to="/Search">
+          <button class="btn btn-outline-secondary">Barcode Scan</button>
+        </router-link>
+      </div>
+    </footer>
+
   </div>
 </template>
 
