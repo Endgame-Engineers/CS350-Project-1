@@ -18,13 +18,6 @@ module.exports = defineConfig({
   chainWebpack: config => {
     config.resolve.alias
       .set('~bootstrap', path.resolve(__dirname, 'node_modules/bootstrap'));
-  },
-  css: {
-    loaderOptions: {
-      sass: {
-        additionalData: `@import "@/assets/scss/custom.scss";`
-      }
-    },
-  },
+  }
 });
 

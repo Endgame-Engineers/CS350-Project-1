@@ -1,22 +1,57 @@
 <template>
-  <div>
-    <h2>Food Item History</h2>
-    <div v-for="item in foodItems" :key="item.name + item.date" class="card mb-3">
-      <div class="card-header">{{ item.date }}</div>
-      <div class="card-body">
-        <strong>{{ item.name }}</strong>
-        <p>Date added: {{ item.date }}</p>
-        <p>Calories: {{ item.calories }}</p>
-        <p>Protein: {{ item.protein }}g</p>
-        <p>Carbs: {{ item.carbs }}g</p>
-        <p>Fat: {{ item.fat }}g</p>
-      </div>
+  <h1>Meal Logs</h1>
+  <div class="row">
+    <div class="col-12 col-md-4 mb-3">
+      <h2 class="text-center">Breakfast</h2>
+      <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
+        <div v-if="item.mealtype.toLowerCase().includes('breakfast')" class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ item.dateadded }}
+            </h5>
+            <p class="card-text">
+              {{ item.servingconsumed }} servings of {{ item.barcode }}
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div class="col-12 col-md-4 mb-3">
+      <h2 class="text-center">Lunch</h2>
+      <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
+        <div v-if="item.mealtype.toLowerCase().includes('lunch')" class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ item.dateadded }}
+            </h5>
+            <p class="card-text">
+              {{ item.servingconsumed }} servings of {{ item.barcode }}
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div class="col-12 col-md-4 mb-3">
+      <h2 class="text-center">Dinner</h2>
+      <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
+        <div v-if="item.mealtype.toLowerCase().includes('dinner')" class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ item.dateadded }}
+            </h5>
+            <p class="card-text">
+              {{ item.servingconsumed }} servings of {{ item.barcode }}
+            </p>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import axios from 'axios';
 
 interface FoodItem {
   date: string;
@@ -27,46 +62,27 @@ interface FoodItem {
   fat: number;
 }
 
+interface MealLog {
+  mealtype: string;
+  dateadded: string;
+  barcode: string;
+  servingconsumed: number;
+}
+
 export default defineComponent({
   name: 'HistoryPage',
   data() {
     return {
-      foodItems: [] as FoodItem[],
+      mealLogs: [] as MealLog[]
     };
   },
-  created() {
-    // Mock data for now, replace with API call if needed
-    this.foodItems = [
-      {
-        date: '2024-09-10',
-        name: 'Chicken Salad',
-        calories: 300,
-        protein: 25,
-        carbs: 10,
-        fat: 15,
-      },
-      {
-        date: '2024-09-10',
-        name: 'Apple',
-        calories: 95,
-        protein: 0.5,
-        carbs: 25,
-        fat: 0.3,
-      },
-      {
-        date: '2024-09-11',
-        name: 'Omelette',
-        calories: 200,
-        protein: 15,
-        carbs: 2,
-        fat: 14,
-      },
-    ];
-  },
+  async created() {
+    const response = await axios.get('/api/user/logs?all=true');
+    this.mealLogs = response.data;
+    this.mealLogs = this.mealLogs.map((log: MealLog) => {
+      log.dateadded = new Date(log.dateadded).toLocaleString();
+      return log;
+    });
+  }
 });
 </script>
-  <style scoped>
-  h1 {
-    color: #42b983;
-  }
-  </style>

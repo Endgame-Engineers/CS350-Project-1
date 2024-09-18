@@ -1,29 +1,66 @@
 <template>
-  <div id="app">
-    <footer class="footer bg-light mt-auto py-3">
-      <router-link to="/">
-        <button class="btn btn-secondary">Home</button>
-      </router-link>
-      <router-link to="/diary">
-        <button class="btn btn-secondary">Diary</button>
-      </router-link>
-      <router-link to="/history">
-        <button class="btn btn-secondary">History</button>
-      </router-link>
-      <router-link to="/search">
-        <button class="btn btn-secondary">Barcode Scan</button>
-      </router-link>
-    </footer>
-    <router-view></router-view>
-  </div>
+  <main class="container mt-4 pt-5">
+    <button v-if="hasPreviousRoute" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
+      <font-awesome-icon :icon="['fas', 'arrow-left']" />
+    </button>
+    <div class="container mt-4">
+      <router-view></router-view>
+    </div>
+  </main>
+  <footer class="container fixed-bottom">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+
+        <div class="d-flex w-100 align-items-center">
+          <div class="d-flex justify-content-start w-100 d-none d-md-block">
+            <a class="navbar-brand" href="#">Carbio.fit</a>
+          </div>
+          <div class="d-flex justify-content-center justify-content-lg-end w-100">
+            <router-link to="/" class="btn btn-outline-primary me-2" type="button">
+              <font-awesome-icon :icon="['fas', 'house']" />
+            </router-link>
+            <router-link to="/history" class="btn btn-outline-primary me-2" type="button">
+              <font-awesome-icon :icon="['fas', 'chart-line']" />
+            </router-link>
+            <router-link to="/profile" class="btn btn-outline-primary me-2" type="button">
+              <font-awesome-icon :icon="['fas', 'user']" />
+            </router-link>
+            <router-link to="/settings" class="btn btn-outline-primary me-2" type="button">
+              <font-awesome-icon :icon="['fas', 'gear']" />
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </footer>
 </template>
 
 <script lang="ts">
-export default {
-  name: 'App',
-};
-</script>
+import { defineComponent } from 'vue';
 
-<style lang="scss">
-@import "@/assets/scss/custom.scss";
-</style>
+export default defineComponent({
+  name: 'App',
+  computed: {
+    hasPreviousRoute() {
+      return window.history.length > 1;
+    }
+  },
+  data() {
+    return {
+      isDarkTheme: true
+    };
+  },
+  mounted() {
+    document.body.setAttribute('data-bs-theme', this.isDarkTheme ? 'dark' : 'light');
+  },
+  methods: {
+    toggleTheme() {
+      this.isDarkTheme = !this.isDarkTheme;
+      document.body.setAttribute('data-bs-theme', this.isDarkTheme ? 'dark' : 'light');
+    },
+    goBack() {
+      this.$router.go(-1);
+    }
+  }
+});
+</script>
