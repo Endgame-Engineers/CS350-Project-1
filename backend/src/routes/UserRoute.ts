@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
+import UserStats from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
 class UserRoute {
@@ -14,6 +15,18 @@ class UserRoute {
     public routes() {
         this.router.get('/user', isAuthenticated, (req, res) => {
             res.json(req.user);
+        });
+
+        this.router.get('/user/stats', isAuthenticated, (req, res) => {
+            const user = req.user as User;
+            if (user.providerid) {
+                UserStats.getUserStats(user.providerid)
+                    .then((userStats) => {
+                        res.json(userStats);
+                    });
+            } else {
+                res.status(400).json({ error: 'User not authenticated' });
+            }
         });
 
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
