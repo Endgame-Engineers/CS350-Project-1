@@ -8,7 +8,7 @@
     </div>
   </main>
   <footer class="container fixed-bottom">
-    <nav  class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
 
         <div class="d-flex w-100 align-items-center">
@@ -28,6 +28,9 @@
             <router-link to="/search" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'gear']" />
             </router-link>
+            <a href="/api/auth/logout" class="btn btn-outline-primary me-2" role="button">
+              <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+            </a>
           </div>
         </div>
       </div>
@@ -36,7 +39,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
   name: 'App',
@@ -44,6 +48,16 @@ export default defineComponent({
     hasPreviousRoute() {
       return window.history.length > 1;
     }
+  },
+  setup() {
+    const route = useRoute();
+
+    // Watch for route changes and update the document title
+    watch(route, (newRoute) => {
+      document.title = `${newRoute.name as string} - Carbio.fit`;
+    }, { immediate: true });
+
+    return {};
   },
   data() {
     return {
