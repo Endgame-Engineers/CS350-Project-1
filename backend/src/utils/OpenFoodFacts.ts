@@ -11,7 +11,7 @@ class OpenFoodFactsAPI {
      */
 
     async fetchProductFromAPI(barcode: string): Promise<FoodItem> {
-        const response = await axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`, {
+        const response = await axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v3/product/${barcode}.json`, {
             headers: {
                 'User-Agent': 'Carbio.fit - Web - Version 1.0.0 - https://carbio.fit'
             }
@@ -19,11 +19,10 @@ class OpenFoodFactsAPI {
         const product: FoodItem = {
             foodname: response.data.product.product_name,
             barcode: barcode,
-            protein_per_serv: parseFloat(response.data.product.nutriments.proteins_serving),
-            carb_per_serv: parseFloat(response.data.product.nutriments.carbohydrates_serving),
-            fat_per_serv: parseFloat(response.data.product.nutriments.fat_serving),
-            grams_per_serv: parseFloat(response.data.product.serving_quantity),
-            calories_per_serv: parseFloat(response.data.product.nutriments['energy-kcal']),
+            protein_per_serv: parseFloat(response.data.product.nutriments.proteins_100g) / 100,
+            carb_per_serv: parseFloat(response.data.product.nutriments.carbohydrates_100g) / 100,
+            fat_per_serv: parseFloat(response.data.product.nutriments.fat_100g) / 100,
+            calories_per_serv: parseFloat(response.data.product.nutriments['energy-kcal_100g']) / 100,
             image: response.data.product.image_url
         };
         return product;
