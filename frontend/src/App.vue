@@ -1,6 +1,6 @@
 <template>
   <main class="container mt-4 pt-5">
-    <button v-if="hasPreviousRoute" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
+    <button v-if="canGoBack" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
     </button>
     <div class="container mt-4">
@@ -39,25 +39,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
+import { defineComponent, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { hasPreviousRoute } from './router';
 
 export default defineComponent({
   name: 'App',
   computed: {
-    hasPreviousRoute() {
-      return window.history.length > 1;
+    canGoBack() {
+      const hasPrevious = hasPreviousRoute();
+      return true;
     }
   },
   setup() {
     const route = useRoute();
-
     // Watch for route changes and update the document title
     watch(route, (newRoute) => {
       document.title = `${newRoute.name as string} - Carbio.fit`;
     }, { immediate: true });
 
-    return {};
+    return {
+    };
   },
   data() {
     return {

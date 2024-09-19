@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { barcodeReader } from '@/services/BarcodeScanner';
+import BarcodeScanner from '@/services/BarcodeScanner';
 import { checkForBackCamera } from '@/services/CheckForBackCamera';
 import router from '@/router';
 
@@ -37,7 +37,7 @@ export default {
                     stream.value = await navigator.mediaDevices.getUserMedia(constraints);
                     if (webCam.value) {
                         webCam.value.srcObject = stream.value;
-                        const barCodeNum = await barcodeReader(webCam.value, selectedDeviceId.value)
+                        const barCodeNum = await BarcodeScanner.barcodeReader(webCam.value, selectedDeviceId.value)
                         if (barCodeNum) {
                             
                             router.push({ path: '/Search', query: { string: barCodeNum } });
@@ -53,6 +53,8 @@ export default {
                 if(stream.value){
                     stream.value.getTracks().forEach(track => track.stop());
                 }
+
+                BarcodeScanner.closeBarcodeReader();
             });
 
         return {

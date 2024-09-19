@@ -50,7 +50,16 @@ const router = createRouter({
   routes,
 });
 
+let previousRoute: string | null = null;
+
 router.beforeEach(async (to, from, next) => {
+    if (from.path === '/' && to.path === '/login') {
+      previousRoute = null;
+    } else {
+      previousRoute = typeof from.name === 'string' ? from.name : null;
+    }
+    console.log('Navigating from', from.fullPath, 'to', to.fullPath);
+
   const isAuthenticated = await fetch('/api/auth/google/success', { credentials: 'include' })
     .then((response) => {
       if (response.ok) {
@@ -58,19 +67,25 @@ router.beforeEach(async (to, from, next) => {
       } else {
         throw new Error('Failed to authenticate');
       }
-    }).then((data) => {
+    })
+    .then((data) => {
       console.log('Authentication status:', data.isAuthenticated);
       return data.isAuthenticated;
-    }).catch((error) => {
+    })
+    .catch((error) => {
       console.error('Error checking authentication status:', error);
       return false;
     });
 
-  if (to.path !== '/login' && isAuthenticated === false) {
+  if (to.path !== '/login' && !isAuthenticated) {
     next('/login');
   } else {
     next();
   }
 });
+
+export function hasPreviousRoute() {
+  return previousRoute !== null;
+}
 
 export default router;
