@@ -15,13 +15,13 @@ class FoodItemsRoute {
     }
 
     public routes() {
-        this.router.get('/food-items', isAuthenticated, (req, res) => {
+        this.router.get('/food-items', (req, res) => {
             FoodItems.getFoodItems().then((foodItems) => {
                 res.json(foodItems);
             });
         });
 
-        this.router.get('/food-items/:barcode', isAuthenticated, (req, res) => {
+        this.router.get('/food-items/:barcode', (req, res) => {
             FoodItems.getFoodItem(req.params.barcode)
                 .then((foodItem) => {
                 if (foodItem !== undefined) {
