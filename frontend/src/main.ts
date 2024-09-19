@@ -2,10 +2,6 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router'; 
 import './assets/scss/custom.scss';
-import { useFavicon } from '@vueuse/core'
-
-const favicon = '@assets/images/icons/favicon-196x196.png'
-useFavicon(favicon)
 
 // Font Awesome imports
 import { library } from '@fortawesome/fontawesome-svg-core';

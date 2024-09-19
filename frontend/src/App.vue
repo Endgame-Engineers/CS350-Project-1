@@ -1,6 +1,6 @@
 <template>
   <main class="container mt-4 pt-5">
-    <button v-if="hasPreviousRoute" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
+    <button v-if="canGoBack" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
     </button>
     <div class="container mt-4">
@@ -15,7 +15,7 @@
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
             <a class="navbar-brand" href="#">Carbio.fit</a>
           </div>
-          <div class="d-flex justify-content-center justify-content-lg-end w-100">
+          <div v-if="$route.path !== '/login'" class="d-flex justify-content-center justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'house']" />
             </router-link>
@@ -28,6 +28,9 @@
             <router-link to="/search" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'gear']" />
             </router-link>
+            <a href="/api/auth/logout" class="btn btn-outline-primary me-2" role="button">
+              <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+            </a>
           </div>
         </div>
       </div>
@@ -36,14 +39,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { hasPreviousRoute } from './router';
 
 export default defineComponent({
   name: 'App',
   computed: {
-    hasPreviousRoute() {
-      return window.history.length > 1;
+    canGoBack() {
+      const hasPrevious = hasPreviousRoute();
+      return true;
     }
+  },
+  setup() {
+    const route = useRoute();
+    // Watch for route changes and update the document title
+    watch(route, (newRoute) => {
+      document.title = `${newRoute.name as string} - Carbio.fit`;
+    }, { immediate: true });
+
+    return {
+    };
   },
   data() {
     return {

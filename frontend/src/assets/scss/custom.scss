@@ -29,3 +29,22 @@ $box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
   font-size: 2.5rem;
   font-weight: bold;
 }
+
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  overflow: hidden; /* Hide any overflow */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black; /* Ensure background is black */
+}
+
+video {
+  width: 100vw; /* Ensure the video fits the full width */
+  height: 100vh; /* Ensure the video fits the full height */
+  object-fit: cover; /* Ensure the video covers the screen, cropping if needed */
+}

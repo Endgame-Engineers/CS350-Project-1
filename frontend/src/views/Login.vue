@@ -1,5 +1,6 @@
 <template>
-  <div class="container d-flex justify-content-center align-items-center">
+<div class="container d-flex flex-column justify-content-center align-items-center">
+    <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit" class="img-fluid" />
     <a href="/api/auth/google" class="btn btn-primary">
       Login with <font-awesome-icon :icon="['fab', 'google']" />
     </a>

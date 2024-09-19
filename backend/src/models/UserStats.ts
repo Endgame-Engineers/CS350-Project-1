@@ -19,7 +19,7 @@ class UserStats {
 
     async getUserStats(providerid: string): Promise<UserStat> {
         const result = await (await this.client).query('SELECT * FROM "UserStats" WHERE providerid = $1', [providerid]);
-        return result.rows[0];
+        return result.rows;
     }
 
     async addUserStats(userStats: UserStat): Promise<void> {

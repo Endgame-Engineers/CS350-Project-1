@@ -1,6 +1,6 @@
 <template>
   <!-- Main Container -->
-  <div class="container d-flex flex-column min-vh-100 py-5">
+  <div class="container d-flex flex-column py-5">
     
     <!-- Welcome Row -->
     <div class="row mb-4">

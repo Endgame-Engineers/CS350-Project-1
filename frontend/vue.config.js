@@ -16,6 +16,10 @@ module.exports = defineConfig({
     allowedHosts: 'all',
   },
   chainWebpack: config => {
+    config.plugin('html').tap(args => {
+      args[0].title = 'Carbio.fit'; // Default title
+      return args;
+    });
     config.resolve.alias
       .set('~bootstrap', path.resolve(__dirname, 'node_modules/bootstrap'));
   },

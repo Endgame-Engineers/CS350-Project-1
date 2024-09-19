@@ -1,0 +1,1 @@
+ - Close out camera after leaving scanner
