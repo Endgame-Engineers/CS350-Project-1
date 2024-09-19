@@ -50,13 +50,13 @@ const router = createRouter({
   routes,
 });
 
-let previousRoute: string | null = null;
+let previousRoute: boolean | null = null;
 
 router.beforeEach(async (to, from, next) => {
-    if (from.path === '/' && to.path === '/login') {
-      previousRoute = null;
+    if (from.fullPath === '/login' || (from.fullPath === '/' && to.fullPath === '/login')) {
+      previousRoute = true;
     } else {
-      previousRoute = typeof from.name === 'string' ? from.name : null;
+      previousRoute = from.fullPath !== to.fullPath; 
     }
     console.log('Navigating from', from.fullPath, 'to', to.fullPath);
 
@@ -85,7 +85,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 export function hasPreviousRoute() {
-  return previousRoute !== null;
+  return previousRoute;
 }
 
 export default router;
