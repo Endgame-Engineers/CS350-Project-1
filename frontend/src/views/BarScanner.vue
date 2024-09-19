@@ -7,6 +7,7 @@
 <script lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { barcodeReader } from '@/services/BarcodeScanner';
+import { checkForBackCamera } from '@/services/CheckForBackCamera';
 import router from '@/router';
 
 export default {
