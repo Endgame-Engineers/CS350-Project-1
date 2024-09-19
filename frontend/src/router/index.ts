@@ -68,8 +68,8 @@ router.beforeEach(async (to, from, next) => {
       return false;
     });
 
-  if (to.path !== '/login' && !isAuthenticated) {
-    next('/login');
+  if (to.path !== '/Login' && !isAuthenticated) {
+    next({ path: '/Login', query: { redirect: to.fullPath } });
   } else {
     next();
   }
