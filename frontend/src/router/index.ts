@@ -50,16 +50,7 @@ const router = createRouter({
   routes,
 });
 
-let previousRoute: boolean | null = null;
-
 router.beforeEach(async (to, from, next) => {
-    if (from.fullPath === '/login' || (from.fullPath === '/' && to.fullPath === '/login')) {
-      previousRoute = true;
-    } else {
-      previousRoute = from.fullPath !== to.fullPath; 
-    }
-    console.log('Navigating from', from.fullPath, 'to', to.fullPath);
-
   const isAuthenticated = await fetch('/api/auth/google/success', { credentials: 'include' })
     .then((response) => {
       if (response.ok) {
@@ -83,9 +74,5 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 });
-
-export function hasPreviousRoute() {
-  return previousRoute;
-}
 
 export default router;
