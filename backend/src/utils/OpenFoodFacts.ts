@@ -41,10 +41,10 @@ class OpenFoodFactsAPI {
             return {
                 foodname: product.product_name,
                 barcode: product.code,
-                protein_per_serv: parseFloat(product.nutriments.proteins_100g) / 100,
-                carb_per_serv: parseFloat(product.nutriments.carbohydrates_100g) / 100,
-                fat_per_serv: parseFloat(product.nutriments.fat_100g) / 100,
-                calories_per_serv: parseFloat(product.nutriments['energy-kcal_100g']) / 100,
+                protein_per_serv: parseFloat(product.nutriments.proteins_100g) / 100 || 0,
+                carb_per_serv: parseFloat(product.nutriments.carbohydrates_100g) / 100 || 0,
+                fat_per_serv: parseFloat(product.nutriments.fat_100g) / 100 || 0,
+                calories_per_serv: parseFloat(product.nutriments['energy-kcal_100g']) / 100 || 0,
                 image: product.image_url
             };
         });
