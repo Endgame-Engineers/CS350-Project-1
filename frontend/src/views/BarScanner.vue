@@ -1,11 +1,11 @@
 <template>
-    <div>
-        <video ref="webCam" autoplay></video>
+    <div class="video-container">
+        <video ref="webCam" autoplay playsinline></video>
     </div>
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { barcodeReader } from '@/services/BarcodeScanner';
 import router from '@/router';
 
@@ -14,28 +14,44 @@ export default {
     
     setup() {
         const webCam = ref<HTMLVideoElement | null>(null);
-        const selectedDeviceId = null;
-        const barCodeNum = null as null | string
-        const constraints = {
-            video: {
-                width: 1280,
-                height: 720,
-            },
-        };
+        let selectedDeviceId = ref<string | null>(null);
+        const barCodeNum = null as null | string;
+        let stream = ref<MediaStream | null>(null);
 
-        onMounted(() => {
-            navigator.mediaDevices.getUserMedia(constraints).then(async (stream) => {
-                if (webCam.value) {
-                    webCam.value.srcObject = stream;
-                    const barCodeNum = await barcodeReader(webCam.value, selectedDeviceId)
-                    if (barCodeNum) {
-                        router.push({ path: '/Search', query: { string: barCodeNum } });
+        onMounted(async () => {
+            const initialStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            selectedDeviceId.value = await checkForBackCamera();
+            console.log(selectedDeviceId.value);
+            initialStream.getTracks().forEach(track => track.stop());
+
+            const constraints = {
+                video: {
+                    deviceId: selectedDeviceId.value ? { exact: selectedDeviceId.value } : undefined,
+                    width: 1280,
+                    height: 720,
+                },
+            };
+                try {
+
+                    stream.value = await navigator.mediaDevices.getUserMedia(constraints);
+                    if (webCam.value) {
+                        webCam.value.srcObject = stream.value;
+                        const barCodeNum = await barcodeReader(webCam.value, selectedDeviceId.value)
+                        if (barCodeNum) {
+                            
+                            router.push({ path: '/Search', query: { string: barCodeNum } });
                         }
                     }
-                }).catch((error) => {
+                } catch (error) {
                     console.error(error);
-                    router.push('/Home');
-                });
+                    router.push('/');
+                }
+            });
+
+            onUnmounted(()=>{
+                if(stream.value){
+                    stream.value.getTracks().forEach(track => track.stop());
+                }
             });
 
         return {
