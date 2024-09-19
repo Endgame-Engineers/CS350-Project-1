@@ -30,7 +30,6 @@
               <p class="card-text"><strong>Protein:</strong> {{ foodData.protein_per_serv }}g</p>
               <p class="card-text"><strong>Carbs:</strong> {{ foodData.carb_per_serv }}g</p>
               <p class="card-text"><strong>Fat:</strong> {{ foodData.fat_per_serv }}g</p>
-              <p class="card-text"><strong>Serving Size:</strong> {{ foodData.grams_per_serv }}g</p>
               <p class="card-text"><strong>Calories:</strong> {{ foodData.calories_per_serv }} kcal</p>
             </div>
           </div>
@@ -55,7 +54,6 @@ interface FoodItem {
   protein_per_serv: number;
   carb_per_serv: number;
   fat_per_serv: number;
-  grams_per_serv: number;
   calories_per_serv: number;
   image: string;
 }
