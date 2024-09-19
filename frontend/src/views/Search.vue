@@ -3,10 +3,9 @@
     <div class="col-12 col-md-4 mb-3">
       <!-- Search Bar and Barcode Scanner -->
       <router-link to="/BarScanner">
-        <div class="input-group-text">
-          <button class="btn btn-primary">
-            <font-awesome-icon :icon="['fas', 'barcode']" />
-          </button>
+        <button class="btn btn-primary">
+          <font-awesome-icon :icon="['fas', 'barcode']" />
+        </button>
       </router-link>
       <input type="text" v-model="searchBar" class="form-control" placeholder="Search for food"
         aria-label="Search for food" @keyup.enter="search" />
