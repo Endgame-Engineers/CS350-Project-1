@@ -20,7 +20,7 @@ class FoodItemsRoute {
                 res.json(foodItems);
             });
         });
-
+        // TODO: can crash server if text is sent to endpoint
         this.router.get('/food-items/:barcode', (req, res) => {
             FoodItems.getFoodItem(req.params.barcode)
                 .then((foodItem) => {
