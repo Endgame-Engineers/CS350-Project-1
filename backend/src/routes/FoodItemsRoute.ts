@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import FoodItems from '../models/FoodItems';
-import { fetchProductFromAPI } from '../utils/OpenFoodFacts';
+import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
 /**
@@ -30,7 +30,7 @@ class FoodItemsRoute {
                 }
                 else {
                     console.log('Food item not found in database');
-                    fetchProductFromAPI(req.params.barcode)
+                    OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
                         .then((product) => {
                         if (product) {
                             FoodItems.addFoodItem(product);
@@ -43,6 +43,20 @@ class FoodItemsRoute {
                 }
             });
         });
+
+        this.router.get('/food-items/search/:searchTerm', (req, res) => {
+            const searchTerm = req.params.searchTerm;
+            const page = parseInt(req.query.page as string, 10) || 1;
+        
+            OpenFoodFacts.searchForProductFromAPI(searchTerm, page)
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    res.status(500).json({ error: error.message });
+                });
+        });
+
 
         this.router.post('/food-items', isAuthenticated, (req, res) => {;
             FoodItems.addFoodItem(req.body);
