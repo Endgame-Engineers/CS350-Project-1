@@ -8,14 +8,14 @@
     </div>
   </main>
   <footer class="container fixed-bottom">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav  class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
 
         <div class="d-flex w-100 align-items-center">
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
             <a class="navbar-brand" href="#">Carbio.fit</a>
           </div>
-          <div class="d-flex justify-content-center justify-content-lg-end w-100">
+          <div v-if="$route.path !== '/login'" class="d-flex justify-content-center justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'house']" />
             </router-link>
