@@ -41,7 +41,6 @@
   <div class="col-12 col-md-4 mb-3">
     <h1>Coming Soonish</h1>
   </div>
-  </div>
 </template>
 
 <script lang="ts">
