@@ -1,6 +1,7 @@
 <template>
   <div class="row">
     <div class="col-12 col-md-4 mb-3">
+      <div class="input-group mb-4">
       <!-- Search Bar and Barcode Scanner -->
       <router-link to="/BarScanner">
         <button class="btn btn-primary">
@@ -20,7 +21,7 @@
   <div class="col-12 col-md-4 mb-3">
     <!-- Food Data Display -->
     <div v-if="foodData && foodData.length">
-      <div v-for="item in foodData" :key="item.id" class="card mb-3">
+      <div v-for="item in foodData" :key="item.barcode" class="card mb-3">
         <div class="row g-0">
           <div class="col-md-4">
             <img :src="item.image" class="img-fluid rounded-start" alt="Food image">
@@ -41,6 +42,7 @@
   <div class="col-12 col-md-4 mb-3">
     <h1>Coming Soonish</h1>
   </div>
+</div>
 </template>
 
 <script lang="ts">

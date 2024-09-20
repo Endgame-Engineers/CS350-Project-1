@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import FoodItems from '../models/FoodItems';
+import FoodItems, { FoodItem } from '../models/FoodItems';
 import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
@@ -53,13 +53,52 @@ class FoodItemsRoute {
                     res.json(result);
                 })
                 .catch((error) => {
-                    res.status(500).json({ error: error.message });
+                    res.status(500).json({  error: (error as Error).message });
                 });
         });
 
+        // TODO: allow endpoint to receive json array of barcodes to lookup
+        // and return an array of food items
+        this.router.post('/food-items', async (req, res) => {
+            const barcodes = req.body.barcodes;
+            if (!barcodes) {
+                res.status(400).json({ error: 'No barcodes provided' });
+                return;
+            }
 
-        this.router.post('/food-items', isAuthenticated, (req, res) => {;
-            FoodItems.addFoodItem(req.body);
+            try {
+                const foodItems: FoodItem[] = await Promise.all(
+                    barcodes.map(async (barcode: string) => {
+                        FoodItems.getFoodItem(barcode)
+                            .then((foodItem) => {
+                            if (foodItem) {
+                                console.log('Food item found in database');
+                                return foodItem;
+                            } else {
+                                OpenFoodFacts.fetchProductFromAPI(barcode)
+                                    .then((product) => {
+                                    if (product) {
+                                        console.log('Food item not found in database');
+                                        FoodItems.addFoodItem(product);
+                                        return product;
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.log('Error fetching food item:', error);
+                                });
+                            }
+                        })
+                        .catch((error) => {
+                            console.log('Error fetching food item:', error);
+                        });
+                    })
+                );
+
+                console.log('Returning food items');
+                res.json(foodItems.filter(item => item !== undefined));
+            } catch (error) {
+                res.status(500).json({ error: (error as Error).message });
+            }
         });
     }
 }
