@@ -14,32 +14,32 @@ const routes = [
     component: home,
   },
   {
-    path: '/Search',
+    path: '/search',
     name: 'Search',
     component: search,
   },
   {
-    path: '/History',
+    path: '/sistory',
     name: 'History',
     component: history,
   },
   {
-    path: '/Diary',
+    path: '/diary',
     name: 'Diary',
     component: diary,
   },
   {
-    path: '/BarScanner',
+    path: '/barscanner',
     name: 'BarScanner',
     component: barscanner,
   },
   {
-    path: '/Login',
+    path: '/login',
     name: 'Login',
     component: login,
   },
   {
-    path: '/Profile',
+    path: '/profile',
     name: 'Profile',
     component: Profile,
   }

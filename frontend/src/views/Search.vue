@@ -25,7 +25,7 @@
       No results found
     </div>
     <!-- Food Data Display -->
-    <div v-if="foodData && foodData.length">
+    <div v-if="foodData && foodData.length" style="max-height: 80%; overflow-y: auto;">
       <div v-for="item in foodData" :key="item.barcode" class="card mb-3">
         <div class="row g-0">
           <div class="col-md-4">
@@ -43,6 +43,7 @@
           </div>
         </div>
       </div>
+      <button @click="loadMore" class="btn btn-primary mt-3">Load More</button>
     </div>
   </div>
   <div class="col-12 col-md-4 mb-3">
@@ -65,6 +66,7 @@ export default {
     const barcode = ref(typeof requestQuery.value === 'string' && /^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
     const searchTerm = ref(typeof requestQuery.value === 'string' && !/^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
     const foodData = ref<FoodItem[] | null>(null);
+    const page = ref(1);
 
     const search = async () => {
       if (searchBar.value) {
@@ -73,7 +75,7 @@ export default {
           barcodeNumSearch();
         } else {
           try {
-            const data = await searchForProducts(searchBar.value);
+            const data = await searchForProducts(searchBar.value, page.value);
             if (data && Array.isArray(data.products)) {
               foodData.value = data.products;
             } else {
@@ -92,11 +94,30 @@ export default {
       foodData.value = null;
     };
 
+    const loadMore = async () => {
+      page.value += 1;
+      if (searchBar.value) {
+        if (/^\d+$/.test(searchBar.value)) {
+          barcode.value = searchBar.value;
+          barcodeNumSearch();
+        } else {
+          try {
+            const data = await searchForProducts(searchBar.value, page.value);
+            if (data && Array.isArray(data.products)) {
+              foodData.value = [...(foodData.value || []), ...data.products];
+            }
+          } catch (error) {
+            console.error('Error during search:', error);
+            foodData.value = [];
+          }
+        }
+      }
+    };
 
     const barcodeNumSearch = async () => {
       if (barcode.value) {
         const data = await barcodeLookup(barcode.value as string);
-        
+
         if ('foodname' in data) {
           foodData.value = [data];
         } else {
@@ -122,6 +143,7 @@ export default {
       clearSearchBar,
       foodData,
       barcodeNumSearch,
+      loadMore,
     };
   },
 };
