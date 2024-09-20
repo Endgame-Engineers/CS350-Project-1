@@ -17,8 +17,13 @@
         <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
       </button>
     </div>
+
   </div>
   <div class="col-12 col-md-4 mb-3">
+    <!-- Error message -->
+    <div v-if="foodData && !foodData.length" class="alert alert-danger" role="alert">
+      No results found
+    </div>
     <!-- Food Data Display -->
     <div v-if="foodData && foodData.length">
       <div v-for="item in foodData" :key="item.barcode" class="card mb-3">
@@ -33,6 +38,7 @@
               <p class="card-text"><strong>Carbs:</strong> {{ item.carb_per_serv }}g</p>
               <p class="card-text"><strong>Fat:</strong> {{ item.fat_per_serv }}g</p>
               <p class="card-text"><strong>Calories:</strong> {{ item.calories_per_serv }} kcal</p>
+              <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
             </div>
           </div>
         </div>
@@ -86,14 +92,16 @@ export default {
       foodData.value = null;
     };
 
+
     const barcodeNumSearch = async () => {
       if (barcode.value) {
-        try {
-          const data = await barcodeLookup(barcode.value as string);
+        const data = await barcodeLookup(barcode.value as string);
+        
+        if ('foodname' in data) {
           foodData.value = [data];
-        } catch (error) {
+        } else {
           foodData.value = [];
-          console.error('Error during barcode lookup:', error);
+          console.log('Error during barcode lookup:', data.message);
         }
       }
     };

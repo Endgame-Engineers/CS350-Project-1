@@ -1,6 +1,12 @@
 // OpenFoodFactsAPI.ts
+
 import axios from 'axios';
 import { FoodItem } from '../models/FoodItems';
+
+export interface ErrorMessage {
+    message: string;
+    type: string;
+}
 
 class OpenFoodFactsAPI {
 
@@ -10,29 +16,48 @@ class OpenFoodFactsAPI {
      * @returns any
      */
 
-    async fetchProductFromAPI(barcode: string): Promise<FoodItem | null> {
-        axios.get<{ product: any }>(`https://world.openfoodfacts.org/api/v3/product/${barcode}.json`, {
-            headers: {
-                'User-Agent': 'Carbio.fit - Web - Version 1.0.0 - https://carbio.fit'
-            }
-        })
-        .then((response) => {
-            const product: FoodItem = {
-                foodname: response.data.product.product_name,
-                barcode: barcode,
-                protein_per_serv: parseFloat(response.data.product.nutriments.proteins_100g) / 100,
-                carb_per_serv: parseFloat(response.data.product.nutriments.carbohydrates_100g) / 100,
-                fat_per_serv: parseFloat(response.data.product.nutriments.fat_100g) / 100,
-                calories_per_serv: parseFloat(response.data.product.nutriments['energy-kcal_100g']) / 100,
-                image: response.data.product.image_url
-            };
-            return product;
-        })
-        .catch((error) => {
-            console.error('Error fetching the API:', error);
-        });
-
-        return null;
+    async fetchProductFromAPI(barcode: string): Promise<FoodItem | ErrorMessage> {
+        return axios
+            .get<{ product: any }>(
+                `https://world.openfoodfacts.org/api/v3/product/${barcode}.json`,
+                {
+                    headers: {
+                        'User-Agent': 'Carbio.fit - Web - Version 1.0.0 - https://carbio.fit',
+                    },
+                }
+            )
+            .then((response) => {
+                const product: FoodItem = {
+                    foodname: response.data.product.product_name,
+                    barcode: barcode,
+                    protein_per_serv:
+                        parseFloat(response.data.product.nutriments.proteins_100g) / 100,
+                    carb_per_serv:
+                        parseFloat(response.data.product.nutriments.carbohydrates_100g) / 100,
+                    fat_per_serv: parseFloat(response.data.product.nutriments.fat_100g) / 100,
+                    calories_per_serv:
+                        parseFloat(response.data.product.nutriments['energy-kcal_100g']) / 100,
+                    image: response.data.product.image_url,
+                };
+                return product;
+            })
+            .catch((error) => {
+                if (error.response || error.request) {
+                    if (error.response) {
+                        switch (error.response.status) {
+                            case 404:
+                                return { message: 'Barcode does not exist', type: 'not_found' };
+                            case 500:
+                                return { message: 'Server error', type: 'server_error' };
+                            default:
+                                return { message: 'Unknown error', type: 'unknown' };
+                        }
+                    } else if (error.request) {
+                        return { message: 'Request error', type: 'request_error' };
+                    }
+                }
+                return { message: 'Unknown error', type: 'unknown' };
+            });
     }
 
     async searchForProductFromAPI(searchTerm: string, page: number = 1): Promise<{ products: FoodItem[], page: number, page_count: number }> {

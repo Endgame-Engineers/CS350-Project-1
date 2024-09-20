@@ -32,8 +32,8 @@ class FoodItemsRoute {
                     console.log('Food item not found in database');
                     OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
                         .then((product) => {
-                        if (product) {
-                            FoodItems.addFoodItem(product);
+                        if (product && 'foodname' in product) {
+                            FoodItems.addFoodItem(product as FoodItem);
                             res.json(product);
                         }
                         else {
@@ -59,7 +59,7 @@ class FoodItemsRoute {
 
         // TODO: allow endpoint to receive json array of barcodes to lookup
         // and return an array of food items
-        this.router.post('/food-items', async (req, res) => {
+        this.router.post('/food-items', isAuthenticated, async (req, res) => {
             const barcodes = req.body.barcodes;
             if (!barcodes) {
                 res.status(400).json({ error: 'No barcodes provided' });
@@ -79,7 +79,9 @@ class FoodItemsRoute {
                                     .then((product) => {
                                     if (product) {
                                         console.log('Food item not found in database');
-                                        FoodItems.addFoodItem(product);
+                                        if ('foodname' in product) {
+                                            FoodItems.addFoodItem(product as FoodItem);
+                                        }
                                         return product;
                                     }
                                 })
