@@ -19,7 +19,7 @@ const routes = [
     component: search,
   },
   {
-    path: '/sistory',
+    path: '/history',
     name: 'History',
     component: history,
   },

@@ -3,7 +3,7 @@
     <div class="col-12 col-md-4 mb-3">
       <div class="input-group mb-4">
       <!-- Search Bar and Barcode Scanner -->
-      <router-link to="/BarScanner">
+      <router-link to="/barscanner">
         <button class="btn btn-primary">
           <font-awesome-icon :icon="['fas', 'barcode']" />
         </button>
