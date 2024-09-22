@@ -6,8 +6,6 @@ import history from '../views/History.vue';
 import barscanner from '../views/BarScanner.vue';
 import login from '../views/Login.vue';
 import Profile from '@/views/Profile.vue';
-import { createPinia } from 'pinia';
-import { useUserStore } from '@/stores/User';
 
 const routes = [
   {
@@ -16,66 +14,62 @@ const routes = [
     component: home,
   },
   {
-    path: '/search',
+    path: '/Search',
     name: 'Search',
     component: search,
   },
   {
-    path: '/history',
+    path: '/History',
     name: 'History',
     component: history,
   },
   {
-    path: '/diary',
+    path: '/Diary',
     name: 'Diary',
     component: diary,
   },
   {
-    path: '/barscanner',
+    path: '/BarScanner',
     name: 'BarScanner',
     component: barscanner,
   },
   {
-    path: '/login',
+    path: '/Login',
     name: 'Login',
     component: login,
   },
   {
-    path: '/profile',
+    path: '/Profile',
     name: 'Profile',
     component: Profile,
   }
 ];
-
-const pinia = createPinia();
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
-const userStore = useUserStore(pinia);
-
 router.beforeEach(async (to, from, next) => {
-  if (!userStore.isAuthenticated) {
-    try {
-      const response = await fetch('/api/auth/google/success', { credentials: 'include' });
+  const isAuthenticated = await fetch('/api/auth/google/success', { credentials: 'include' })
+    .then((response) => {
       if (response.ok) {
-        const data = await response.json();
-        console.log('Authentication status:', data.isAuthenticated);
-        userStore.setUser(data.user);
-        userStore.setAuthenticated(data.isAuthenticated);
+        return response.json();
       } else {
         throw new Error('Failed to authenticate');
       }
-    } catch (error) {
+    })
+    .then((data) => {
+      console.log('Authentication status:', data.isAuthenticated);
+      return data.isAuthenticated;
+    })
+    .catch((error) => {
       console.error('Error checking authentication status:', error);
-      userStore.setAuthenticated(false);
-    }
-  }
+      return false;
+    });
 
-  if (to.path.toLocaleLowerCase() !== '/login' && !userStore.isAuthenticated) {
-    next({ path: '/login', query: { redirect: to.fullPath } });
+  if (to.path !== '/login' && !isAuthenticated) {
+    next('/login');
   } else {
     next();
   }

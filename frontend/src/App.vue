@@ -1,6 +1,6 @@
 <template>
   <main class="container mt-4 pt-5">
-    <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
+    <button v-if="$route.path !== '/login' && canGoBack" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
     </button>
     <div class="container mt-4">
@@ -15,7 +15,7 @@
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
             <a class="navbar-brand" href="#">Carbio.fit</a>
           </div>
-          <div v-if="$route.path.toLocaleLowerCase() !== '/login'" class="d-flex justify-content-center justify-content-lg-end w-100">
+          <div v-if="$route.path !== '/login'" class="d-flex justify-content-center justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'house']" />
             </router-link>

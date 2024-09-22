@@ -1,6 +1,6 @@
 {
-  "watch": ["dist"],                  
-  "ext": "js",  
-  "exec": "node ./dist/index.js",  
-  "ignore": ["src/*", "node_modules/*", "../../frontend/*"]
-}
+    "watch": ["dist"],                  
+    "ext": "js",  
+    "exec": "node ./dist/index.js",  
+    "ignore": ["src/*", "node_modules/*"]
+  }

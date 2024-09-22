@@ -1,8 +1,7 @@
 <template>
     <div class="row">
         <div class="col-12 col-md-4 mb-3">
-            <h1>{{ user?.username }}</h1>
-            <img :src="user?.profilepic" alt="avatar" class="img-fluid rounded-circle">
+            <h1>Breakfast</h1>
         </div>
         <div class="col-12 col-md-4 mb-3">
             <h1>Lunch</h1>
@@ -14,22 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { useUserStore } from '@/stores/User';
-
-export default defineComponent({
+export default {
     name: 'ProfilePage',
-    setup() {
-        const userStore = useUserStore();
-        const user = userStore.user;
-
-        if (!user) {
-            console.error('User data is not available');
-        }
-
-        return {
-            user,
-        };
-    },
-});
+};
 </script>

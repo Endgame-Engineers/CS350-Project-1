@@ -10,7 +10,6 @@ export interface User {
     lastlogin: Date;
     providername: string;
     providerid: string;
-    profilepic: string;
 }
 
 class Users {
