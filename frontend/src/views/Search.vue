@@ -55,7 +55,8 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { barcodeLookup, searchForProducts, FoodItem, SearchResult } from '@/services/foodSearch';
+import { FoodItem, SearchResult } from '@/models/Models';
+import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
 
 export default {
   name: 'SearchPage',

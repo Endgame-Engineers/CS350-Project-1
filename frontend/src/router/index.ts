@@ -6,6 +6,8 @@ import history from '../views/History.vue';
 import barscanner from '../views/BarScanner.vue';
 import login from '../views/Login.vue';
 import Profile from '@/views/Profile.vue';
+import { createPinia } from 'pinia';
+import { useUserStore } from '@/stores/User';
 
 const routes = [
   {
@@ -45,30 +47,34 @@ const routes = [
   }
 ];
 
+const pinia = createPinia();
+
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
+const userStore = useUserStore(pinia);
+
 router.beforeEach(async (to, from, next) => {
-  const isAuthenticated = await fetch('/api/auth/google/success', { credentials: 'include' })
-    .then((response) => {
+  if (!userStore.isAuthenticated) {
+    try {
+      const response = await fetch('/api/auth/google/success', { credentials: 'include' });
       if (response.ok) {
-        return response.json();
+        const data = await response.json();
+        console.log('Authentication status:', data.isAuthenticated);
+        userStore.setUser(data.user);
+        userStore.setAuthenticated(data.isAuthenticated);
       } else {
         throw new Error('Failed to authenticate');
       }
-    })
-    .then((data) => {
-      console.log('Authentication status:', data.isAuthenticated);
-      return data.isAuthenticated;
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error('Error checking authentication status:', error);
-      return false;
-    });
+      userStore.setAuthenticated(false);
+    }
+  }
 
-  if (to.path.toLocaleLowerCase() !== '/login' && !isAuthenticated) {
+  if (to.path.toLocaleLowerCase() !== '/login' && !userStore.isAuthenticated) {
     next({ path: '/login', query: { redirect: to.fullPath } });
   } else {
     next();

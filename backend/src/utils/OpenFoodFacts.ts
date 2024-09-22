@@ -9,7 +9,6 @@ export interface ErrorMessage {
 }
 
 class OpenFoodFactsAPI {
-
     /**
      * Fetch product information from OpenFoodFacts API
      * @param barcode string

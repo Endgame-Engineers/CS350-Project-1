@@ -11,7 +11,6 @@ class AuthRoutes {
 
     public routes() {
         // Google OAuth routes
-
         // Redirect the user to Google for authentication.
         this.router.get(
             '/auth/google',

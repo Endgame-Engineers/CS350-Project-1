@@ -52,22 +52,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios from 'axios';
-
-interface FoodItem {
-  date: string;
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
-interface MealLog {
-  mealtype: string;
-  dateadded: string;
-  barcode: string;
-  servingconsumed: number;
-}
+import { FoodItem, MealLog } from '@/models/Models';
 
 export default defineComponent({
   name: 'HistoryPage',

@@ -1,24 +1,5 @@
 import axios, { AxiosError } from 'axios';
-export interface FoodItem {
-  foodname: string;
-  barcode: string;
-  protein_per_serv: number;
-  carb_per_serv: number;
-  fat_per_serv: number;
-  calories_per_serv: number;
-  image: string;
-}
-
-export interface ErrorMessage {
-  message: string;
-  type: string;
-}
-
-export interface SearchResult {
-  products: FoodItem[];
-  page: number;
-  page_count: number;
-}
+import { FoodItem, SearchResult, ErrorMessage } from '@/models/Models';
 
 export async function barcodeLookup(query: string): Promise<FoodItem | ErrorMessage> {
   try {
