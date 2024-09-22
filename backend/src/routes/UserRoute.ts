@@ -20,7 +20,7 @@ class UserRoute {
         this.router.get('/user/stats', isAuthenticated, (req, res) => {
             const user = req.user as User;
             if (user.id) {
-                    UserStats.getUserStats(user.id, req.params.all === 'true')
+                UserStats.getUserStats(user.id)
                     .then((userStats) => {
                         res.json(userStats);
                     })
