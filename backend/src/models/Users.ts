@@ -11,6 +11,7 @@ export interface User {
     providername: string;
     providerid: string;
     profilepic: string;
+    profilecreated: boolean;
 }
 
 class Users {
@@ -39,6 +40,10 @@ class Users {
 
     async updateUserLastLogin(uuid: string): Promise<void> {
         await (await this.client).query('UPDATE "Users" SET lastlogin = $1 WHERE uuid = $2', [new Date(), uuid]);
+    }
+
+    async updateProfileCreated(uuid: string): Promise<void> {
+        await (await this.client).query('UPDATE "Users" SET profilecreated = $1 WHERE uuid = $2', [true, uuid]);
     }
 
     async updateUser(user: User): Promise<void> {

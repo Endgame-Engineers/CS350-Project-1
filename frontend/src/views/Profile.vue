@@ -3,6 +3,9 @@
         <div class="col-12 col-md-4 mb-3">
             <h1>{{ user?.username }}</h1>
             <img :src="user?.profilepic" alt="avatar" class="img-fluid rounded-circle">
+            <div v-for="(value, key) in user" :key="key">
+                <p>{{ key }}: {{ value }}</p>
+            </div>
         </div>
         <div class="col-12 col-md-4 mb-3">
             <h1>Lunch</h1>
