@@ -13,6 +13,7 @@ export const useUserStore = defineStore('user', {
             providername: '',
             providerid: '',
             profilepic: '',
+            profilecreated: false,
         } as User,
         isAuthenticated: false,
     }),
@@ -32,6 +33,7 @@ export const useUserStore = defineStore('user', {
                 providername: '',
                 providerid: '',
                 profilepic: '',
+                profilecreated: false,
             } as User
         },
 
