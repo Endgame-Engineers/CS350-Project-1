@@ -20,7 +20,10 @@ class AuthGoogle {
                             if (existingUser) {
                                 console.log('User found in database');
                                 await Users.updateUserLastLogin(existingUser.uuid);
+                                existingUser.profilepic = profile.photos ? profile.photos[0].value : '';
                                 req.user = existingUser;
+
+
                                 return done(null, existingUser);
                             } else {
                                 console.log('User not found in database, creating');
@@ -33,6 +36,7 @@ class AuthGoogle {
                                     lastlogin: new Date(),
                                     providername: "Google",
                                     providerid: profile.id,
+                                    profilepic: profile.photos ? profile.photos[0].value : '',
                                 }
                                 await Users.addUser(user);
                                 req.user = user;

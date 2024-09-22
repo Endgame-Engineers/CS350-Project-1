@@ -11,7 +11,6 @@ class AuthRoutes {
 
     public routes() {
         // Google OAuth routes
-
         // Redirect the user to Google for authentication.
         this.router.get(
             '/auth/google',
@@ -47,9 +46,14 @@ class AuthRoutes {
 
         this.router.get('/auth/google/success', (req, res) => {
             if (req.user) {
-                res.json({ isAuthenticated: true });
+                res.json({ 
+                    isAuthenticated: true,
+                    user: req.user
+                });
             } else {
-                res.json({ isAuthenticated: false });
+                res.json({ 
+                    isAuthenticated: false 
+                });
             }
         });
     }
