@@ -13,7 +13,9 @@
 
         <div class="d-flex w-100 align-items-center">
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
-            <a class="navbar-brand" href="#">Carbio.fit</a>
+            <a class="navbar-brand" href="#">
+              <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+            </a>
           </div>
           <div v-if="$route.path.toLocaleLowerCase() !== '/login'" class="d-flex justify-content-center justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">

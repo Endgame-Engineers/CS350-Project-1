@@ -37,4 +37,5 @@ export interface User {
   providername: string;
   providerid: string;
   profilepic: string;
+  profilecreated: boolean;
 }
