@@ -47,9 +47,14 @@ class AuthRoutes {
 
         this.router.get('/auth/google/success', (req, res) => {
             if (req.user) {
-                res.json({ isAuthenticated: true });
+                res.json({ 
+                    isAuthenticated: true,
+                    user: req.user
+                });
             } else {
-                res.json({ isAuthenticated: false });
+                res.json({ 
+                    isAuthenticated: false 
+                });
             }
         });
     }
