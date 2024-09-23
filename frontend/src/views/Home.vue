@@ -34,6 +34,20 @@
               </div>
             </div>
           </div>
+          <div class="d-flex justify-content-between">
+            <div>
+              <p class="display-6">0</p>
+              <p>Consumed</p>
+            </div>
+            <div>
+              <p class="display-6">0</p>
+              <p>Burned</p>
+            </div>
+            <div>
+              <p class="display-6">{{ userStats.caloriegoal }}</p>
+              <p>Goal</p>
+            </div> 
+          </div>
         </div>
       </div>
     </div>
