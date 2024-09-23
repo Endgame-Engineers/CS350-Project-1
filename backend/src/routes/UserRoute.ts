@@ -42,6 +42,7 @@ class UserRoute {
             }
         });
 
+
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
             const startDate = start ? new Date(start as string) : new Date();
