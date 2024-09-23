@@ -39,3 +39,13 @@ export interface User {
   profilepic: string;
   profilecreated: boolean;
 }
+
+export interface UserStat {
+  userid: number;
+  height: number;
+  weight: number;
+  caloriegoal: number;
+  activitylevel: number;
+  age: number;
+  sex: string;
+}

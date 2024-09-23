@@ -29,6 +29,19 @@ class UserRoute {
             }
         });
 
+        this.router.post('/user/stats', isAuthenticated, (req, res) => {
+            const user = req.user as User;
+            if (user.id) {
+                const userStats = { ...req.body, userid: user.id };
+                UserStats.addUserStats(userStats)
+                    .then((userStats) => {
+                        res.status(201).json(userStats);
+                    });
+            } else {
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
             const startDate = start ? new Date(start as string) : new Date();
