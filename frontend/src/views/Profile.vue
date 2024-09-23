@@ -104,13 +104,14 @@ export default defineComponent({
 
         const formattedDateOfBirth = computed({
             get() {
-                if (!userStats.value.dateofbirth) {
-                    return '';
-                }
-                return userStats.value.dateofbirth.toISOString().split('T')[0];
+            if (!userStats.value.dateofbirth) {
+                return '';
+            }
+            const date = new Date(userStats.value.dateofbirth);
+            return date.toISOString().split('T')[0];
             },
             set(value: string) {
-                userStats.value.dateofbirth = new Date(value);
+            userStats.value.dateofbirth = new Date(value);
             }
         });
 
