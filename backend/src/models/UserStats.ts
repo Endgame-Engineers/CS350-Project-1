@@ -7,7 +7,9 @@ export interface UserStat {
     caloriegoal: number;
     activitylevel: number;
     age: number;
-    sex: string;
+    sex: number;
+    dateofbirth: Date;
+    updatedon: Date;
 }
 
 class UserStats {

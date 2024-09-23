@@ -41,11 +41,12 @@ export interface User {
 }
 
 export interface UserStat {
-  userid: number;
   height: number;
   weight: number;
   caloriegoal: number;
   activitylevel: number;
   age: number;
-  sex: string;
+  sex: number;
+  dateofbirth: Date;
+  updatedon: Date;
 }
