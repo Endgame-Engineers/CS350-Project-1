@@ -8,6 +8,10 @@ export async function getUserStats(): Promise<UserStat> {
 }
 
 export async function addUserStats(userStats: UserStat): Promise<UserStat> {
-    const response = await axios.post('/api/user/stats', userStats);
-    return response.data;
+    const response = await axios.post('/api/user/stats', JSON.stringify(userStats), {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    return userStats;
 }

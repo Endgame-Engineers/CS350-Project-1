@@ -30,7 +30,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="dob" class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control" id="dob" v-model="userStats.dateofbirth">
+                    <input type="date" class="form-control" id="dob" v-model="formattedDateOfBirth">
                 </div>
                 <div class="mb-3">
                     <label for="activityLevel" class="form-label">Activity Level</label>
@@ -41,7 +41,7 @@
                         <option value="4">Very Active</option>
                         <option value="5">Super Active</option>
                     </select>
-                </div>  
+                </div>
                 <div class="mb-3">
                     <label for="sex" class="form-label">Sex</label>
                     <select class="form-select" id="sex" v-model="userStats.sex">
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useUserStore } from '@/stores/User';
 import { UserStat } from '@/models/Models';
 import { addUserStats, getUserStats } from '@/services/UserStats';
@@ -68,7 +68,7 @@ export default defineComponent({
     setup() {
         const userStore = useUserStore();
         const user = userStore.user;
-    
+
         const userStats = ref<UserStat>(
             {
                 weight: 0,
@@ -81,27 +81,53 @@ export default defineComponent({
                 updatedon: new Date(),
             }
         );
-    
+
         const fetchUserStats = async () => {
             const stats = await getUserStats();
             userStats.value = stats;
         };
-    
+
         const saveUserStats = async () => {
-            await addUserStats(userStats.value);
+            const userStat = {
+                weight: userStats.value.weight,
+                height: userStats.value.height,
+                age: userStats.value.age,
+                caloriegoal: userStats.value.caloriegoal,
+                dateofbirth: userStats.value.dateofbirth,
+                activitylevel: userStats.value.activitylevel,
+                sex: userStats.value.sex
+            } as UserStat;
+
+            await addUserStats(userStat);
+            await fetchUserStats();
         };
-    
-        if (!user) {
-            console.error('User data is not available');
-        } else {
-            fetchUserStats();
-        }
-    
+
+        const formattedDateOfBirth = computed({
+            get() {
+                if (!userStats.value.dateofbirth) {
+                    return '';
+                }
+                return userStats.value.dateofbirth.toISOString().split('T')[0];
+            },
+            set(value: string) {
+                userStats.value.dateofbirth = new Date(value);
+            }
+        });
+
         return {
             user,
             userStats,
             saveUserStats,
+            formattedDateOfBirth,
+            fetchUserStats
         };
     },
+    mounted() {
+        if (!this.user) {
+            console.error('User data is not available');
+        } else {
+            this.fetchUserStats();
+        }
+    }
 });
 </script>
