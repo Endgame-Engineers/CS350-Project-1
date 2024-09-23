@@ -200,7 +200,7 @@ export default defineComponent({
                 return date.toISOString().split('T')[0];
             },
             set(value: string) {
-                userStats.value.dateofbirth = new Date(value);
+            userStats.value.dateofbirth = new Date(value);
             }
         });
 
