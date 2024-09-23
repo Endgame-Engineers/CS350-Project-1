@@ -1,5 +1,8 @@
+import { get } from 'axios';
 import { Router, Request, Response } from 'express';
+import UserStats from '../models/UserStats';
 import passport from 'passport';
+import { User } from '../models/Users';
 
 class AuthRoutes {
     router: Router;
@@ -44,11 +47,24 @@ class AuthRoutes {
             });
         });
 
-        this.router.get('/auth/google/success', (req, res) => {
-            if (req.user) {
+        this.router.get('/auth/google/success', async (req, res) => {
+            // update req.user if req.user.profilecreated is false
+            const reqUser = req.user as User;
+            if (reqUser) {
+                if (reqUser.profilecreated === false) {
+                    // make sure its actually false
+                    if (reqUser.id === undefined) {
+                        throw new Error('User ID is undefined');
+                    }
+                    await UserStats.getUserStats(reqUser.id, false).then((userStats) => {
+                        if (userStats !== null) {
+                            reqUser.profilecreated = true;
+                        }
+                    });
+                }
                 res.json({ 
                     isAuthenticated: true,
-                    user: req.user
+                    user: reqUser
                 });
             } else {
                 res.json({ 

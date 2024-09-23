@@ -76,9 +76,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (userStore.isAuthenticated && userStore.user.profilecreated === false && to.path.toLocaleLowerCase() !== '/profile') {
     next({ path: '/profile', query: { redirect: to.fullPath } });
-  }
-
-  if (to.path.toLocaleLowerCase() !== '/login' && !userStore.isAuthenticated) {
+  } else if (to.path.toLocaleLowerCase() !== '/login' && !userStore.isAuthenticated) {
     next({ path: '/login', query: { redirect: to.fullPath } });
   } else {
     next();
