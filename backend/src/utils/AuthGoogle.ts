@@ -2,6 +2,7 @@ import passport from 'passport';
 import { NextFunction, Response, Request } from 'express';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import Users, { User } from '../models/Users';
+import UserStats from '../models/UserStats';
 
 class AuthGoogle {
     constructor() {
@@ -11,7 +12,7 @@ class AuthGoogle {
                     clientID: process.env.GOOGLE_CLIENT_ID!,
                     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
                     callbackURL: '/api/auth/google/callback',
-                    passReqToCallback: true, 
+                    passReqToCallback: true,
                 },
                 async (req, accessToken, refreshToken, profile, done) => {
                     try {
@@ -21,6 +22,17 @@ class AuthGoogle {
                                 console.log('User found in database');
                                 await Users.updateUserLastLogin(existingUser.uuid);
                                 existingUser.profilepic = profile.photos ? profile.photos[0].value : '';
+                                if (existingUser.id !== undefined) {
+                                    existingUser.profilecreated = await UserStats.getUserStats(existingUser.id, false).then((userStats) => {
+                                        if (userStats != null) {
+                                            return true;
+                                        }
+                                        return false;
+                                    });
+                                    req.user = existingUser;
+                                } else {
+                                    throw new Error('User ID is undefined');
+                                }
                                 req.user = existingUser;
 
 

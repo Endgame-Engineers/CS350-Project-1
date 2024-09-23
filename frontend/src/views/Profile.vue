@@ -69,49 +69,48 @@ export default defineComponent({
         const userStore = useUserStore();
         const user = userStore.user;
 
-        const userStats = ref<UserStat>(
-            {
-                weight: 0,
-                height: 0,
-                age: 0,
-                caloriegoal: 0,
-                dateofbirth: new Date(),
-                activitylevel: 0,
-                sex: 0,
-                updatedon: new Date(),
-            }
-        );
+        const userStats = ref<UserStat>({
+            weight: 0,
+            height: 0,
+            age: 0,
+            caloriegoal: 0,
+            dateofbirth: new Date(),
+            activitylevel: 1,
+            sex: 1,
+            updatedon: new Date(),
+        });
 
         const fetchUserStats = async () => {
-            const stats = await getUserStats();
-            userStats.value = stats;
+            try {
+                const stats = await getUserStats();
+                if (stats) {
+                    userStats.value = stats;
+                }
+            } catch (error) {
+                console.error('Failed to fetch user stats:', error);
+            }
         };
 
         const saveUserStats = async () => {
-            const userStat = {
-                weight: userStats.value.weight,
-                height: userStats.value.height,
-                age: userStats.value.age,
-                caloriegoal: userStats.value.caloriegoal,
-                dateofbirth: userStats.value.dateofbirth,
-                activitylevel: userStats.value.activitylevel,
-                sex: userStats.value.sex
-            } as UserStat;
-
-            await addUserStats(userStat);
-            await fetchUserStats();
+            try {
+                await addUserStats(userStats.value);
+                await fetchUserStats();
+                console.log('User stats saved successfully');
+            } catch (error) {
+                console.error('Failed to save user stats:', error);
+            }
         };
 
         const formattedDateOfBirth = computed({
             get() {
-            if (!userStats.value.dateofbirth) {
-                return '';
-            }
-            const date = new Date(userStats.value.dateofbirth);
-            return date.toISOString().split('T')[0];
+                if (!userStats.value.dateofbirth) {
+                    return '';
+                }
+                const date = new Date(userStats.value.dateofbirth);
+                return date.toISOString().split('T')[0];
             },
             set(value: string) {
-            userStats.value.dateofbirth = new Date(value);
+                userStats.value.dateofbirth = new Date(value);
             }
         });
 

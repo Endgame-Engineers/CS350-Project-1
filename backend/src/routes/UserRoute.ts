@@ -37,12 +37,11 @@ class UserRoute {
             const user = req.user as User;
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
 
-            console.log(userStat);  
-
             if (user.id) {
             UserStats.addUserStats(userStat, user.id)
                 .then((userStats) => {
-                res.status(201).json(userStats);
+                    console.log("User Stat created");
+                    res.status(201).json(userStats);
                 });
             } else {
             res.status(400).json({ error: 'User not authenticated' });
