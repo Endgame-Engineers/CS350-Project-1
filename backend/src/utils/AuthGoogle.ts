@@ -37,6 +37,7 @@ class AuthGoogle {
                                     providername: "Google",
                                     providerid: profile.id,
                                     profilepic: profile.photos ? profile.photos[0].value : '',
+                                    profilecreated: false
                                 }
                                 await Users.addUser(user);
                                 req.user = user;

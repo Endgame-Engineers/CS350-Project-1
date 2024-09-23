@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
-import UserStats from '../models/UserStats';
+import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
 
 class UserRoute {
@@ -20,9 +20,13 @@ class UserRoute {
         this.router.get('/user/stats', isAuthenticated, (req, res) => {
             const user = req.user as User;
             if (user.id) {
-                UserStats.getUserStats(user.id)
+                    UserStats.getUserStats(user.id, req.params.all === 'true')
                     .then((userStats) => {
                         res.json(userStats);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
                     });
             } else {
                 res.status(400).json({ error: 'User not authenticated' });
@@ -31,14 +35,17 @@ class UserRoute {
 
         this.router.post('/user/stats', isAuthenticated, (req, res) => {
             const user = req.user as User;
+            const userStat = { ...req.body, updatedon: new Date() } as UserStat;
+
+            console.log(userStat);  
+
             if (user.id) {
-                const userStats = { ...req.body, userid: user.id };
-                UserStats.addUserStats(userStats)
-                    .then((userStats) => {
-                        res.status(201).json(userStats);
-                    });
+            UserStats.addUserStats(userStat, user.id)
+                .then((userStats) => {
+                res.status(201).json(userStats);
+                });
             } else {
-                res.status(400).json({ error: 'User not authenticated' });
+            res.status(400).json({ error: 'User not authenticated' });
             }
         });
 
