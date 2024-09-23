@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/User';
 import { UserStat } from '@/models/Models';
 import { addUserStats, getUserStats } from '@/services/UserStats';
@@ -115,6 +115,10 @@ export default defineComponent({
             }
         });
 
+        onMounted(() => {
+            fetchUserStats();
+        });
+
         return {
             user,
             userStats,
@@ -123,12 +127,5 @@ export default defineComponent({
             fetchUserStats
         };
     },
-    mounted() {
-        if (!this.user) {
-            console.error('User data is not available');
-        } else {
-            this.fetchUserStats();
-        }
-    }
 });
 </script>
