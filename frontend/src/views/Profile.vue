@@ -225,5 +225,12 @@ export default defineComponent({
             updateUserStat,
         };
     },
+    mounted() {
+        if (!this.user) {
+            console.error('User data is not available');
+        } else {
+            this.fetchUserStats();
+        }
+    }
 });
 </script>
