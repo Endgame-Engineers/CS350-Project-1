@@ -57,6 +57,9 @@ const router = createRouter({
 const userStore = useUserStore(pinia);
 
 router.beforeEach(async (to, from, next) => {
+  // Reset the userStore on route switch
+  userStore.$reset();
+
   if (!userStore.isAuthenticated) {
     try {
       const response = await fetch('/api/auth/google/success', { credentials: 'include' });
