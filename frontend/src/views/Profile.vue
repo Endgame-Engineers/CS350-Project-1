@@ -126,12 +126,5 @@ export default defineComponent({
             fetchUserStats
         };
     },
-    mounted() {
-        if (!this.user) {
-            console.error('User data is not available');
-        } else {
-            this.fetchUserStats();
-        }
-    }
 });
 </script>
