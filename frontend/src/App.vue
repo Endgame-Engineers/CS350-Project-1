@@ -1,19 +1,19 @@
 <template>
-  <header class="container-fuild fixed-top bg-dark">
-    <div class="row w-100 align-items-center">
+  <header class="container-fuild fixed-top bg-dark p-3">
+    <div class="row">
       <div class="col text-start">
-        <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
-          class="btn btn-primary m-3">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" />
-        </button>
+      <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
+        class="btn btn-primary">
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+      </button>
       </div>
-      <div class="col text-center">
-        <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+      <div class="col-auto text-center">
+      <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
       </div>
       <div class="col text-end">
-        <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary" role="button">
-          <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
-        </a>
+      <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary" role="button">
+        <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+      </a>
       </div>
     </div>
   </header>
