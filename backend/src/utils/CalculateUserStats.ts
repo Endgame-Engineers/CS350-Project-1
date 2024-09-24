@@ -72,6 +72,23 @@ Divide by 4 to get the grams of protein: 750/4 = 187.5 grams
 anytime that your weight, height, or age, changes -- BMR changes -- if BMR changes then tdee changes -- anytime tdee changes... then calorie goal changes -- anytime calorie goal changes, then macronutrient goals change
 */
 
+/*
+TODO: create end points for calculating and updating user stats (enter goal, enter activity level, enter weight, enter height, enter age, etc.)
+
+1. once the user has entered their sex, weight, height, and age, then we can calculate BMR
+2. Once we have BMR, we then ask for their activity level
+3. Once we have activity level, we can then calculate TDEE -- which is their total daily energy expenditure
+4. We now need to have the user enter their goal (weight loss, maintenance, or weight gain) -- this will determine what their calorie goal should be
+5. After we have their calorie goal, we now allow the user to enter their desired macronutrient distribution with a starting recommended ration (35% protein, 20% fats, 45% carbs)
+6. After we have their desired macronutrient distribution, then we calculate the macronutrient goals. For example, Protein: 4 calories per gram
+Carbohydrates: 4 calories per gram
+Fat: 9 calories per gram
+Ex. If TDEE is 2500 calories and you want 30% from protein, that's 750 calories from protein
+Divide by 4 to get the grams of protein: 750/4 = 187.5 grams
+
+anytime that your weight, height, or age, changes -- BMR changes -- if BMR changes then tdee changes -- anytime tdee changes... then calorie goal changes -- anytime calorie goal changes, then macronutrient goals change
+*/
+
 export interface UserStats extends UserStat {
     tdee: number; // this would be the Total Daily Energy Expenditure
     bmr: number; // this would be the Basal Metabolic Rate -- the number of calories your body needs to function at rest
