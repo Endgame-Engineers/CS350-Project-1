@@ -28,6 +28,7 @@ export async function getUserStat(): Promise<UserStat | ErrorMessage> {
     }
 }
 
+// Function to submit new user stats to the backend
 export async function addUserStats(userStats: UserStat): Promise<UserStat> {
     try {
         const response = await axios.post<UserStat>('/api/user/stats', userStats, {
