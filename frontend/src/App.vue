@@ -4,7 +4,7 @@
       class="btn btn-primary position-absolute top-0 start-0 m-3">
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
     </button>
-    <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-outline-primary me-2 position-absolute top-0 end-0 m-3" role="button">
+    <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary position-absolute top-0 end-0 m-3" role="button">
       <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
     </a>
     <div class="container mt-4">
@@ -12,7 +12,7 @@
     </div>
   </main>
   <footer class="container-fluid fixed-bottom bg-dark">
-    <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', { 'pb-5': isMobile }]">
+    <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', { 'pb-4': isMobile }]">
       <div class="container-fluid">
 
         <div class="d-flex w-100 align-items-center">
