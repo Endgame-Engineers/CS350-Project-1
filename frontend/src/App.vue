@@ -7,8 +7,8 @@
       <router-view></router-view>
     </div>
   </main>
-  <footer class="container fixed-bottom">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <footer class="container-fluid fixed-bottom">
+    <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', 'bg-dark', { 'pb-5': isMobile }]">
       <div class="container-fluid">
 
         <div class="d-flex w-100 align-items-center">
@@ -62,7 +62,8 @@ export default defineComponent({
   },
   data() {
     return {
-      isDarkTheme: true
+      isDarkTheme: true,
+      isMobile: window.innerWidth < 768
     };
   },
   mounted() {
