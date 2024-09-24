@@ -44,6 +44,12 @@
         <bar-chart :data="chartData" :options="chartOptions"></bar-chart>
       </div>
     </div>
+
+    <!-- Chart Row -->
+    <!-- Testing Charts -->
+    <div class="row mt-4">
+      <bar-chart :data="chartData" :options="chartOptions"></bar-chart>
+    </div>
   </div>
 </template>
 
