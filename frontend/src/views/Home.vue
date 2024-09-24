@@ -81,11 +81,23 @@ export default defineComponent({
 
     const chartData = ref({
       labels: ['January', 'February', 'March'],
-      datasets: [{ data: [40, 20, 12] }]
+      datasets: [
+        {
+          label: 'Calories Consumed',
+          backgroundColor: '#f87979',
+          data: [40, 20, 30],
+        },
+        {
+          label: 'Calories Burned',
+          backgroundColor: '#79f8f8',
+          data: [10, 30, 40],
+        },
+      ],
     });
 
     const chartOptions = ref({
-      responsive: true
+      responsive: true,
+      maintainAspectRatio: false,
     });
 
 
