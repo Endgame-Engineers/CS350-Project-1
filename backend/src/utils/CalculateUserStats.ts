@@ -211,6 +211,11 @@ export class CalculateUserStats {
         this.refreshStats();
     }
 
+    public updateCalorieGoal(calorieGoal: number): void {
+        this.calorieGoal = calorieGoal;
+        this.refreshStats();
+    }
+
     public updateMacronutrientPercentageGoals(proteinPercentage: number, fatPercentage: number, carbPercentage: number): void {
         this.stats.proteinpercentage = proteinPercentage;
         this.stats.fatpercentage = fatPercentage;
