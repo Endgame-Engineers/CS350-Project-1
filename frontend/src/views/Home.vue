@@ -1,7 +1,7 @@
 <template>
   <!-- Main Container -->
   <div class="container d-flex flex-column py-5">
-    
+
     <!-- Welcome Row -->
     <div class="row mb-4">
       <div class="col text-center">
@@ -33,10 +33,16 @@
             <div>
               <p class="display-6">{{ userStats.caloriegoal }}</p>
               <p>Goal</p>
-            </div> 
+            </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Chart Row -->
+    <!-- Testing Charts -->
+    <div class="row mt-4">
+      <bar-chart :data="chartData" :options="chartOptions"></bar-chart>
     </div>
   </div>
 </template>
@@ -45,9 +51,17 @@
 import { defineComponent, ref } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/User';
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+
+
 
 export default defineComponent({
   name: 'HomePage',
+  components: {
+    BarChart: Bar,
+  },
   setup() {
     const userStore = useUserStore();
     const user = userStore.user;
@@ -65,9 +79,21 @@ export default defineComponent({
 
     fetchUserStats();
 
+    const chartData = ref({
+      labels: ['January', 'February', 'March'],
+      datasets: [{ data: [40, 20, 12] }]
+    });
+
+    const chartOptions = ref({
+      responsive: true
+    });
+
+
     return {
       user,
       userStats,
+      chartData,
+      chartOptions,
     };
   },
 });
