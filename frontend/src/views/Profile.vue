@@ -12,37 +12,40 @@
         <div class="col-12 col-md-8 mb-3">
             <h1 class="text-center">Edit Profile</h1>
             <!-- Weight, height, age, calorie goal, date of birth, activity level, sex -->
+             <div class="d-flex justify-content-end">
+                <button v-if="!isEditing" class="btn btn-outline-primary me-2" @click="toggleIsEditing"><font-awesome-icon :icon="['fas', 'pencil']"/></button>
+             </div>
 
             <form @submit.prevent="saveUserStats">
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="weight" class="form-label">Weight</label>
-                        <input type="number" placeholder="Enter weight in pounds" class="form-control" id="weight" v-model="userStats.weight">
+                        <input type="number" placeholder="Enter weight in pounds" class="form-control" id="weight" v-model="userStats.weight" :readonly="!isEditing">
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="height" class="form-label">Height</label>
-                        <input type="number" placeholder="Enter height in inches" class="form-control" id="height" v-model="userStats.height">
+                        <input type="number" placeholder="Enter height in inches" class="form-control" id="height" v-model="userStats.height" :readonly="!isEditing">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="age" class="form-label">Age</label>
-                        <input type="number" placeholder="Enter age" class="form-control" id="age" v-model="userStats.age">
+                        <input type="number" placeholder="Enter age" class="form-control" id="age" v-model="userStats.age" :readonly="!isEditing">
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="calorieGoal" class="form-label">Calorie Goal</label>
-                        <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal" v-model="userStats.caloriegoal">
+                        <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal" v-model="userStats.caloriegoal" :readonly="!isEditing">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 mb-3">
                         <label for="dob" class="form-label">Date of Birth</label>
-                        <input type="date" placeholder="Enter date of birth" class="form-control" id="dob" v-model="formattedDateOfBirth">
+                        <input type="date" placeholder="Enter date of birth" class="form-control" id="dob" v-model="formattedDateOfBirth" :readonly="!isEditing">
                     </div>
                 </div>
                 <div class="mb-3">
                     <label for="activityLevel" class="form-label">Activity Level</label>
-                    <select class="form-select" id="activityLevel" v-model="userStats.activitylevel">
+                    <select class="form-select" id="activityLevel" v-model="userStats.activitylevel" :disabled="!isEditing">
                         <option value="1">Sedentary</option>
                         <option value="2">Lightly Active</option>
                         <option value="3">Moderately Active</option>
@@ -52,18 +55,16 @@
                 </div>
                 <div class="mb-3">
                     <label for="sex" class="form-label">Sex</label>
-                    <select class="form-select" id="sex" v-model="userStats.sex">
+                    <select class="form-select" id="sex" v-model="userStats.sex" :disabled="!isEditing">
                         <option value="1">Male</option>
                         <option value="2">Female</option>
                     </select>
                 </div>
                 <div v-if="isEditing" class="d-flex flex-column justify-content-end align-items-end">
-                    <button @click="toggleEditingAndSave" class="btn btn-primary">Save</button>
+                    <button @click="toggleIsEditing" type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
         </div>
-        <!-- <div class="col-12 col-md-4 mb-3">
-        </div> -->
     </div>
 </template>
 
@@ -79,6 +80,7 @@ export default defineComponent({
         const userStore = useUserStore();
         const user = userStore.user;
         const excludedKeys = ref(['id', 'uuid', 'providerid', 'profilepic', 'profilecreated']);
+        let isEditing = ref(false);
 
         const userStats = ref<UserStat>({
             weight: null,
@@ -130,6 +132,10 @@ export default defineComponent({
             }
         });
 
+        const toggleIsEditing = () => {
+            isEditing.value = !isEditing.value;
+        };
+
         onMounted(() => {
             fetchUserStats();
         });
@@ -142,8 +148,7 @@ export default defineComponent({
             fetchUserStats,
             excludedKeys,
             isEditing,
-            toggleIsEditing,
-            toggleEditingAndSave,
+            toggleIsEditing
         };
     },
 });
