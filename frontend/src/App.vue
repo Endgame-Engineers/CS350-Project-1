@@ -7,7 +7,7 @@
     <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary position-absolute top-0 end-0 m-3" role="button">
       <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
     </a>
-    <div class="container mt-4">
+    <div class="container mt-4 pb-2">
       <router-view></router-view>
     </div>
   </main>
