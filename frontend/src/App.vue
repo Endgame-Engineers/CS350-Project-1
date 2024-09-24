@@ -1,12 +1,23 @@
 <template>
+  <header class="container-fuild fixed-top bg-dark">
+    <div class="row w-100 align-items-center">
+      <div class="col text-start">
+        <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
+          class="btn btn-primary m-3">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        </button>
+      </div>
+      <div class="col text-center">
+        <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+      </div>
+      <div class="col text-end">
+        <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary" role="button">
+          <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+        </a>
+      </div>
+    </div>
+  </header>
   <main class="container mt-4 pt-5 pb-5">
-    <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
-      class="btn btn-primary position-absolute top-0 start-0 m-3">
-      <font-awesome-icon :icon="['fas', 'arrow-left']" />
-    </button>
-    <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary position-absolute top-0 end-0 m-3" role="button">
-      <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
-    </a>
     <div class="container mt-4 pb-2">
       <router-view></router-view>
     </div>
@@ -17,7 +28,7 @@
 
         <div class="d-flex w-100 align-items-center">
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
-            <a class="navbar-brand" href="#">
+            <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/" class="navbar-brand">
               <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
             </a>
           </div>
