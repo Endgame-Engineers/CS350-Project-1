@@ -1,5 +1,5 @@
 <template>
-  <main class="container mt-4 pt-5">
+  <main class="container mt-4 pt-5" style="padding-bottom: 50px;">
     <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
     </button>
