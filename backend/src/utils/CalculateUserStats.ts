@@ -58,15 +58,15 @@ interface UserStats {
     weight: number; // in kg -- would be nice to have this in lbs as well for our American friends
     height: number; // in cm -- would be nice to have this in inches as well for our American friends
     age: number;
-    gender: 'male' | 'female';
+    sex: 'male' | 'female';
     activityLevel: 'sedentary' | 'lightly active' | 'moderately active' | 'very active' | 'super active';
     goal: 'weight loss' | 'maintenance' | 'weight gain';
     tdee: number; // this would be the Total Daily Energy Expenditure
     bmr: number; // this would be the Basal Metabolic Rate -- the number of calories your body needs to function at rest
     calorieGoal: number; // this would be the adjusted calories based on the goal
-    proteinPercentage?: number;
-    fatPercentage?: number;
-    carbPercentage?: number;
+    proteinPercentage: number;
+    fatPercentage: number;
+    carbPercentage: number;
     proteinGrams: number;
     fatGrams: number;
     carbGrams: number;
@@ -77,7 +77,7 @@ class CalculateUserStats {
     private weight: number;
     private height: number;
     private age: number;
-    private gender: 'male' | 'female';
+    private sex: 'male' | 'female';
     private activityLevel: 'sedentary' | 'lightly active' | 'moderately active' | 'very active' | 'super active';
     private goal: 'weight loss' | 'maintenance' | 'weight gain';
     private tdee: number;
@@ -95,15 +95,15 @@ class CalculateUserStats {
         this.weight = userStats.weight;
         this.height = userStats.height;
         this.age = userStats.age;
-        this.gender = userStats.gender;
+        this.sex = userStats.sex;
         this.activityLevel = userStats.activityLevel;
         this.goal = userStats.goal;
         this.tdee = userStats.tdee;
         this.bmr = userStats.bmr;
         this.calorieGoal = userStats.calorieGoal;
-        this.proteinPercentage = userStats.proteinPercentage || 15;
-        this.fatPercentage = userStats.fatPercentage || 30;
-        this.carbPercentage = userStats.carbPercentage || 55;
+        this.proteinPercentage = userStats.proteinPercentage;
+        this.fatPercentage = userStats.fatPercentage;
+        this.carbPercentage = userStats.carbPercentage;
         this.proteinGrams = userStats.proteinGrams;
         this.fatGrams = userStats.fatGrams;
         this.carbGrams = userStats.carbGrams;
@@ -113,7 +113,7 @@ class CalculateUserStats {
     // Calculate BMR
     // if BMR changes, then TDEE changes, if TDEE changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     private calculateBMR(): number {
-        if (this.gender === 'male') {
+        if (this.sex === 'male') {
             return 10 * this.weight + 6.25 * this.height - 5 * this.age + 5;
         } else {
             return 10 * this.weight + 6.25 * this.height - 5 * this.age - 161;
@@ -123,7 +123,6 @@ class CalculateUserStats {
     // Calculate TDEE
     // if TDEE changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     private calculateTDEE(): number {
-        const bmr = this.calculateBMR();
         let activityFactor: number;
 
         switch (this.activityLevel) {
@@ -146,17 +145,18 @@ class CalculateUserStats {
                 activityFactor = 1.2;
         }
 
-        return bmr * activityFactor;
+        return this.bmr * activityFactor;
     }
 
     // Adjust calorie goal based on user goal (weight loss, maintenance, or weight gain)
     // if user goal changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
-    private adjustForGoal(tdee: number): number {
+    // TODO: allow the user to change the percentage of the adjustment -- for example, if they want to lose weight but only want to subtract 10% instead of 20%
+    private calculateCalorieGoal(tdee: number): number {
         switch (this.goal) {
             case 'weight loss':
                 return tdee * 0.8; // Subtract 20% for weight loss
             case 'maintenance':
-                return tdee; // Use TDEE as is
+                return tdee; // Use TDEE as is for maintenance
             case 'weight gain':
                 return tdee * 1.2; // Add 20% for weight gain
             default:
@@ -179,24 +179,25 @@ class CalculateUserStats {
 
     // Method to refresh all dependent stats when a key attribute (weight, height, age, etc.) changes -- this will be particularly useful for the frontend so that they don't have to worry about recalculating everything and only need to worry about updating the specific attribute
     private refreshStats(): void { 
-        // TODO: refactor this 
+        // TODO: everytime this method is called, we need to also need to create a new snapshot of the user stats
+        this.bmr = this.calculateBMR();
         this.tdee = this.calculateTDEE();
-        this.calorieGoal = this.adjustForGoal(this.tdee);
-        const macronutrients = this.calculateMacronutrientGoals(this.calorieGoal);
+        this.calorieGoal = this.calculateCalorieGoal(this.tdee);
+        const macronutrientQuantities = this.calculateMacronutrientGoals(this.calorieGoal);
         this.lastUpdated = new Date();
 
         console.log('Updated Stats:', {
-            bmr: this.calculateBMR(),
+            bmr: this.bmr,
             tdee: this.tdee,
             calorieGoal: this.calorieGoal,
-            macronutrients,
+            macronutrientQuantities,
             lastUpdated: this.lastUpdated
         });
     }
 
     // Update methods that call refreshStats to recalculate all dependent values
     public updateWeight(weight: number): void {
-        this.weight = weight;
+        // this.weight = weight; // This line is not needed and causes an error
         this.refreshStats();
     }
 
@@ -217,6 +218,11 @@ class CalculateUserStats {
 
     public updateGoal(goal: 'weight loss' | 'maintenance' | 'weight gain'): void {
         this.goal = goal;
+        this.refreshStats();
+    }
+
+    public updateCalorieGoal(calorieGoal: number): void {
+        this.calorieGoal = calorieGoal;
         this.refreshStats();
     }
 
@@ -241,14 +247,13 @@ class CalculateUserStats {
         this.carbGrams = carbGrams;
     }
 
-    // This would return the latest calculated user stats
-    public calculateUserStats(): { bmr: number, tdee: number, adjustedCalories: number, macronutrients: { protein: number, fat: number, carbs: number }, lastUpdated: Date } {
-        return {
-            bmr: this.calculateBMR(),
-            tdee: this.tdee,
-            adjustedCalories: this.calorieGoal,
-            macronutrients: this.calculateMacronutrientGoals(this.calorieGoal),
-            lastUpdated: this.lastUpdated
-        };
+    // this would be used on the initial user stats creation -- we cannot use the update methods because we are not updating an existing value, we are setting the initial values
+    public calculateInitialUserStats(weight: number, height: number, age: number, sex: 'male' | 'female', activityLevel: 'sedentary' | 'lightly active' | 'moderately active' | 'very active' | 'super active', goal: 'weight loss' | 'maintenance' | 'weight gain'): void {
+        this.weight = weight;
+        this.height = height;
+        this.age = age;
+        this.sex = sex;
+        this.activityLevel = activityLevel;
+        this.goal = goal;
     }
 }
