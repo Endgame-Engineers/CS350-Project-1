@@ -2,26 +2,28 @@
   <header class="container-fuild fixed-top bg-dark p-3">
     <div class="row">
       <div class="col text-start">
-      <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
-        class="btn btn-primary">
-        <font-awesome-icon :icon="['fas', 'arrow-left']" />
-      </button>
+        <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
+          class="btn btn-primary">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        </button>
       </div>
       <div class="col-auto text-center">
-      <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+        <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
       </div>
       <div class="col text-end">
-      <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary" role="button">
-        <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
-      </a>
+        <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary"
+          role="button">
+          <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+        </a>
       </div>
     </div>
   </header>
-  <main class="container mt-4 pt-5 pb-5">
+  <main v-if="$route.path.toLocaleLowerCase() !== '/welcomescreen' && $route.path.toLocaleLowerCase() !== '/login'" class="container mt-4 pt-5 pb-5">
     <div class="container mt-4 pb-2">
       <router-view></router-view>
     </div>
   </main>
+  <router-view v-else></router-view>
   <footer class="container-fluid fixed-bottom bg-dark">
     <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', { 'pb-4': isMobile }]">
       <div class="container-fluid">
