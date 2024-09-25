@@ -41,11 +41,18 @@ export interface User {
 }
 
 export interface UserStat {
-  height: number;
-  weight: number;
-  caloriegoal: number;
-  activitylevel: number;
-  age: number;
+  userid?: number;
+  height: number | null;
+  weight: number | null;
+  goal: number;
+  caloriegoal: number | null;
+  activitylevel: number
+  proteinpercentage: number;
+  fatpercentage: number;
+  carbpercentage: number;
+  proteingrams: number;
+  fatgrams: number;
+  carbgrams: number;
   sex: number;
   dateofbirth: Date;
   updatedon: Date;

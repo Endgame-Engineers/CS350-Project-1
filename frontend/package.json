@@ -18,10 +18,12 @@
     "@zxing/browser": "^0.1.5",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.4",
     "core-js": "^3.8.3",
     "pinia": "^2.2.2",
     "register-service-worker": "^1.7.2",
     "vue": "^3.2.13",
+    "vue-chartjs": "^5.3.1",
     "vue-router": "^4.0.13"
   },
   "devDependencies": {

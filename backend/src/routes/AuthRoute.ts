@@ -56,8 +56,8 @@ class AuthRoutes {
                     if (reqUser.id === undefined) {
                         throw new Error('User ID is undefined');
                     }
-                    await UserStats.getUserStats(reqUser.id, false).then((userStats) => {
-                        if (userStats !== null) {
+                    await UserStats.getUserStats(reqUser.id).then((userStats) => {
+                        if (userStats.length > 0) {
                             reqUser.profilecreated = true;
                         }
                     });

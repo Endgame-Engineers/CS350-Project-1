@@ -23,9 +23,3 @@
     name: 'DiaryPage',
   };
   </script>
-  
-  <style scoped>
-  h1 {
-    color: #42b983;
-  }
-  </style>
