@@ -27,7 +27,6 @@
   <footer class="container-fluid fixed-bottom bg-dark">
     <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', { 'pb-4': isMobile }]">
       <div class="container-fluid">
-
         <div class="d-flex w-100 align-items-center">
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
             <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/" class="navbar-brand">
