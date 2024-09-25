@@ -79,10 +79,10 @@ export default defineComponent({
         const excludedKeys = ref(['id', 'uuid', 'providerid', 'profilepic', 'profilecreated']);
 
         const userStats = ref<UserStat>({
-            weight: 0,
-            height: 0,
-            age: 0,
-            caloriegoal: 0,
+            weight: null,
+            height: null,
+            age: null,
+            caloriegoal: null,
             dateofbirth: new Date(),
             activitylevel: 1,
             sex: 1,
