@@ -10,6 +10,10 @@ import welcomescreen from '@/views/WelcomeScreen.vue';
 import { createPinia } from 'pinia';
 import { useUserStore } from '@/stores/User';
 
+const pinia = createPinia();
+const userStore = useUserStore(pinia);
+
+
 const routes = [
   {
     path: '/',
@@ -50,17 +54,22 @@ const routes = [
     path: '/welcomescreen',
     name: 'WelcomeScreen',
     component: welcomescreen,
+    beforeEnter: (to: any, from: any, next: any) => {
+      const userStore = useUserStore();
+      if (userStore.user.profilecreated) {
+        next({ name: 'Home' }); 
+      } else {
+        next();
+      }
+    }
   }
 ];
-
-const pinia = createPinia();
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
-const userStore = useUserStore(pinia);
 
 router.beforeEach(async (to, from, next) => {
   // Reset the userStore on route switch

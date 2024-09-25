@@ -210,10 +210,6 @@ export default defineComponent({
             }
         });
 
-        onUnmounted(() => {
-            saveUserStats();
-        });
-
         return {
             step,
             user,
