@@ -1,8 +1,4 @@
 <template>
-  <h1>Meal Logs</h1>
-  <div>
-    <form @submit.prevent="addMealLog">   
-      <div>
     <h1>Meal Logs</h1>
     <form @submit.prevent="addMealLog">
       <div class="form-group">
