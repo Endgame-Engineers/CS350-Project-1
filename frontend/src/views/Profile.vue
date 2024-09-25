@@ -57,7 +57,9 @@
                         <option value="2">Female</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <div v-if="isEditing" class="d-flex flex-column justify-content-end align-items-end">
+                    <button @click="toggleEditingAndSave" class="btn btn-primary">Save</button>
+                </div>
             </form>
         </div>
         <!-- <div class="col-12 col-md-4 mb-3">
@@ -110,6 +112,11 @@ export default defineComponent({
             }
         };
 
+        const toggleEditingAndSave = () => {
+            saveUserStats();
+            toggleIsEditing();
+        };
+
         const formattedDateOfBirth = computed({
             get() {
                 if (!userStats.value.dateofbirth) {
@@ -133,7 +140,10 @@ export default defineComponent({
             saveUserStats,
             formattedDateOfBirth,
             fetchUserStats,
-            excludedKeys
+            excludedKeys,
+            isEditing,
+            toggleIsEditing,
+            toggleEditingAndSave,
         };
     },
 });
