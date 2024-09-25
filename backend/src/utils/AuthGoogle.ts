@@ -23,7 +23,7 @@ class AuthGoogle {
                                 await Users.updateUserLastLogin(existingUser.uuid);
                                 existingUser.profilepic = profile.photos ? profile.photos[0].value : '';
                                 if (existingUser.id !== undefined) {
-                                    existingUser.profilecreated = await UserStats.getUserStats(existingUser.id, false).then((userStats) => {
+                                    existingUser.profilecreated = await UserStats.getUserStats(existingUser.id).then((userStats) => {
                                         if (userStats != null) {
                                             return true;
                                         }
