@@ -33,34 +33,6 @@
                 <p>Goal</p>
               </div>
             </div>
-            <div class="d-flex justify-content-between">
-              <div>
-                <p class="display-6">0</p>
-                <p>Consumed</p>
-              </div>
-              <div>
-                <p class="display-6">0</p>
-                <p>Burned</p>
-              </div>
-              <div>
-                <p class="display-6">{{ userStats.caloriegoal }}</p>
-                <p>Goal</p>
-              </div>
-            </div>
-            <div class="d-flex justify-content-between">
-              <div>
-                <p class="display-6">0</p>
-                <p>Consumed</p>
-              </div>
-              <div>
-                <p class="display-6">0</p>
-                <p>Burned</p>
-              </div>
-              <div>
-                <p class="display-6">{{ userStats.caloriegoal }}</p>
-                <p>Goal</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -71,12 +43,6 @@
       <div class="row mt-4">
         <bar-chart :data="chartData" :options="chartOptions"></bar-chart>
       </div>
-    </div>
-
-    <!-- Chart Row -->
-    <!-- Testing Charts -->
-    <div class="row mt-4">
-      <bar-chart :data="chartData" :options="chartOptions"></bar-chart>
     </div>
   </div>
 </template>
