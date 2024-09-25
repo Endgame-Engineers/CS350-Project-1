@@ -58,6 +58,7 @@ anytime that your weight, height, or age, changes -- BMR changes -- if BMR chang
 export interface UserStats extends UserStat {
     tdee: number; // this would be the Total Daily Energy Expenditure
     bmr: number; // this would be the Basal Metabolic Rate -- the number of calories your body needs to function at rest
+    age: number; // this would be the age of the user -- calculated from the date of birth
 }
 
 export class CalculateUserStats {
@@ -65,6 +66,7 @@ export class CalculateUserStats {
 
     constructor(userStat: UserStat) {
         this.stats = userStat as UserStats;
+        this.stats.age = this.calculateAge(this.stats.dateofbirth);
     }
 
     // Calculate BMR
@@ -75,6 +77,20 @@ export class CalculateUserStats {
         } else {
             return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
         }
+    }
+
+    // Calculate age based on date of birth
+    private calculateAge(dateofbirth: Date): number {
+        const today = new Date();
+        const birthDate = new Date(dateofbirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const month = today.getMonth() - birthDate.getMonth();
+
+        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        return age;
     }
 
     // Calculate TDEE
@@ -123,9 +139,9 @@ export class CalculateUserStats {
 
     // Calculate macronutrient goals -- how many grams of protein, fat, and carbs the user should consume
     private calculateMacronutrientGoals(calories: number): { protein: number, fat: number, carbs: number } {
-        const proteinCalories = (this.stats.proteinPercentage / 100) * calories;
-        const fatCalories = (this.stats.fatPercentage / 100) * calories;
-        const carbCalories = (this.stats.carbPercentage / 100) * calories;
+        const proteinCalories = (this.stats.proteinpercentage / 100) * calories;
+        const fatCalories = (this.stats.fatpercentage / 100) * calories;
+        const carbCalories = (this.stats.carbpercentage / 100) * calories;
 
         return {
             protein: proteinCalories / 4, // 4 calories per gram of protein
@@ -163,11 +179,6 @@ export class CalculateUserStats {
         this.refreshStats();
     }
 
-    public updateAge(age: number): void {
-        this.stats.age = age;
-        this.refreshStats();
-    }
-
     public updateActivityLevel(activityLevel: number): void {
         this.stats.activitylevel = activityLevel;
         this.refreshStats();
@@ -184,31 +195,30 @@ export class CalculateUserStats {
     }
 
     public updateMacronutrientPercentageGoals(proteinPercentage: number, fatPercentage: number, carbPercentage: number): void {
-        this.stats.proteinPercentage = proteinPercentage;
-        this.stats.fatPercentage = fatPercentage;
-        this.stats.carbPercentage = carbPercentage;
+        this.stats.proteinpercentage = proteinPercentage;
+        this.stats.fatpercentage = fatPercentage;
+        this.stats.carbpercentage = carbPercentage;
         this.refreshStats();
     }
 
     // TODO: with the following methods, we would need to update the respective macronutrient percentages and recalculate the calorie goal based off the new macronutrient grams
     // TODO: allow the user to update the macronutrient grams directly as well -- I think it is important to first focus on the percentages and then allow the user to update the grams directly -- btw this is a paid myfitnesspal feature
     public updateProteinGrams(proteinGrams: number): void {
-        this.stats.proteinGrams = proteinGrams;
+        this.stats.proteingrams = proteinGrams;
     }
 
     public updateFatGrams(fatGrams: number): void {
-        this.stats.fatGrams = fatGrams;
+        this.stats.fatgrams = fatGrams;
     }
 
     public updateCarbGrams(carbGrams: number): void {
-        this.stats.carbGrams = carbGrams;
+        this.stats.carbgrams = carbGrams;
     }
 
     // this would be used on the initial user stats creation -- we cannot use the update methods because we are not updating an existing value, we are setting the initial values
-    public calculateInitialUserStats(weight: number, height: number, age: number, sex: number, activityLevel: number, goal: number): void {
+    public calculateInitialUserStats(weight: number, height: number, sex: number, activityLevel: number, goal: number): void {
         this.stats.weight = weight;
         this.stats.height = height;
-        this.stats.age = age;
         this.stats.sex = sex;
         this.stats.activitylevel = activityLevel;
         this.stats.goal = goal;

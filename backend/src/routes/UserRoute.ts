@@ -28,7 +28,6 @@ class UserRoute {
                                 ...userStat,
                                 bmr: stats.calculateBMR(),
                                 tdee: stats.calculateTDEE(),
-                                caloriegoal: stats.calculateCalorieGoal(stats.calculateTDEE())
                             };
                         }))
                         .then((calculatedStats) => {

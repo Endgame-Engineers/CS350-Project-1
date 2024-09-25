@@ -49,10 +49,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import axios from 'axios';
 import { useUserStore } from '@/stores/User';
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import { getUserStat } from '@/services/UserStats';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 
@@ -70,8 +70,15 @@ export default defineComponent({
 
     const fetchUserStats = async () => {
       try {
-        const response = await axios.get('/api/user/stats');
-        userStats.value = response.data;
+        const stats = await getUserStat();
+        if (stats) {
+          userStats.value = {
+            ...stats,
+            caloriegoal: 'caloriegoal' in stats && stats.caloriegoal !== null ? stats.caloriegoal : 0,
+          };
+        } else {
+          console.error('Failed to fetch user stats:', stats);
+        }
       } catch (error) {
         console.error('Failed to fetch user stats:', error);
       }
