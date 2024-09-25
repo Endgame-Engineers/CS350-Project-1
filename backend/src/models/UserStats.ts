@@ -4,8 +4,15 @@ export interface UserStat {
     userid: number;
     height: number;
     weight: number;
+    goal: number;
     caloriegoal: number;
     activitylevel: number;
+    proteinPercentage: number;
+    fatPercentage: number;
+    carbPercentage: number;
+    proteinGrams: number;
+    fatGrams: number;
+    carbGrams: number;
     age: number;
     sex: number;
     dateofbirth: Date;
@@ -19,14 +26,10 @@ class UserStats {
         this.client = ConnectToDB.getClient();
     }
 
-    async getUserStats(id: number, all = false): Promise<UserStat> {
-        const query = all ? 'SELECT * FROM "UserStats" WHERE userid = $1 ORDER BY updatedon' : 'SELECT * FROM "UserStats" WHERE userid = $1 ORDER BY updatedon DESC LIMIT 1';
+    async getUserStats(id: number): Promise<UserStat[]> {
+        const query = 'SELECT * FROM "UserStats" WHERE userid = $1 ORDER BY updatedon';
         const result = await (await this.client).query(query, [id]);
-        
-        if (all) {
-            return result.rows;
-        }
-        return result.rows[0] || null;
+        return result.rows;
     }
 
     async addUserStats(userStats: UserStat, userid: number): Promise<boolean> {

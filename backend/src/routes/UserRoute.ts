@@ -3,6 +3,7 @@ import { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
+import { CalculateUserStats } from '../utils/CalculateUserStats';
 
 class UserRoute {
     router: Router;
@@ -20,14 +21,23 @@ class UserRoute {
         this.router.get('/user/stats', isAuthenticated, (req, res) => {
             const user = req.user as User;
             if (user.id) {
-                    UserStats.getUserStats(user.id, req.params.all === 'true')
-                    .then((userStats) => {
-                        res.json(userStats);
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        res.status(500).json({ error: 'An error occurred' });
-                    });
+                    UserStats.getUserStats(user.id)
+                        .then((userStats) => userStats.map((userStat) => {
+                            const stats = new CalculateUserStats(userStat);
+                            return {
+                                ...userStat,
+                                bmr: stats.calculateBMR(),
+                                tdee: stats.calculateTDEE(),
+                                caloriegoal: stats.calculateCalorieGoal(stats.calculateTDEE())
+                            };
+                        }))
+                        .then((calculatedStats) => {
+                            res.json(calculatedStats);
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            res.status(500).json({ error: 'An error occurred' });
+                        });
             } else {
                 res.status(400).json({ error: 'User not authenticated' });
             }
