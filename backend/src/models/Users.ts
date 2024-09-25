@@ -26,16 +26,21 @@ class Users {
         return result.rows;
     }
 
-    async getUser(providerid: string): Promise<User> {
+    async getUser(providerid: string): Promise<User | null> {
         const result = await (await this.client).query('SELECT * FROM "Users" WHERE providerid = $1', [providerid]);
+        if (result.rows.length === 0) {
+            return null;
+        }
         return result.rows[0];
     }
 
-    async addUser(user: User): Promise<void> {
-        await (await this.client).query(
-            'INSERT INTO "Users" (username, email, firstname, lastname, uuid, lastlogin, providername, providerid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+    async addUser(user: User): Promise<User> {
+        const result = await (await this.client).query(
+            'INSERT INTO "Users" (username, email, firstname, lastname, uuid, lastlogin, providername, providerid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
             [user.username, user.email, user.firstname, user.lastname, user.uuid, user.lastlogin, user.providername, user.providerid]
         );
+        user.id = result.rows[0].id;
+        return user;
     }
 
     async updateUserLastLogin(uuid: string): Promise<void> {
