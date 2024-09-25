@@ -21,7 +21,8 @@
     "@types/passport": "^1.0.16",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/pg": "^8.11.8",
-    "concurrently": "^9.0.0"
+    "concurrently": "^9.0.0",
+    "rollup": "^3.29.5"
   },
   "scripts": {
     "build": "tsc",

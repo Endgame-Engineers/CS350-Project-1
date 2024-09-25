@@ -55,8 +55,6 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 import { getUserStat } from '@/services/UserStats';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-
-
 export default defineComponent({
   name: 'HomePage',
   components: {
