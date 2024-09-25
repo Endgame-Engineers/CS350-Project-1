@@ -212,7 +212,7 @@ export class CalculateUserStats {
     }
 
     public updateCalorieGoal(calorieGoal: number): void {
-        this.calorieGoal = calorieGoal;
+        this.stats.caloriegoal = calorieGoal;
         this.refreshStats();
     }
 
