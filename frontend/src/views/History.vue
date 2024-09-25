@@ -1,39 +1,5 @@
 <template>
-    <h1>Meal Logs</h1>
-    <form @submit.prevent="addMealLog">
-      <div class="form-group">
-        <label for="barcode">Barcode</label>
-        <input
-          type="text"
-          v-model="newMeal.barcode"
-          class="form-control"
-          id="barcode"
-          placeholder="Enter food barcode"
-        />
-      </div>   
-      <div class="form-group">
-        <label for="serving">Serving Consumed</label>
-        <input
-          type="number"
-          v-model="newMeal.servingconsumed"
-          class="form-control"
-          id="serving"
-          placeholder="Enter number of servings"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="mealtype">Meal Type</label>
-        <select v-model="newMeal.mealtype" class="form-control" id="mealtype">
-          <option value="Breakfast">Breakfast</option>
-          <option value="Lunch">Lunch</option>
-          <option value="Dinner">Dinner</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Add Meal</button>
-    </form>
-  </div>
+  <h1>Meal Logs</h1>
   <div class="row">
     <div class="col-12 col-md-4 mb-3">
       <h2 class="text-center">Breakfast</h2>
