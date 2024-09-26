@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { User } from '../models/Users';
+import Users, { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
@@ -52,6 +52,23 @@ class UserRoute {
                     console.log("User Stat created");
                     res.status(201).json(userStats);
                 });
+            } else {
+            res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.post('/user/stats/caloriegoal', isAuthenticated, (req, res) => {
+            // TODO: restructure this ;-;
+            const user = req.user as User;
+            const userStat = { ...req.body, updatedon: new Date() } as UserStat;
+            console.log(userStat);
+            const calculatedStats = new CalculateUserStats(userStat);
+            console.log(calculatedStats.calculateBMR());
+            console.log(calculatedStats.calculateTDEE());
+            const caloriegoal = calculatedStats.calculateCalorieGoal();
+
+            if (user.id) {
+                res.status(201).json({ caloriegoal });
             } else {
             res.status(400).json({ error: 'User not authenticated' });
             }

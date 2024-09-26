@@ -90,8 +90,10 @@ export class CalculateUserStats {
     // if BMR changes, then TDEE changes, if TDEE changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     public calculateBMR(): number {
         if (this.stats.sex === 1) {
+            this.stats.bmr = 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age + 5;
             return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age + 5;
         } else {
+            this.stats.bmr = 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
             return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
         }
     }
@@ -135,109 +137,24 @@ export class CalculateUserStats {
                 activityFactor = 1.2;
         }
 
+        this.stats.tdee = this.stats.bmr * activityFactor;
         return this.stats.bmr * activityFactor;
     }
 
     // Adjust calorie goal based on user goal (weight loss, maintenance, or weight gain)
     // if user goal changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     // TODO: allow the user to change the percentage of the adjustment -- for example, if they want to lose weight but only want to subtract 10% instead of 20%
-    public calculateCalorieGoal(tdee: number): number {
+    public calculateCalorieGoal(): number {
+        //TODO: refactor this to call all the necessary methods to calculate the calorie goal
         switch (this.stats.goal) {
             case 1:
-                return tdee * 0.8; // Subtract 20% for weight loss
+                return this.stats.tdee * 0.8; // Subtract 20% for weight loss
             case 2:
-                return tdee; // Use TDEE as is for maintenance
+                return this.stats.tdee; // Use TDEE as is for maintenance
             case 3:
-                return tdee * 1.2; // Add 20% for weight gain
+                return this.stats.tdee * 1.2; // Add 20% for weight gain
             default:
-                return tdee;
+                return this.stats.tdee;
         }
-    }
-
-    // Calculate macronutrient goals -- how many grams of protein, fat, and carbs the user should consume
-    private calculateMacronutrientGoals(calories: number): { protein: number, fat: number, carbs: number } {
-        const proteinCalories = (this.stats.proteinpercentage / 100) * calories;
-        const fatCalories = (this.stats.fatpercentage / 100) * calories;
-        const carbCalories = (this.stats.carbpercentage / 100) * calories;
-
-        return {
-            protein: proteinCalories / 4, // 4 calories per gram of protein
-            fat: fatCalories / 9, // 9 calories per gram of fat
-            carbs: carbCalories / 4 // 4 calories per gram of carbs
-        };
-    }
-
-    // Method to refresh all dependent stats when a key attribute (weight, height, age, etc.) changes -- this will be particularly useful for the frontend so that they don't have to worry about recalculating everything and only need to worry about updating the specific attribute
-    private refreshStats(): void { 
-        // TODO: everytime this method is called, we need to also need to create a new snapshot of the user stats
-        this.stats.bmr = this.calculateBMR();
-        this.stats.tdee = this.calculateTDEE();
-        this.stats.caloriegoal = this.calculateCalorieGoal(this.stats.tdee);
-        const macronutrientQuantities = this.calculateMacronutrientGoals(this.stats.caloriegoal);
-        this.stats.updatedon = new Date();
-
-        console.log('Updated Stats:', {
-            bmr: this.stats.bmr,
-            tdee: this.stats.tdee,
-            calorieGoal: this.stats.caloriegoal,
-            macronutrientQuantities,
-            lastUpdated: this.stats.updatedon
-        });
-    }
-
-    // Update methods that call refreshStats to recalculate all dependent values
-    public updateWeight(weight: number): void {
-        // this.stats.weight = weight; // This line is not needed and causes an error
-        this.refreshStats();
-    }
-
-    public updateHeight(height: number): void {
-        this.stats.height = height;
-        this.refreshStats();
-    }
-
-    public updateActivityLevel(activityLevel: number): void {
-        this.stats.activitylevel = activityLevel;
-        this.refreshStats();
-    }
-
-    public updateGoal(goal: number): void {
-        this.stats.goal = goal;
-        this.refreshStats();
-    }
-
-    public updateCalorieGoal(calorieGoal: number): void {
-        this.stats.caloriegoal = calorieGoal;
-        this.refreshStats();
-    }
-
-    public updateMacronutrientPercentageGoals(proteinPercentage: number, fatPercentage: number, carbPercentage: number): void {
-        this.stats.proteinpercentage = proteinPercentage;
-        this.stats.fatpercentage = fatPercentage;
-        this.stats.carbpercentage = carbPercentage;
-        this.refreshStats();
-    }
-
-    // TODO: with the following methods, we would need to update the respective macronutrient percentages and recalculate the calorie goal based off the new macronutrient grams
-    // TODO: allow the user to update the macronutrient grams directly as well -- I think it is important to first focus on the percentages and then allow the user to update the grams directly -- btw this is a paid myfitnesspal feature
-    public updateProteinGrams(proteinGrams: number): void {
-        this.stats.proteingrams = proteinGrams;
-    }
-
-    public updateFatGrams(fatGrams: number): void {
-        this.stats.fatgrams = fatGrams;
-    }
-
-    public updateCarbGrams(carbGrams: number): void {
-        this.stats.carbgrams = carbGrams;
-    }
-
-    // this would be used on the initial user stats creation -- we cannot use the update methods because we are not updating an existing value, we are setting the initial values
-    public calculateInitialUserStats(weight: number, height: number, sex: number, activityLevel: number, goal: number): void {
-        this.stats.weight = weight;
-        this.stats.height = height;
-        this.stats.sex = sex;
-        this.stats.activitylevel = activityLevel;
-        this.stats.goal = goal;
     }
 }
