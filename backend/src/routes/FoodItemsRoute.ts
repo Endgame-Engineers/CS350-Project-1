@@ -23,24 +23,42 @@ class FoodItemsRoute {
 
         this.router.get('/food-items/:barcode', isAuthenticated, (req, res) => {
             FoodItems.getFoodItem(req.params.barcode)
-                .then((foodItem) => {
-                if (foodItem !== undefined) {
-                    console.log('Food item found in database');
-                    res.json(foodItem);
-                }
-                else {
-                    console.log('Food item not found in database');
-                    OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
-                        .then((product) => {
-                        if (product && 'foodname' in product) {
-                            FoodItems.addFoodItem(product as FoodItem);
-                            res.json(product);
+            .then((foodItem) => {
+            if (foodItem !== undefined) {
+                console.log('Food item found in database');
+                res.json(foodItem);
+            }
+            else {
+                console.log('Food item not found in database');
+                OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
+                .then((product) => {
+                if (product && 'foodname' in product) {
+                    // Check again before adding to prevent duplicates
+                    FoodItems.getFoodItem(req.params.barcode)
+                    .then((existingItem) => {
+                        if (!existingItem) {
+                        FoodItems.addFoodItem(product as FoodItem);
                         }
-                        else {
-                            res.status(404).json({ message: 'Food item not found' });
-                        }
+                        res.json(product);
+                    })
+                    .catch((error) => {
+                        console.log('Error checking food item:', error);
+                        res.status(500).json({ error: (error as Error).message });
                     });
                 }
+                else {
+                    res.status(404).json({ message: 'Food item not found' });
+                }
+                })
+                .catch((error) => {
+                console.log('Error fetching food item:', error);
+                res.status(500).json({ error: (error as Error).message });
+                });
+            }
+            })
+            .catch((error) => {
+            console.log('Error fetching food item:', error);
+            res.status(500).json({ error: (error as Error).message });
             });
         });
 

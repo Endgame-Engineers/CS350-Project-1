@@ -76,7 +76,7 @@ class OpenFoodFactsAPI {
                 carb_per_serv: parseFloat(product.nutriments.carbohydrates_100g) / 100 || 0,
                 fat_per_serv: parseFloat(product.nutriments.fat_100g) / 100 || 0,
                 calories_per_serv: parseFloat(product.nutriments['energy-kcal_100g']) / 100 || 0,
-                image: product.image_url
+                image: product.image_url || "/img/No-Image-Placeholder.svg"
             };
         });
 
