@@ -36,7 +36,7 @@ class OpenFoodFactsAPI {
                     fat_per_serv: parseFloat(response.data.product.nutriments.fat_100g) / 100,
                     calories_per_serv:
                         parseFloat(response.data.product.nutriments['energy-kcal_100g']) / 100,
-                    image: response.data.product.image_url,
+                    image: response.data.product.image_url ?? "/img/No-Image-Placeholder.svg"
                 };
                 return product;
             })
@@ -76,7 +76,7 @@ class OpenFoodFactsAPI {
                 carb_per_serv: parseFloat(product.nutriments.carbohydrates_100g) / 100 || 0,
                 fat_per_serv: parseFloat(product.nutriments.fat_100g) / 100 || 0,
                 calories_per_serv: parseFloat(product.nutriments['energy-kcal_100g']) / 100 || 0,
-                image: product.image_url || "/img/No-Image-Placeholder.svg"
+                image: product.image_url ?? "/img/No-Image-Placeholder.svg"
             };
         });
 
