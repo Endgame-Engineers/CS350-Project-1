@@ -52,12 +52,11 @@ class AuthRoutes {
             const reqUser = req.user as User;
             if (reqUser) {
                 if (reqUser.profilecreated === false) {
-                    // make sure its actually false
                     if (reqUser.id === undefined) {
                         throw new Error('User ID is undefined');
                     }
                     await UserStats.getUserStats(reqUser.id).then((userStats) => {
-                        if (userStats !== null) {
+                        if (userStats.length > 0) {
                             reqUser.profilecreated = true;
                         }
                     });

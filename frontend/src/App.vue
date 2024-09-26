@@ -1,23 +1,40 @@
 <template>
-  <main class="container mt-4 pt-5">
-    <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack" class="btn btn-primary position-absolute top-0 start-0 m-3">
-      <font-awesome-icon :icon="['fas', 'arrow-left']" />
-    </button>
-    <div class="container mt-4">
+  <header class="container-fuild fixed-top bg-dark p-3">
+    <div class="row">
+      <div class="col text-start">
+        <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
+          class="btn btn-primary">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        </button>
+      </div>
+      <div class="col-auto text-center">
+        <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+      </div>
+      <div class="col text-end">
+        <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary"
+          role="button">
+          <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+        </a>
+      </div>
+    </div>
+  </header>
+  <main v-if="$route.path.toLocaleLowerCase() !== '/welcomescreen' && $route.path.toLocaleLowerCase() !== '/login'" class="container mt-4 pt-5 pb-5">
+    <div class="container mt-4 pb-2">
       <router-view></router-view>
     </div>
   </main>
-  <footer class="container fixed-bottom">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <router-view v-else></router-view>
+  <footer class="container-fluid fixed-bottom bg-dark">
+    <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', { 'pb-4': isMobile }]">
       <div class="container-fluid">
-
         <div class="d-flex w-100 align-items-center">
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
-            <a class="navbar-brand" href="#">
+            <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/" class="navbar-brand">
               <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
             </a>
           </div>
-          <div v-if="$route.path.toLocaleLowerCase() !== '/login'" class="d-flex justify-content-center justify-content-lg-end w-100">
+          <div v-if="$route.path.toLocaleLowerCase() !== '/login'"
+            class="d-flex justify-content-center justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'house']" />
             </router-link>
@@ -27,12 +44,6 @@
             <router-link to="/profile" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'user']" />
             </router-link>
-            <router-link to="/search" class="btn btn-outline-primary me-2" type="button">
-              <font-awesome-icon :icon="['fas', 'gear']" />
-            </router-link>
-            <a href="/api/auth/logout" class="btn btn-outline-primary me-2" role="button">
-              <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
-            </a>
           </div>
         </div>
       </div>
@@ -62,7 +73,8 @@ export default defineComponent({
   },
   data() {
     return {
-      isDarkTheme: true
+      isDarkTheme: true,
+      isMobile: window.innerWidth < 768
     };
   },
   mounted() {

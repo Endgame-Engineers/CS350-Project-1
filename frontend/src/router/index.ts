@@ -6,8 +6,13 @@ import history from '../views/History.vue';
 import barscanner from '../views/BarScanner.vue';
 import login from '../views/Login.vue';
 import Profile from '@/views/Profile.vue';
+import welcomescreen from '@/views/WelcomeScreen.vue';
 import { createPinia } from 'pinia';
 import { useUserStore } from '@/stores/User';
+
+const pinia = createPinia();
+const userStore = useUserStore(pinia);
+
 
 const routes = [
   {
@@ -44,17 +49,27 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: Profile,
+  },
+  {
+    path: '/welcomescreen',
+    name: 'WelcomeScreen',
+    component: welcomescreen,
+    beforeEnter: (to: any, from: any, next: any) => {
+      const userStore = useUserStore();
+      if (userStore.user.profilecreated) {
+        next({ name: 'Home' }); 
+      } else {
+        next();
+      }
+    }
   }
 ];
-
-const pinia = createPinia();
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
 
-const userStore = useUserStore(pinia);
 
 router.beforeEach(async (to, from, next) => {
   // Reset the userStore on route switch
@@ -77,8 +92,8 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  if (userStore.isAuthenticated && userStore.user.profilecreated === false && to.path.toLocaleLowerCase() !== '/profile') {
-    next({ path: '/profile', query: { redirect: to.fullPath } });
+  if (userStore.isAuthenticated && userStore.user.profilecreated === false && to.path.toLocaleLowerCase() !== '/welcomescreen') {
+    next({ path: '/welcomescreen', query: { redirect: to.fullPath } });
   } else if (to.path.toLocaleLowerCase() !== '/login' && !userStore.isAuthenticated) {
     next({ path: '/login', query: { redirect: to.fullPath } });
   } else {

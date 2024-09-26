@@ -1,10 +1,11 @@
 <template>
-<div class="container d-flex flex-column justify-content-center align-items-center">
-    <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit" class="img-fluid" />
+<div class="d-flex flex-column align-items-center justify-content-center vh-100">
+  <div class="contianer text-center">
     <a :href="googleAuthUrl" class="btn btn-primary">
       Login with <font-awesome-icon :icon="['fab', 'google']" />
     </a>
   </div>
+</div>
 </template>
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';

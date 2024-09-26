@@ -58,16 +58,48 @@ export default defineComponent({
   name: 'HistoryPage',
   data() {
     return {
-      mealLogs: [] as MealLog[]
+      mealLogs: [] as MealLog[],
+      newMeal: {
+        barcode: '',
+        servingconsumed: 1,
+        mealtype: 'Breakfast',
+        dateadded: ''
+      }
     };
   },
   async created() {
     const response = await axios.get('/api/user/logs?all=true');
-    this.mealLogs = response.data;
-    this.mealLogs = this.mealLogs.map((log: MealLog) => {
-      log.dateadded = new Date(log.dateadded).toLocaleString();
-      return log;
-    });
+    this.mealLogs = response.data.map((log: MealLog) => ({
+      ...log,
+      dateadded: new Date(log.dateadded).toLocaleString()
+    }));
+  },
+  methods: {
+    async addMealLog() {
+      try {
+        this.newMeal.dateadded = new Date().toISOString();
+
+        const response = await axios.post('/api/user/logs', {
+          barcode: this.newMeal.barcode,
+          servingconsumed: this.newMeal.servingconsumed,
+          mealtype: this.newMeal.mealtype,
+        });
+
+        this.mealLogs.push({
+          ...this.newMeal,
+          dateadded: new Date(this.newMeal.dateadded).toLocaleString(),
+        });
+
+        this.newMeal = {
+          barcode: '',
+          servingconsumed: 1,
+          mealtype: 'Breakfast',
+          dateadded: ''
+        };
+      } catch (error) {
+        console.error('Error adding meal log:', error);
+      }
+    }
   }
 });
 </script>
