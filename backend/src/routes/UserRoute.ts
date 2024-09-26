@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { User } from '../models/Users';
-import MealLogs, { MealLog } from '../models/MealLogs';
+import Users, { User } from '../models/Users';
+import MealLogs from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
@@ -61,6 +61,24 @@ class UserRoute {
             res.status(400).json({ error: 'User not authenticated' });
             }
         });
+
+        this.router.post('/user/stats/caloriegoal', isAuthenticated, (req, res) => {
+            // TODO: restructure this ;-;
+            const user = req.user as User;
+            const userStat = { ...req.body, updatedon: new Date() } as UserStat;
+            console.log(userStat);
+            const calculatedStats = new CalculateUserStats(userStat);
+            console.log(calculatedStats.calculateBMR());
+            console.log(calculatedStats.calculateTDEE());
+            const caloriegoal = calculatedStats.calculateCalorieGoal();
+
+            if (user.id) {
+                res.status(201).json({ caloriegoal });
+            } else {
+            res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
 
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
