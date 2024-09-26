@@ -1,49 +1,15 @@
 <template>
   <div class="row">
-    <div class="col-12 col-md-4 mb-3">
-      <h2 class="text-center">Breakfast</h2>
+    <div v-for="mealType in ['Breakfast', 'Lunch', 'Dinner']" :key="mealType" class="col-12 col-md-4 mb-3">
+      <h2 class="text-center">{{ mealType }}</h2>
       <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
-        <div v-if="item.mealtype.toLowerCase().includes('breakfast')" class="card mb-3">
+        <div v-if="item.mealtype.toLowerCase().includes(mealType.toLowerCase())" class="card mb-3">
           <div class="card-body">
             <img :src="item.image" alt="food image" class="img-thumbnail">
             <h5 class="card-title">
               {{ item.foodname }}
             </h5>
             <h5 class="card-title">
-              {{ item.dateadded }}
-            </h5>
-            <p class="card-text">
-              {{ item.servingconsumed }} servings of {{ item.foodname }}
-            </p>
-          </div>
-        </div>
-      </template>
-    </div>
-    <div class="col-12 col-md-4 mb-3">
-      <h2 class="text-center">Lunch</h2>
-      <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
-        <div v-if="item.mealtype.toLowerCase().includes('lunch')" class="card mb-3">
-          <div class="card-body">
-            <h5 class="card-title">
-              {{ item.foodname }}
-              <img :src="item.image" alt="food image" class="img-thumbnail">
-              {{ item.dateadded }}
-            </h5>
-            <p class="card-text">
-              {{ item.servingconsumed }} servings of {{ item.foodname }}
-            </p>
-          </div>
-        </div>
-      </template>
-    </div>
-    <div class="col-12 col-md-4 mb-3">
-      <h2 class="text-center">Dinner</h2>
-      <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
-        <div v-if="item.mealtype.toLowerCase().includes('dinner')" class="card mb-3">
-          <div class="card-body">
-            <h5 class="card-title">
-              {{ item.foodname }}
-              <img :src="item.image" alt="food image" class="img-thumbnail">
               {{ item.dateadded }}
             </h5>
             <p class="card-text">
