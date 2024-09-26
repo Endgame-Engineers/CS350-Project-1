@@ -47,13 +47,15 @@ class FoodItemsRoute {
         this.router.post('/food-items/bulk', isAuthenticated, (req, res) => {
             const barcodes = req.body.barcodes;
             if (!barcodes) {
+                console.log('No barcodes provided');
                 res.status(400).json({ error: 'No barcodes provided' });
                 return;
             }
 
             FoodItems.getFoodItems(barcodes)
                 .then((foodItems) => {
-                res.json(foodItems);
+                    console.log('Returning food items');
+                    res.json(foodItems);
             });
         });
 
