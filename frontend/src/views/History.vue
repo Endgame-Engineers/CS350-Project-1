@@ -1,16 +1,19 @@
 <template>
-  <h1>Meal Logs</h1>
   <div class="row">
     <div class="col-12 col-md-4 mb-3">
       <h2 class="text-center">Breakfast</h2>
       <template v-for="item in mealLogs" :key="item.barcode + item.dateadded">
         <div v-if="item.mealtype.toLowerCase().includes('breakfast')" class="card mb-3">
           <div class="card-body">
+            <img :src="item.image" alt="food image" class="img-thumbnail">
+            <h5 class="card-title">
+              {{ item.foodname }}
+            </h5>
             <h5 class="card-title">
               {{ item.dateadded }}
             </h5>
             <p class="card-text">
-              {{ item.servingconsumed }} servings of {{ item.barcode }}
+              {{ item.servingconsumed }} servings of {{ item.foodname }}
             </p>
           </div>
         </div>
@@ -22,10 +25,12 @@
         <div v-if="item.mealtype.toLowerCase().includes('lunch')" class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">
+              {{ item.foodname }}
+              <img :src="item.image" alt="food image" class="img-thumbnail">
               {{ item.dateadded }}
             </h5>
             <p class="card-text">
-              {{ item.servingconsumed }} servings of {{ item.barcode }}
+              {{ item.servingconsumed }} servings of {{ item.foodname }}
             </p>
           </div>
         </div>
@@ -37,10 +42,12 @@
         <div v-if="item.mealtype.toLowerCase().includes('dinner')" class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">
+              {{ item.foodname }}
+              <img :src="item.image" alt="food image" class="img-thumbnail">
               {{ item.dateadded }}
             </h5>
             <p class="card-text">
-              {{ item.servingconsumed }} servings of {{ item.barcode }}
+              {{ item.servingconsumed }} servings of {{ item.foodname }}
             </p>
           </div>
         </div>
@@ -53,12 +60,17 @@
 import { defineComponent } from 'vue';
 import axios from 'axios';
 import { FoodItem, MealLog } from '@/models/Models';
+import { barcodeLookup } from '@/services/foodSearch';
 
 export default defineComponent({
   name: 'HistoryPage',
   data() {
+    interface HistoryData extends MealLog {
+      foodname: string;
+      image: string;
+    }
     return {
-      mealLogs: [] as MealLog[],
+      mealLogs: [] as HistoryData[],
       newMeal: {
         barcode: '',
         servingconsumed: 1,
@@ -69,10 +81,18 @@ export default defineComponent({
   },
   async created() {
     const response = await axios.get('/api/user/logs?all=true');
-    this.mealLogs = response.data.map((log: MealLog) => ({
-      ...log,
-      dateadded: new Date(log.dateadded).toLocaleString()
-    }));
+    this.mealLogs = await Promise.all(
+        response.data.map(async (log: MealLog) => {
+          const foodDetails = await barcodeLookup(log.barcode) as FoodItem;
+          return {
+            ...log,
+            dateadded: new Date(log.dateadded).toLocaleString(),
+            foodname: foodDetails.foodname,
+            image: foodDetails.image
+          };
+        })
+      );
+    console.log(this.mealLogs);
   },
   methods: {
     async addMealLog() {
@@ -88,6 +108,8 @@ export default defineComponent({
         this.mealLogs.push({
           ...this.newMeal,
           dateadded: new Date(this.newMeal.dateadded).toLocaleString(),
+          foodname: '',
+          image: ''
         });
 
         this.newMeal = {
