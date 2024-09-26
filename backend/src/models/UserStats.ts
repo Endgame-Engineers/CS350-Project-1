@@ -26,7 +26,7 @@ class UserStats {
     }
 
     async getUserStats(id: number): Promise<UserStat[]> {
-        const query = 'SELECT * FROM "UserStats" WHERE userid = $1 ORDER BY updatedon';
+        const query = 'SELECT * FROM "UserStats" WHERE userid = $1 ORDER BY updatedon DESC';
         const result = await (await this.client).query(query, [id]);
         return result.rows;
     }
