@@ -13,7 +13,7 @@
                 <div v-if="step === 2" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Enter current Weight</h1>
                     <label for="weight" class="form-label"></label>
-                    <input type="number" placeholder="Enter weight in pounds" id="weight" class="form-control"
+                    <input type="number" placeholder="Enter weight in kilograms" id="weight" class="form-control"
                         v-model="userStats.weight" @change="updateUserStat('weight', $event)">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
@@ -28,7 +28,7 @@
                 <div v-if="step === 3" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Enter current Height</h1>
                     <label for="height" class="form-label"></label>
-                    <input type="number" placeholder="Enter height in inches" id="height" class="form-control"
+                    <input type="number" placeholder="Enter height in centimeters" id="height" class="form-control"
                         v-model="userStats.height" @change="updateUserStat('height', $event)">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">

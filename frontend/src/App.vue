@@ -33,7 +33,7 @@
               <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
             </a>
           </div>
-          <div v-if="$route.path.toLocaleLowerCase() !== '/login'"
+          <div v-if="$route.path.toLocaleLowerCase() !== '/login' && $route.path.toLocaleLowerCase() !== '/welcomescreen'"
             class="d-flex justify-content-center justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'house']" />
