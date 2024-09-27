@@ -1,3 +1,77 @@
+<script lang="ts">
+import { useUserStore } from '@/stores/User';
+import { defineComponent, ref, computed, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { UserStat } from '@/models/Models';
+import { addUserStats, fetchCalorieGoal } from '@/services/UserStats';
+import { updateUserStat, userStats } from '@/services/UserStats';
+
+export default defineComponent({
+    name: 'WelcomeScreen',
+    setup() {
+        const router = useRouter();
+        const userStore = useUserStore();
+        const user = userStore.user;
+        const step = ref(1);
+
+        const nextStep = () => {
+            getRecommendedCalorieGoal();
+            step.value += 1;
+        }
+
+        const prevStep = () => {
+            getRecommendedCalorieGoal();
+            step.value -= 1;
+        }
+
+        const getRecommendedCalorieGoal = async () => {
+            try {
+                const calorieGoal = await fetchCalorieGoal(userStats.value as UserStat);
+                userStats.value.recommendedcaloriegoal = calorieGoal;
+            } catch (error) {
+                console.error('Failed to fetch calorie goal:', error);
+            }
+        };
+
+        const saveUserStats = async () => {
+            try {
+                await addUserStats(userStats.value);
+                console.log('User stats saved successfully');
+                router.push({ name: 'Home' });
+            } catch (error) {
+                console.error('Failed to save user stats:', error);
+            }
+        };
+
+        const formattedDateOfBirth = computed({
+            get() {
+                if (!userStats.value.dateofbirth) {
+                    return '';
+                }
+                const date = new Date(userStats.value.dateofbirth);
+                return date.toISOString().split('T')[0];
+            },
+            set(value: string) {
+                userStats.value.dateofbirth = new Date(value);
+            }
+        });
+
+        return {
+            step,
+            user,
+            userStats,
+            nextStep,
+            prevStep,
+            saveUserStats,
+            updateUserStat,
+            formattedDateOfBirth,
+            getRecommendedCalorieGoal
+        }
+    }
+});
+
+</script>
+
 <template>
     <main class="d-flex flex-column align-items-center justify-content-center vh-100">
         <div class="container">
@@ -133,41 +207,7 @@
 
                 <div v-if="step === 9" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Macronutrient Distribution</h1>
-                    <div class="row">
-                        <div class="col-12 col-md-4 mb-3">
-                            <label for="proteinPercentage" class="form-label">Protein Percentage</label>
-                            <div class="d-flex justify-content-between">
-                                <span>1%</span>
-                                <span>{{ userStats.proteinpercentage }}%</span>
-                                <span>100%</span>
-                            </div>
-                            <input type="range" step="1" min="1" max="100" class="form-control" id="proteinPercentage"
-                                v-model.number="userStats.proteinpercentage"
-                                @change="updateUserStat('proteinpercentage', $event)">
-                        </div>
-                        <div class="col-12 col-md-4 mb-3">
-                            <label for="fatPercentage" class="form-label">Fat Percentage</label>
-                            <div class="d-flex justify-content-between">
-                                <span>1%</span>
-                                <span>{{ userStats.fatpercentage }}%</span>
-                                <span>100%</span>
-                            </div>
-                            <input type="range" step="1" min="1" max="100" class="form-control" id="fatPercentage"
-                                v-model.number="userStats.fatpercentage"
-                                @change="updateUserStat('fatpercentage', $event)">
-                        </div>
-                        <div class="col-12 col-md-4 mb-3">
-                            <label for="carbPercentage" class="form-label">Carb Percentage</label>
-                            <div class="d-flex justify-content-between">
-                                <span>1%</span>
-                                <span>{{ userStats.carbpercentage }}%</span>
-                                <span>100%</span>
-                            </div>
-                            <input type="range" step="1" min="1" max="100" class="form-control" id="carbPercentage"
-                                v-model.number="userStats.carbpercentage"
-                                @change="updateUserStat('carbpercentage', $event)">
-                        </div>
-                    </div>
+                    <user-stats-percentages />
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -177,128 +217,7 @@
                         </button>
                     </div>
                 </div>
-
             </form>
         </div>
     </main>
 </template>
-
-
-
-
-<script lang="ts">
-import { useUserStore } from '@/stores/User';
-import { defineComponent, ref, computed, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { UserStat } from '@/models/Models';
-import { addUserStats, fetchCalorieGoal } from '@/services/UserStats';
-
-
-export default defineComponent({
-    name: 'WelcomeScreen',
-    setup() {
-        const router = useRouter();
-        const userStore = useUserStore();
-        const user = userStore.user;
-        const step = ref(1);
-
-        interface ProfileStats extends UserStat {
-            recommendedcaloriegoal: number;
-        }
-
-        const userStats = ref<ProfileStats>({
-            weight: null,
-            height: null,
-            caloriegoal: null,
-            dateofbirth: new Date(),
-            activitylevel: 1,
-            sex: 1,
-            updatedon: new Date(),
-            goal: 1,
-            proteinpercentage: 0,
-            fatpercentage: 0,
-            carbpercentage: 0,
-            proteingrams: 0,
-            fatgrams: 0,
-            carbgrams: 0,
-            recommendedcaloriegoal: 0
-        });
-
-        const nextStep = () => {
-            getRecommendedCalorieGoal();
-            step.value += 1;
-        }
-
-        const prevStep = () => {
-            getRecommendedCalorieGoal();
-            step.value -= 1;
-        }
-
-        const updateUserStat = (property: keyof UserStat, event: Event) => {
-            const target = event.target as HTMLInputElement | null;
-            if (target) {
-                const value = target.value;
-                let parsedValue: any = value;
-
-                const propertyType = typeof userStats.value[property];
-
-                if (propertyType === 'number') {
-                    parsedValue = Number(value);
-                    if (isNaN(parsedValue)) {
-                        parsedValue = 0;
-                    }
-                } else if (propertyType === 'boolean') {
-                    parsedValue = value === 'true';
-                }
-
-                userStats.value[property] = parsedValue;
-            }
-        };
-
-        const getRecommendedCalorieGoal = async () => {
-            try {
-                const calorieGoal = await fetchCalorieGoal(userStats.value as UserStat);
-                userStats.value.recommendedcaloriegoal = calorieGoal;
-            } catch (error) {
-                console.error('Failed to fetch calorie goal:', error);
-            }
-        };
-
-        const saveUserStats = async () => {
-            try {
-                await addUserStats(userStats.value);
-                console.log('User stats saved successfully');
-                router.push({ name: 'Home' });
-            } catch (error) {
-                console.error('Failed to save user stats:', error);
-            }
-        };
-
-        const formattedDateOfBirth = computed({
-            get() {
-                if (!userStats.value.dateofbirth) {
-                    return '';
-                }
-                const date = new Date(userStats.value.dateofbirth);
-                return date.toISOString().split('T')[0];
-            },
-            set(value: string) {
-                userStats.value.dateofbirth = new Date(value);
-            }
-        });
-
-        return {
-            step,
-            user,
-            userStats,
-            nextStep,
-            prevStep,
-            saveUserStats,
-            updateUserStat,
-            formattedDateOfBirth,
-            getRecommendedCalorieGoal
-        }
-    }
-});
-
-</script>

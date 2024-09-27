@@ -1,5 +1,29 @@
 import { UserStat, ErrorMessage } from "../models/Models";
+import { ref } from "vue";
 import axios from "axios";
+
+
+export interface ProfileStats extends UserStat {
+    recommendedcaloriegoal: number;
+}
+
+export const userStats = ref<ProfileStats>({
+    weight: null,
+    height: null,
+    caloriegoal: null,
+    dateofbirth: new Date(),
+    activitylevel: 1,
+    sex: 1,
+    updatedon: new Date(),
+    goal: 1,
+    proteinpercentage: 0,
+    fatpercentage: 0,
+    carbpercentage: 0,
+    proteingrams: 0,
+    fatgrams: 0,
+    carbgrams: 0,
+    recommendedcaloriegoal: 0
+});
 
 // Function to fetch user stats from the backend
 export async function getUserStats(): Promise<UserStat> {
@@ -56,4 +80,25 @@ export async function fetchCalorieGoal(userStat: UserStat): Promise<number> {
         throw new Error("Could not fetch calorie goal.");
     }
 }
+
+export const updateUserStat = (property: keyof UserStat, event: Event) => {
+    const target = event.target as HTMLInputElement | null;
+    if (target) {
+        const value = target.value;
+        let parsedValue: any = value;
+
+        const propertyType = typeof userStats.value[property];
+
+        if (propertyType === 'number') {
+            parsedValue = Number(value);
+            if (isNaN(parsedValue)) {
+                parsedValue = 0;
+            }
+        } else if (propertyType === 'boolean') {
+            parsedValue = value === 'true';
+        }
+
+        userStats.value[property] = parsedValue;
+    }
+};
 

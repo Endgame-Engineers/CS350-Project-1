@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router'; 
 import './assets/scss/custom.scss';
+import UserStatsPercentages from './components/UserStatsPercentages.vue';
 
 // Font Awesome imports
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -17,6 +18,7 @@ dom.watch();
 createApp(App)
   .use(router)
   .component('font-awesome-icon', FontAwesomeIcon)
+  .component('user-stats-percentages', UserStatsPercentages)
   .mount('#app');
 
 function mount(arg0: string) {
