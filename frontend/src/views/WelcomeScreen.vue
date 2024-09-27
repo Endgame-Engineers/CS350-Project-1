@@ -37,7 +37,8 @@ export default defineComponent({
             }
         }
 
-        const prevStep = () => {
+        const prevStep = (event: Event) => {
+            event.preventDefault();
             getRecommendedCalorieGoal();
             if (step.value > 2) step.value--;
         }
