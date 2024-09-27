@@ -91,13 +91,13 @@ export default defineComponent({
             <form @submit.prevent="saveUserStats">
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
-                        <label for="weight" class="form-label">Weight</label>
+                        <label for="weight" class="form-label">Weight (lbs)</label>
                         <div v-if="!isEditing">{{ userStats.weight }} lbs</div>
                         <input v-else type="number" placeholder="Enter weight in pounds" class="form-control"
                             id="weight" v-model.number="userStats.weight">
                     </div>
                     <div class="col-12 col-md-6 mb-3">
-                        <label for="height" class="form-label">Height</label>
+                        <label for="height" class="form-label">Height (inches)</label>
                         <div v-if="!isEditing">{{ userStats.height }} inches</div>
                         <input v-else type="number" placeholder="Enter height in inches" class="form-control"
                             id="height" v-model.number="userStats.height">
