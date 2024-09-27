@@ -35,6 +35,7 @@
                         <label for="calorieGoal" class="form-label">Calorie Goal</label>
                         <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
                             v-model="userStats.caloriegoal" :readonly="!isEditing" @change="updateUserStat('caloriegoal', $event)">
+                        <div class="form-text">Recommended calorie goal: {{ userStats.recommendedcaloriegoal }}</div>
                     </div>
                 </div>
                 <div class="row">
@@ -126,7 +127,11 @@ export default defineComponent({
         const excludedKeys = ref(['id', 'uuid', 'providerid', 'profilepic', 'profilecreated']);
         let isEditing = ref(false);
 
-        const userStats = ref<UserStat>({
+        interface ProfileStats extends UserStat {
+            recommendedcaloriegoal: number
+        }
+
+        const userStats = ref<ProfileStats>({
             weight: 0,
             height: 0,
             caloriegoal: 0,
@@ -141,11 +146,12 @@ export default defineComponent({
             proteingrams: 0,
             fatgrams: 0,
             carbgrams: 0,
+            recommendedcaloriegoal: 0,
         });
 
         const fetchUserStats = async () => {
             try {
-                const stats = await getUserStat();
+                const stats = await getUserStat() as ProfileStats
                 if (stats && 'weight' in stats && 'height' in stats) {
                     userStats.value = stats;
                 }
