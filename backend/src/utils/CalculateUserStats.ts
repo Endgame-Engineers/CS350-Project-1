@@ -132,13 +132,13 @@ export class CalculateUserStats {
 
         switch (this.stats.goal) {
             case 1:
-            return Math.round(this.stats.tdee * 0.8); // Subtract 20% for weight loss
+                return this.stats.tdee * 0.8; // Subtract 20% for weight loss
             case 2:
-            return Math.round(this.stats.tdee); // Use TDEE as is for maintenance
+                return this.stats.tdee; // Use TDEE as is for maintenance
             case 3:
-            return Math.round(this.stats.tdee * 1.2); // Add 20% for weight gain
+                return this.stats.tdee * 1.2; // Add 20% for weight gain
             default:
-            return Math.round(this.stats.tdee);
+                return this.stats.tdee;
         }
     }
 }

@@ -33,7 +33,7 @@ class UserRoute {
                                 ...userStat,
                                 bmr: stats.calculateBMR(),
                                 tdee: stats.calculateTDEE(),
-                                recommendedcaloriegoal: stats.calculateCalorieGoal(),
+                                recommendedcaloriegoal: Math.round(stats.calculateCalorieGoal()),
                             };
                         }))
                         .then((calculatedStats) => {
@@ -68,7 +68,7 @@ class UserRoute {
             const user = req.user as User;
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
             const calculatedStats = new CalculateUserStats(userStat);
-            const caloriegoal = calculatedStats.calculateCalorieGoal();
+            const caloriegoal = Math.round(calculatedStats.calculateCalorieGoal());
 
             if (user.id) {
                 res.status(201).json(caloriegoal);
