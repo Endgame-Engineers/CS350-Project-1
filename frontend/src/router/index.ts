@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import home from '../views/Home.vue';
 import search from '../views/Search.vue';
-import diary from '../views/Diary.vue';
 import history from '../views/History.vue';
 import barscanner from '../views/BarScanner.vue';
 import login from '../views/Login.vue';
@@ -29,11 +28,6 @@ const routes = [
     path: '/history',
     name: 'History',
     component: history,
-  },
-  {
-    path: '/diary',
-    name: 'Diary',
-    component: diary,
   },
   {
     path: '/barscanner',

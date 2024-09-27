@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { User } from '../models/Users';
-import MealLogs from '../models/MealLogs';
+import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
+import FoodItems, { FoodItem } from '../models/FoodItems';
+
+interface ExtendedMealLog extends MealLog {
+    foodItem: FoodItem;
+}
 
 class UserRoute {
     router: Router;
@@ -28,7 +33,7 @@ class UserRoute {
                                 ...userStat,
                                 bmr: stats.calculateBMR(),
                                 tdee: stats.calculateTDEE(),
-                                recommendedcaloriegoal: stats.calculateCalorieGoal(),
+                                recommendedcaloriegoal: Math.round(stats.calculateCalorieGoal()),
                             };
                         }))
                         .then((calculatedStats) => {
@@ -63,15 +68,15 @@ class UserRoute {
             const user = req.user as User;
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
             const calculatedStats = new CalculateUserStats(userStat);
-            const caloriegoal = calculatedStats.calculateCalorieGoal();
+            const caloriegoal = Math.round(calculatedStats.calculateCalorieGoal());
 
             if (user.id) {
-                res.status(201).json({ caloriegoal });
+                console.log("Calorie goal created");
+                res.status(201).json(caloriegoal);
             } else {
             res.status(400).json({ error: 'User not authenticated' });
             }
         });
-
 
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
@@ -83,7 +88,17 @@ class UserRoute {
                 if (all) {
                     MealLogs.getMealLogs(user.id)
                         .then((mealLogs) => {
-                            res.json(mealLogs);
+                            const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
+                                const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
+                                if (foodItem) {
+                                    mealLog.foodItem = foodItem;
+                                }
+                                return mealLog;
+                            });
+                            return Promise.all(mealLogPromises);
+                        })
+                        .then((mappedMealLogs) => {
+                            res.json(mappedMealLogs);
                         });
                 } else {
                     MealLogs.getMealLog(user.id, startDate, endDate)
