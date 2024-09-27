@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { User } from '../models/Users';
-import MealLogs from '../models/MealLogs';
+import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
+import FoodItems, { FoodItem } from '../models/FoodItems';
+
+interface ExtendedMealLog extends MealLog {
+    foodItem: FoodItem;
+}
 
 class UserRoute {
     router: Router;
@@ -57,7 +62,6 @@ class UserRoute {
             }
         });
 
-
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
             const startDate = start ? new Date(start as string) : new Date();
@@ -68,7 +72,27 @@ class UserRoute {
                 if (all) {
                     MealLogs.getMealLogs(user.id)
                         .then((mealLogs) => {
-                            res.json(mealLogs);
+                            const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
+                                const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
+                                if (foodItem) {
+                                    mealLog.foodItem = foodItem;
+                                } else {
+                                    mealLog.foodItem = {
+                                        foodname: 'Food item not found',
+                                        barcode: mealLog.barcode,
+                                        protein_per_serv: 0,
+                                        carb_per_serv: 0,
+                                        fat_per_serv: 0,
+                                        calories_per_serv: 0,
+                                        image: '/img/No-Image-Placeholder.svg',
+                                    };
+                                }
+                                return mealLog;
+                            });
+                            return Promise.all(mealLogPromises);
+                        })
+                        .then((mappedMealLogs) => {
+                            res.json(mappedMealLogs);
                         });
                 } else {
                     MealLogs.getMealLog(user.id, startDate, endDate)
