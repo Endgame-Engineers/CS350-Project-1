@@ -75,19 +75,8 @@ class UserRoute {
                         .then((mealLogs) => {
                             const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
                                 const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
-                                // TODO: need to fix
                                 if (foodItem) {
                                     mealLog.foodItem = foodItem;
-                                } else {
-                                    mealLog.foodItem = {
-                                        foodname: 'Food item not found',
-                                        barcode: mealLog.barcode,
-                                        protein_per_serv: 0,
-                                        carb_per_serv: 0,
-                                        fat_per_serv: 0,
-                                        calories_per_serv: 0,
-                                        image: '/img/No-Image-Placeholder.svg',
-                                    };
                                 }
                                 return mealLog;
                             });
