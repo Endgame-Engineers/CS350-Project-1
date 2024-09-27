@@ -39,7 +39,7 @@ export default defineComponent({
 
         const prevStep = () => {
             getRecommendedCalorieGoal();
-            if (step.value > 1) step.value--;
+            if (step.value > 2) step.value--;
         }
 
         const getRecommendedCalorieGoal = async () => {
