@@ -16,31 +16,24 @@ export default defineComponent({
 
         const nextStep = () => {
             if (step.value === 2 && !userStats.value.weight) {
-            userStats.value.Error = 'Please enter your weight.';
-            return;
+                userStats.value.Error = 'Please enter your weight.';
             } else if (step.value === 3 && !userStats.value.height) {
-            userStats.value.Error = 'Please enter your height.';
-            return;
+                userStats.value.Error = 'Please enter your height.';
             } else if (step.value === 4 && !userStats.value.dateofbirth) {
-            userStats.value.Error = 'Please enter your date of birth.';
-            return;
+                userStats.value.Error = 'Please enter your date of birth.';
             } else if (step.value === 5 && !userStats.value.sex) {
-            userStats.value.Error = 'Please select your sex.';
-            return;
+                userStats.value.Error = 'Please select your sex.';
             } else if (step.value === 6 && !userStats.value.activitylevel) {
-            userStats.value.Error = 'Please select your activity level.';
-            return;
+                userStats.value.Error = 'Please select your activity level.';
             } else if (step.value === 7 && !userStats.value.goal) {
-            userStats.value.Error = 'Please select your goal.';
-            return;
+                userStats.value.Error = 'Please select your goal.';
             } else if (step.value === 8 && !userStats.value.caloriegoal) {
-            userStats.value.Error = 'Please enter your calorie goal.';
-            return;
+                userStats.value.Error = 'Please enter your calorie goal.';
             } else {
-            userStats.value.Error = '';
+                userStats.value.Error = '';
+                step.value += 1;
+                getRecommendedCalorieGoal();
             }
-            getRecommendedCalorieGoal();
-            step.value += 1;
         }
 
         const prevStep = () => {
@@ -205,8 +198,7 @@ export default defineComponent({
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
                         </button>
-                        <button class="btn btn-outline-primary"
-                            @click="() => { nextStep() }">
+                        <button class="btn btn-outline-primary" @click="() => { nextStep() }">
                             <font-awesome-icon :icon="['fas', 'arrow-right']" />
                         </button>
                     </div>
@@ -217,7 +209,8 @@ export default defineComponent({
                     <label for="calorieGoal" class="form-label"></label>
                     <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
                         v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)">
-                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per day</div>
+                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per
+                        day</div>
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
