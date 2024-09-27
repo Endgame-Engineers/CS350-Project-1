@@ -39,7 +39,6 @@ class UserStats {
     
             if (result.rows.length > 0) {
                 const latestRecord = result.rows[0];
-                console.log(latestRecord);
 
                 // convert date to string so that when we compare them they are in the same format. Without this, the comparison will always return false
                 const latestRecordDateOfBirth = new Date(latestRecord.dateofbirth).toISOString().split('T')[0];
@@ -58,8 +57,6 @@ class UserStats {
                     latestRecord.carbgrams === userStats.carbgrams &&
                     latestRecord.sex === userStats.sex &&
                     latestRecordDateOfBirth === userStatsDateOfBirth;
-    
-                    console.log(isSame);
                 if (isSame) {
                     return false;
                 }
