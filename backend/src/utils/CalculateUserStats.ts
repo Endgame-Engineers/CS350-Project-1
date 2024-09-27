@@ -66,6 +66,8 @@ export class CalculateUserStats {
     constructor(userStat: UserStat) {
         this.stats = userStat as UserStats;
         this.stats.age = this.calculateAge(this.stats.dateofbirth);
+        this.stats.height = this.stats.height * 2.54; // convert height from inches to cm
+        this.stats.weight = this.stats.weight * 0.453592; // convert weight from lbs to kg
     }
 
     // Calculate BMR
