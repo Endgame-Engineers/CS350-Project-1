@@ -58,6 +58,8 @@ export interface UserStats extends UserStat {
     tdee: number; // this would be the Total Daily Energy Expenditure
     bmr: number; // this would be the Basal Metabolic Rate -- the number of calories your body needs to function at rest
     age: number; // this would be the age of the user -- calculated from the date of birth
+    heightcms: number; // this would be the height of the user in centimeters
+    weightkgs: number; // this would be the weight of the user in kilograms
 }
 
 export class CalculateUserStats {
@@ -66,19 +68,19 @@ export class CalculateUserStats {
     constructor(userStat: UserStat) {
         this.stats = userStat as UserStats;
         this.stats.age = this.calculateAge(this.stats.dateofbirth);
-        this.stats.height = this.stats.height * 2.54; // convert height from inches to cm
-        this.stats.weight = this.stats.weight * 0.453592; // convert weight from lbs to kg
+        this.stats.heightcms = this.stats.height * 2.54; // convert height from inches to cm
+        this.stats.weightkgs = this.stats.weight * 0.453592; // convert weight from lbs to kg
     }
 
     // Calculate BMR
     // if BMR changes, then TDEE changes, if TDEE changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     public calculateBMR(): number {
         if (this.stats.sex === 1) { // if they are male
-            this.stats.bmr = 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age + 5;
-            return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age + 5;
+            this.stats.bmr = 10 * this.stats.weightkgs + 6.25 * this.stats.heightcms - 5 * this.stats.age + 5;
+            return 10 * this.stats.weightkgs + 6.25 * this.stats.heightcms - 5 * this.stats.age + 5;
         } else { // if they are female
-            this.stats.bmr = 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
-            return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
+            this.stats.bmr = 10 * this.stats.weightkgs + 6.25 * this.stats.heightcms - 5 * this.stats.age - 161;
+            return 10 * this.stats.weightkgs + 6.25 * this.stats.height - 5 * this.stats.age - 161;
         }
     }
 
