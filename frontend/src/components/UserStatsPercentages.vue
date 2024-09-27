@@ -1,5 +1,50 @@
 <script setup lang="ts">
 import { updateUserStat, userStats } from '@/services/UserStats';
+import { reactive, watch } from 'vue';
+
+type ProfileStats = {
+    proteinpercentage: number;
+    fatpercentage: number;
+    carbpercentage: number;
+};
+
+const adjustPercentages = (changedStat: keyof ProfileStats, newValue: number) => {
+    // Update the changed stat first
+    (userStats.value as ProfileStats)[changedStat] = newValue;
+
+    // Calculate total and excess
+    const total = userStats.value.proteinpercentage + userStats.value.fatpercentage + userStats.value.carbpercentage;
+    let excess = total - 100;
+
+    // If there's excess, adjust other percentages
+    if (excess > 0) {
+        const stats: (keyof ProfileStats)[] = ['proteinpercentage', 'fatpercentage', 'carbpercentage'];
+        const otherStats = stats.filter(stat => stat !== changedStat);
+
+        for (let stat of otherStats) {
+            if (userStats.value[stat] > excess) {
+                userStats.value[stat] -= excess;
+                break;
+            } else {
+                excess -= userStats.value[stat];
+                userStats.value[stat] = 0;
+            }
+        }
+    }
+};
+
+// Watchers for changes in percentages
+watch(() => userStats.value.proteinpercentage, (newValue) => {
+    adjustPercentages('proteinpercentage', newValue);
+});
+
+watch(() => userStats.value.fatpercentage, (newValue) => {
+    adjustPercentages('fatpercentage', newValue);
+});
+
+watch(() => userStats.value.carbpercentage, (newValue) => {
+    adjustPercentages('carbpercentage', newValue);
+});
 </script>
 <template>
     <div class="row">

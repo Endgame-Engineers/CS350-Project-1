@@ -15,6 +15,30 @@ export default defineComponent({
         const step = ref(1);
 
         const nextStep = () => {
+            if (step.value === 2 && !userStats.value.weight) {
+            userStats.value.Error = 'Please enter your weight.';
+            return;
+            } else if (step.value === 3 && !userStats.value.height) {
+            userStats.value.Error = 'Please enter your height.';
+            return;
+            } else if (step.value === 4 && !userStats.value.dateofbirth) {
+            userStats.value.Error = 'Please enter your date of birth.';
+            return;
+            } else if (step.value === 5 && !userStats.value.sex) {
+            userStats.value.Error = 'Please select your sex.';
+            return;
+            } else if (step.value === 6 && !userStats.value.activitylevel) {
+            userStats.value.Error = 'Please select your activity level.';
+            return;
+            } else if (step.value === 7 && !userStats.value.goal) {
+            userStats.value.Error = 'Please select your goal.';
+            return;
+            } else if (step.value === 8 && !userStats.value.caloriegoal) {
+            userStats.value.Error = 'Please enter your calorie goal.';
+            return;
+            } else {
+            userStats.value.Error = '';
+            }
             getRecommendedCalorieGoal();
             step.value += 1;
         }
@@ -193,8 +217,7 @@ export default defineComponent({
                     <label for="calorieGoal" class="form-label"></label>
                     <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
                         v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)">
-                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per
-                        day</div>
+                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per day</div>
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -216,6 +239,10 @@ export default defineComponent({
                             Save and Continue
                         </button>
                     </div>
+                </div>
+
+                <div v-if="userStats.Error" class="alert alert-danger mt-3" role="alert">
+                    {{ userStats.Error }}
                 </div>
             </form>
         </div>
