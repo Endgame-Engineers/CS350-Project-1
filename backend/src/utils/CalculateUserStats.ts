@@ -1,5 +1,4 @@
 // this class will be used to calculate the user stats and to set/update information like weight, height, age, calorie goal, activity level, date updated, and a unique identifier to map the user to the stats.
-
 import UserStats from "../models/UserStats";
 import { UserStat } from "../models/UserStats";
 
@@ -55,23 +54,6 @@ Divide by 4 to get the grams of protein: 750/4 = 187.5 grams
 anytime that your weight, height, or age, changes -- BMR changes -- if BMR changes then tdee changes -- anytime tdee changes... then calorie goal changes -- anytime calorie goal changes, then macronutrient goals change
 */
 
-/*
-TODO: create end points for calculating and updating user stats (enter goal, enter activity level, enter weight, enter height, enter age, etc.)
-
-1. once the user has entered their sex, weight, height, and age, then we can calculate BMR
-2. Once we have BMR, we then ask for their activity level
-3. Once we have activity level, we can then calculate TDEE -- which is their total daily energy expenditure
-4. We now need to have the user enter their goal (weight loss, maintenance, or weight gain) -- this will determine what their calorie goal should be
-5. After we have their calorie goal, we now allow the user to enter their desired macronutrient distribution with a starting recommended ration (35% protein, 20% fats, 45% carbs)
-6. After we have their desired macronutrient distribution, then we calculate the macronutrient goals. For example, Protein: 4 calories per gram
-Carbohydrates: 4 calories per gram
-Fat: 9 calories per gram
-Ex. If TDEE is 2500 calories and you want 30% from protein, that's 750 calories from protein
-Divide by 4 to get the grams of protein: 750/4 = 187.5 grams
-
-anytime that your weight, height, or age, changes -- BMR changes -- if BMR changes then tdee changes -- anytime tdee changes... then calorie goal changes -- anytime calorie goal changes, then macronutrient goals change
-*/
-
 export interface UserStats extends UserStat {
     tdee: number; // this would be the Total Daily Energy Expenditure
     bmr: number; // this would be the Basal Metabolic Rate -- the number of calories your body needs to function at rest
@@ -89,10 +71,10 @@ export class CalculateUserStats {
     // Calculate BMR
     // if BMR changes, then TDEE changes, if TDEE changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     public calculateBMR(): number {
-        if (this.stats.sex === 1) {
+        if (this.stats.sex === 1) { // if they are male
             this.stats.bmr = 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age + 5;
             return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age + 5;
-        } else {
+        } else { // if they are female
             this.stats.bmr = 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
             return 10 * this.stats.weight + 6.25 * this.stats.height - 5 * this.stats.age - 161;
         }
@@ -145,7 +127,9 @@ export class CalculateUserStats {
     // if user goal changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     // TODO: allow the user to change the percentage of the adjustment -- for example, if they want to lose weight but only want to subtract 10% instead of 20%
     public calculateCalorieGoal(): number {
-        //TODO: refactor this to call all the necessary methods to calculate the calorie goal
+        this.calculateBMR();
+        this.calculateTDEE();
+
         switch (this.stats.goal) {
             case 1:
                 return this.stats.tdee * 0.8; // Subtract 20% for weight loss

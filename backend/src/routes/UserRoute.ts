@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Users, { User } from '../models/Users';
+import { User } from '../models/Users';
 import MealLogs from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
@@ -62,10 +62,7 @@ class UserRoute {
             // TODO: restructure this ;-;
             const user = req.user as User;
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
-            console.log(userStat);
             const calculatedStats = new CalculateUserStats(userStat);
-            console.log(calculatedStats.calculateBMR());
-            console.log(calculatedStats.calculateTDEE());
             const caloriegoal = calculatedStats.calculateCalorieGoal();
 
             if (user.id) {
