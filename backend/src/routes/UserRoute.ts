@@ -63,6 +63,20 @@ class UserRoute {
             }
         });
 
+        this.router.post('/user/stats/caloriegoal', isAuthenticated, (req, res) => {
+            // TODO: restructure this ;-;
+            const user = req.user as User;
+            const userStat = { ...req.body, updatedon: new Date() } as UserStat;
+            const calculatedStats = new CalculateUserStats(userStat);
+            const caloriegoal = calculatedStats.calculateCalorieGoal();
+
+            if (user.id) {
+                res.status(201).json(caloriegoal);
+            } else {
+            res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
             const startDate = start ? new Date(start as string) : new Date();

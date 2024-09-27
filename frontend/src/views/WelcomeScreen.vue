@@ -95,21 +95,6 @@
                 </div>
 
                 <div v-if="step === 7" class="col-12 col-md-5 mb-3 text-center">
-                    <h1>Enter Calorie Goal</h1>
-                    <label for="calorieGoal" class="form-label"></label>
-                    <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
-                        v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)">
-                    <div class="d-flex justify-content-between mt-3">
-                        <button class="btn btn-outline-primary" @click="prevStep">
-                            <font-awesome-icon :icon="['fas', 'arrow-left']" />
-                        </button>
-                        <button class="btn btn-outline-primary" @click="nextStep">
-                            <font-awesome-icon :icon="['fas', 'arrow-right']" />
-                        </button>
-                    </div>
-                </div>
-
-                <div v-if="step === 8" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Select Goal</h1>
                     <label for="goal" class="form-label"></label>
                     <select class="form-select" id="goal" v-model="userStats.goal"
@@ -118,6 +103,22 @@
                         <option value="2">Maintain Weight</option>
                         <option value="3">Gain Weight</option>
                     </select>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-primary" @click="prevStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+                        </button>
+                        <button class="btn btn-outline-primary" @click="() => { nextStep(); getRecommendedCalorieGoal(); }">
+                            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="step === 8" class="col-12 col-md-5 mb-3 text-center">
+                    <h1>Enter Calorie Goal</h1>
+                    <label for="calorieGoal" class="form-label"></label>
+                    <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
+                        v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)">
+                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per day</div>
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -137,7 +138,7 @@ import { useUserStore } from '@/stores/User';
 import { defineComponent, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserStat } from '@/models/Models';
-import { addUserStats, getUserStats } from '@/services/UserStats';
+import { addUserStats, fetchCalorieGoal } from '@/services/UserStats';
 
 
 export default defineComponent({
@@ -148,7 +149,11 @@ export default defineComponent({
         const user = userStore.user;
         const step = ref(1);
 
-        const userStats = ref<UserStat>({
+        interface ProfileStats extends UserStat {
+            recommendedcaloriegoal: number;
+        }
+
+        const userStats = ref<ProfileStats>({
             weight: null,
             height: null,
             caloriegoal: null,
@@ -163,6 +168,7 @@ export default defineComponent({
             proteingrams: 0,
             fatgrams: 0,
             carbgrams: 0,
+            recommendedcaloriegoal: 0
         });
 
         const nextStep = () => {
@@ -191,6 +197,15 @@ export default defineComponent({
                 }
 
                 userStats.value[property] = parsedValue;
+            }
+        };
+
+        const getRecommendedCalorieGoal = async () => {
+            try {
+                const calorieGoal = await fetchCalorieGoal(userStats.value as UserStat);
+                userStats.value.recommendedcaloriegoal = calorieGoal;
+            } catch (error) {
+                console.error('Failed to fetch calorie goal:', error);
             }
         };
 
@@ -225,7 +240,8 @@ export default defineComponent({
             prevStep,
             saveUserStats,
             updateUserStat,
-            formattedDateOfBirth
+            formattedDateOfBirth,
+            getRecommendedCalorieGoal
         }
     }
 });

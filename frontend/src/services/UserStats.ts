@@ -43,3 +43,17 @@ export async function addUserStats(userStats: UserStat): Promise<UserStat> {
     }
 }
 
+export async function fetchCalorieGoal(userStat: UserStat): Promise<number> {
+    try {
+        const response = await axios.post<number>('/api/user/stats/caloriegoal', userStat, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching calorie goal", error);
+        throw new Error("Could not fetch calorie goal.");
+    }
+}
+
