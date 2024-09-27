@@ -14,7 +14,8 @@ export default defineComponent({
         const user = userStore.user;
         const step = ref(1);
 
-        const nextStep = () => {
+        const nextStep = (event: Event) => {
+            event.preventDefault();
             if (step.value === 2 && !userStats.value.weight) {
                 userStats.value.Error = 'Please enter your weight.';
             } else if (step.value === 3 && !userStats.value.height) {
@@ -38,7 +39,7 @@ export default defineComponent({
 
         const prevStep = () => {
             getRecommendedCalorieGoal();
-            step.value -= 1;
+            if (step.value > 1) step.value--;
         }
 
         const getRecommendedCalorieGoal = async () => {
