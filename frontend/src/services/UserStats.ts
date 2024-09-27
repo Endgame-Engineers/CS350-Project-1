@@ -81,25 +81,3 @@ export async function fetchCalorieGoal(userStat: UserStat): Promise<number> {
         throw new Error("Could not fetch calorie goal.");
     }
 }
-
-export const updateUserStat = (property: keyof UserStat, event: Event) => {
-    const target = event.target as HTMLInputElement | null;
-    if (target) {
-        const value = target.value;
-        let parsedValue: any = value;
-
-        const propertyType = typeof userStats.value[property];
-
-        if (propertyType === 'number') {
-            parsedValue = Number(value);
-            if (isNaN(parsedValue)) {
-                parsedValue = 0;
-            }
-        } else if (propertyType === 'boolean') {
-            parsedValue = value === 'true';
-        }
-
-        userStats.value[property] = parsedValue;
-    }
-};
-

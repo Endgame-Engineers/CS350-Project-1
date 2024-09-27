@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/User';
-import { addUserStats, getUserStat, updateUserStat, userStats, ProfileStats } from '@/services/UserStats';
+import { addUserStats, getUserStat, userStats, ProfileStats } from '@/services/UserStats';
 
 export default defineComponent({
     name: 'ProfilePage',
@@ -25,18 +25,12 @@ export default defineComponent({
 
         const saveUserStats = async () => {
             try {
-                console.log('Saving user stats:', userStats.value);
                 await addUserStats(userStats.value);
                 await fetchUserStats();
-                console.log('User stats saved successfully');
+                toggleIsEditing();
             } catch (error) {
                 console.error('Failed to save user stats:', error);
             }
-        };
-
-        const toggleEditingAndSave = () => {
-            saveUserStats();
-            toggleIsEditing();
         };
 
         const formattedDateOfBirth = computed({
@@ -68,9 +62,7 @@ export default defineComponent({
             fetchUserStats,
             excludedKeys,
             isEditing,
-            toggleIsEditing,
-            toggleEditingAndSave,
-            updateUserStat,
+            toggleIsEditing
         };
     },
 });
@@ -91,51 +83,64 @@ export default defineComponent({
             <h1 class="text-center">Edit Profile</h1>
             <!-- Weight, height, age, calorie goal, date of birth, activity level, sex -->
             <div class="d-flex justify-content-end">
-                <button v-if="!isEditing" class="btn btn-outline-primary me-2"
-                    @click="toggleIsEditing"><font-awesome-icon :icon="['fas', 'pencil']" /></button>
+                <button v-if="!isEditing" class="btn btn-outline-primary me-2" @click="toggleIsEditing">
+                    <font-awesome-icon :icon="['fas', 'pencil']" />
+                </button>
             </div>
 
             <form @submit.prevent="saveUserStats">
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="weight" class="form-label">Weight</label>
-                        <input type="number" placeholder="Enter weight in pounds" class="form-control" id="weight"
-                            v-model="userStats.weight" :readonly="!isEditing" @change="updateUserStat('weight', $event)">
+                        <div v-if="!isEditing">{{ userStats.weight }} lbs</div>
+                        <input v-else type="number" placeholder="Enter weight in pounds" class="form-control"
+                            id="weight" v-model.number="userStats.weight">
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="height" class="form-label">Height</label>
-                        <input type="number" placeholder="Enter height in inches" class="form-control" id="height"
-                            v-model="userStats.height" :readonly="!isEditing" @change="updateUserStat('height', $event)">
+                        <div v-if="!isEditing">{{ userStats.height }} inches</div>
+                        <input v-else type="number" placeholder="Enter height in inches" class="form-control"
+                            id="height" v-model.number="userStats.height">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="calorieGoal" class="form-label">Calorie Goal</label>
-                        <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
-                            v-model="userStats.caloriegoal" :readonly="!isEditing" @change="updateUserStat('caloriegoal', $event)">
+                        <div v-if="!isEditing">{{ userStats.caloriegoal }} kcal</div>
+                        <input v-else type="number" placeholder="Enter calorie goal" class="form-control"
+                            id="calorieGoal" v-model.number="userStats.caloriegoal">
                         <div class="form-text">Recommended calorie goal: {{ userStats.recommendedcaloriegoal }}</div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="dob" class="form-label">Date of Birth</label>
-                        <input type="date" placeholder="Enter date of birth" class="form-control" id="dob"
-                            v-model="formattedDateOfBirth" :readonly="!isEditing">
+                        <div v-if="!isEditing">{{ formattedDateOfBirth }}</div>
+                        <input v-else type="date" placeholder="Enter date of birth" class="form-control" id="dob"
+                            v-model="formattedDateOfBirth">
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="goal" class="form-label">Goal</label>
-                        <select class="form-select" id="goal" v-model="userStats.goal" :disabled="!isEditing" @change="updateUserStat('goal', $event)">
-                            <option value="1">Lose Weight</option>
-                            <option value="2">Maintain Weight</option>
-                            <option value="3">Gain Weight</option>
-                        </select>
+                        <div v-if="!isEditing">
+                            <span v-if="userStats.goal = 1">Lose Weight</span>
+                            <span v-else-if="userStats.goal = 2">Maintain Weight</span>
+                            <span v-else-if="userStats.goal = 3">Gain Weight</span>
+                        </div>
+                        <input v-else type="number" placeholder="Enter goal" class="form-control" id="goal"
+                            v-model.number="userStats.goal">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
-                        <label for="activityLevel" class="form-label">Activity Level</label>
-                        <select class="form-select" id="activityLevel" v-model="userStats.activitylevel"
-                            :disabled="!isEditing" @change="updateUserStat('activitylevel', $event)">
+                        <label for="activitylevel" class="form-label">Activity Level</label>
+                        <div v-if="!isEditing">
+                            <span v-if="userStats.activitylevel = 1">Sedentary</span>
+                            <span v-else-if="userStats.activitylevel = 2">Lightly Active</span>
+                            <span v-else-if="userStats.activitylevel = 3">Moderately Active</span>
+                            <span v-else-if="userStats.activitylevel = 4">Very Active</span>
+                            <span v-else-if="userStats.activitylevel = 5">Super Active</span>
+                        </div>
+                        <select v-else class="form-select" id="activitylevel" v-model.number="userStats.activitylevel">
                             <option value="1">Sedentary</option>
                             <option value="2">Lightly Active</option>
                             <option value="3">Moderately Active</option>
@@ -145,15 +150,16 @@ export default defineComponent({
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="sex" class="form-label">Sex</label>
-                        <select class="form-select" id="sex" v-model="userStats.sex" :disabled="!isEditing" @change="updateUserStat('sex', $event)">
+                        <div v-if="!isEditing">{{ userStats.sex === 1 ? 'Male' : 'Female' }}</div>
+                        <select v-else class="form-select" id="sex" v-model.number="userStats.sex">
                             <option value="1">Male</option>
                             <option value="2">Female</option>
                         </select>
                     </div>
+                    <user-stats-percentages :is-editing="isEditing" />
                 </div>
-                <user-stats-percentages />
-                <div v-if="isEditing" class="d-flex flex-column justify-content-end align-items-end">
-                    <button @click="toggleEditingAndSave" type="submit" class="btn btn-primary">Save</button>
+                <div class="d-flex justify-content-end">
+                    <button v-if="isEditing" type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
         </div>
