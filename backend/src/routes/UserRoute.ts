@@ -67,6 +67,7 @@ class UserRoute {
             // TODO: restructure this ;-;
             const user = req.user as User;
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
+            console.log(userStat);
             const calculatedStats = new CalculateUserStats(userStat);
             const caloriegoal = Math.round(calculatedStats.calculateCalorieGoal());
 

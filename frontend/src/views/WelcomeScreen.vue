@@ -4,7 +4,7 @@ import { defineComponent, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserStat } from '@/models/Models';
 import { addUserStats, fetchCalorieGoal } from '@/services/UserStats';
-import { updateUserStat, userStats } from '@/services/UserStats';
+import { userStats } from '@/services/UserStats';
 
 export default defineComponent({
     name: 'WelcomeScreen',
@@ -82,7 +82,6 @@ export default defineComponent({
             nextStep,
             prevStep,
             saveUserStats,
-            updateUserStat,
             formattedDateOfBirth,
             getRecommendedCalorieGoal
         }
@@ -107,7 +106,7 @@ export default defineComponent({
                     <h1>Enter current Weight</h1>
                     <label for="weight" class="form-label"></label>
                     <input type="number" placeholder="Enter weight in kilograms" id="weight" class="form-control"
-                        v-model="userStats.weight" @change="updateUserStat('weight', $event)" @keydown.enter="nextStep">
+                        v-model.number="userStats.weight" @keydown.enter="nextStep">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -122,7 +121,7 @@ export default defineComponent({
                     <h1>Enter current Height</h1>
                     <label for="height" class="form-label"></label>
                     <input type="number" placeholder="Enter height in centimeters" id="height" class="form-control"
-                        v-model="userStats.height" @change="updateUserStat('height', $event)" @keydown.enter="nextStep">
+                        v-model.number="userStats.height" @keydown.enter="nextStep">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -137,7 +136,7 @@ export default defineComponent({
                     <h1>Enter Date of Birth</h1>
                     <label for="dob" class="form-label"></label>
                     <input type="date" placeholder="Enter date of birth" class="form-control" id="dob"
-                        v-model="formattedDateOfBirth" @change="updateUserStat('dateofbirth', $event)" @keydown.enter="nextStep">
+                        v-model="formattedDateOfBirth" @keydown.enter="nextStep">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -151,8 +150,7 @@ export default defineComponent({
                 <div v-if="step === 5" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Enter Sex</h1>
                     <label for="sex" class="form-label"></label>
-                    <select class="form-select" id="sex" v-model="userStats.sex"
-                        @change="updateUserStat('sex', $event)" @keydown.enter="nextStep">
+                    <select class="form-select" id="sex" v-model.number="userStats.sex" @keydown.enter="nextStep">
                         <option value="1">Male</option>
                         <option value="2">Female</option>
                     </select>
@@ -168,9 +166,9 @@ export default defineComponent({
 
                 <div v-if="step === 6" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Select Activity level</h1>
-                    <label for="activityLevel" class="form-label"></label>
-                    <select class="form-select" id="activityLevel" v-model="userStats.activitylevel"
-                        @change="updateUserStat('activitylevel', $event)" @keydown.enter="nextStep">
+                    <label for="activitylevel" class="form-label"></label>
+                    <select class="form-select" id="activitylevel" v-model.number="userStats.activitylevel"
+                        @keydown.enter="nextStep">
                         <option value="1">Sedentary</option>
                         <option value="2">Lightly Active</option>
                         <option value="3">Moderately Active</option>
@@ -190,8 +188,7 @@ export default defineComponent({
                 <div v-if="step === 7" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Select Goal</h1>
                     <label for="goal" class="form-label"></label>
-                    <select class="form-select" id="goal" v-model="userStats.goal"
-                        @change="updateUserStat('goal', $event)" @keydown.enter="nextStep">
+                    <select class="form-select" id="goal" v-model.number="userStats.goal" @keydown.enter="nextStep">
                         <option value="1">Lose Weight</option>
                         <option value="2">Maintain Weight</option>
                         <option value="3">Gain Weight</option>
@@ -210,7 +207,7 @@ export default defineComponent({
                     <h1>Enter Calorie Goal</h1>
                     <label for="calorieGoal" class="form-label"></label>
                     <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
-                        v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)" @keydown.enter="nextStep">
+                        v-model.number="userStats.caloriegoal" @keydown.enter="nextStep">
                     <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per
                         day</div>
                     <div class="d-flex justify-content-between mt-3">
