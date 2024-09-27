@@ -1,9 +1,3 @@
-<template>
-    <div class="video-container">
-        <video ref="webCam" autoplay playsinline></video>
-    </div>
-</template>
-
 <script lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import BarcodeScanner from '@/services/BarcodeScanner';
@@ -64,3 +58,9 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="video-container">
+        <video ref="webCam" autoplay playsinline></video>
+    </div>
+</template>
