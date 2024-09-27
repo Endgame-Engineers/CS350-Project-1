@@ -107,7 +107,7 @@ export default defineComponent({
                     <h1>Enter current Weight</h1>
                     <label for="weight" class="form-label"></label>
                     <input type="number" placeholder="Enter weight in kilograms" id="weight" class="form-control"
-                        v-model="userStats.weight" @change="updateUserStat('weight', $event)">
+                        v-model="userStats.weight" @change="updateUserStat('weight', $event)" @keydown.enter="nextStep">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -122,7 +122,7 @@ export default defineComponent({
                     <h1>Enter current Height</h1>
                     <label for="height" class="form-label"></label>
                     <input type="number" placeholder="Enter height in centimeters" id="height" class="form-control"
-                        v-model="userStats.height" @change="updateUserStat('height', $event)">
+                        v-model="userStats.height" @change="updateUserStat('height', $event)" @keydown.enter="nextStep">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -137,7 +137,7 @@ export default defineComponent({
                     <h1>Enter Date of Birth</h1>
                     <label for="dob" class="form-label"></label>
                     <input type="date" placeholder="Enter date of birth" class="form-control" id="dob"
-                        v-model="formattedDateOfBirth" @change="updateUserStat('dateofbirth', $event)">
+                        v-model="formattedDateOfBirth" @change="updateUserStat('dateofbirth', $event)" @keydown.enter="nextStep">
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -152,7 +152,7 @@ export default defineComponent({
                     <h1>Enter Sex</h1>
                     <label for="sex" class="form-label"></label>
                     <select class="form-select" id="sex" v-model="userStats.sex"
-                        @change="updateUserStat('sex', $event)">
+                        @change="updateUserStat('sex', $event)" @keydown.enter="nextStep">
                         <option value="1">Male</option>
                         <option value="2">Female</option>
                     </select>
@@ -170,7 +170,7 @@ export default defineComponent({
                     <h1>Select Activity level</h1>
                     <label for="activityLevel" class="form-label"></label>
                     <select class="form-select" id="activityLevel" v-model="userStats.activitylevel"
-                        @change="updateUserStat('activitylevel', $event)">
+                        @change="updateUserStat('activitylevel', $event)" @keydown.enter="nextStep">
                         <option value="1">Sedentary</option>
                         <option value="2">Lightly Active</option>
                         <option value="3">Moderately Active</option>
@@ -191,7 +191,7 @@ export default defineComponent({
                     <h1>Select Goal</h1>
                     <label for="goal" class="form-label"></label>
                     <select class="form-select" id="goal" v-model="userStats.goal"
-                        @change="updateUserStat('goal', $event)">
+                        @change="updateUserStat('goal', $event)" @keydown.enter="nextStep">
                         <option value="1">Lose Weight</option>
                         <option value="2">Maintain Weight</option>
                         <option value="3">Gain Weight</option>
@@ -200,7 +200,7 @@ export default defineComponent({
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
                         </button>
-                        <button class="btn btn-outline-primary" @click="() => { nextStep() }">
+                        <button class="btn btn-outline-primary" @click="nextStep">
                             <font-awesome-icon :icon="['fas', 'arrow-right']" />
                         </button>
                     </div>
@@ -210,7 +210,7 @@ export default defineComponent({
                     <h1>Enter Calorie Goal</h1>
                     <label for="calorieGoal" class="form-label"></label>
                     <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
-                        v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)">
+                        v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)" @keydown.enter="nextStep">
                     <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per
                         day</div>
                     <div class="d-flex justify-content-between mt-3">
