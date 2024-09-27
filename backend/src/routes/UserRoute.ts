@@ -71,6 +71,7 @@ class UserRoute {
             const caloriegoal = Math.round(calculatedStats.calculateCalorieGoal());
 
             if (user.id) {
+                console.log("Calorie goal created");
                 res.status(201).json(caloriegoal);
             } else {
             res.status(400).json({ error: 'User not authenticated' });

@@ -108,7 +108,7 @@
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
                         </button>
                         <button class="btn btn-outline-primary"
-                            @click="() => { nextStep(); getRecommendedCalorieGoal(); }">
+                            @click="() => { nextStep() }">
                             <font-awesome-icon :icon="['fas', 'arrow-right']" />
                         </button>
                     </div>
@@ -225,11 +225,12 @@ export default defineComponent({
         });
 
         const nextStep = () => {
+            getRecommendedCalorieGoal();
             step.value += 1;
-            console.log(userStats.value.activitylevel);
         }
 
         const prevStep = () => {
+            getRecommendedCalorieGoal();
             step.value -= 1;
         }
 
