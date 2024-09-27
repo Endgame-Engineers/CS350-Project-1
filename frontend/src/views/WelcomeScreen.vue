@@ -107,7 +107,8 @@
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
                         </button>
-                        <button class="btn btn-outline-primary" @click="() => { nextStep(); getRecommendedCalorieGoal(); }">
+                        <button class="btn btn-outline-primary"
+                            @click="() => { nextStep(); getRecommendedCalorieGoal(); }">
                             <font-awesome-icon :icon="['fas', 'arrow-right']" />
                         </button>
                     </div>
@@ -118,7 +119,55 @@
                     <label for="calorieGoal" class="form-label"></label>
                     <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
                         v-model="userStats.caloriegoal" @change="updateUserStat('caloriegoal', $event)">
-                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per day</div>
+                    <div class="form-text">Your Recommended Calorie Intake is {{ userStats.recommendedcaloriegoal }} per
+                        day</div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-primary" @click="prevStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+                        </button>
+                        <button class="btn btn-outline-primary" @click="nextStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="step === 9" class="col-12 col-md-5 mb-3 text-center">
+                    <h1>Macronutrient Distribution</h1>
+                    <div class="row">
+                        <div class="col-12 col-md-4 mb-3">
+                            <label for="proteinPercentage" class="form-label">Protein Percentage</label>
+                            <div class="d-flex justify-content-between">
+                                <span>1%</span>
+                                <span>{{ userStats.proteinpercentage }}%</span>
+                                <span>100%</span>
+                            </div>
+                            <input type="range" step="1" min="1" max="100" class="form-control" id="proteinPercentage"
+                                v-model.number="userStats.proteinpercentage"
+                                @change="updateUserStat('proteinpercentage', $event)">
+                        </div>
+                        <div class="col-12 col-md-4 mb-3">
+                            <label for="fatPercentage" class="form-label">Fat Percentage</label>
+                            <div class="d-flex justify-content-between">
+                                <span>1%</span>
+                                <span>{{ userStats.fatpercentage }}%</span>
+                                <span>100%</span>
+                            </div>
+                            <input type="range" step="1" min="1" max="100" class="form-control" id="fatPercentage"
+                                v-model.number="userStats.fatpercentage"
+                                @change="updateUserStat('fatpercentage', $event)">
+                        </div>
+                        <div class="col-12 col-md-4 mb-3">
+                            <label for="carbPercentage" class="form-label">Carb Percentage</label>
+                            <div class="d-flex justify-content-between">
+                                <span>1%</span>
+                                <span>{{ userStats.carbpercentage }}%</span>
+                                <span>100%</span>
+                            </div>
+                            <input type="range" step="1" min="1" max="100" class="form-control" id="carbPercentage"
+                                v-model.number="userStats.carbpercentage"
+                                @change="updateUserStat('carbpercentage', $event)">
+                        </div>
+                    </div>
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -128,10 +177,14 @@
                         </button>
                     </div>
                 </div>
+
             </form>
         </div>
     </main>
 </template>
+
+
+
 
 <script lang="ts">
 import { useUserStore } from '@/stores/User';
@@ -173,6 +226,7 @@ export default defineComponent({
 
         const nextStep = () => {
             step.value += 1;
+            console.log(userStats.value.activitylevel);
         }
 
         const prevStep = () => {
