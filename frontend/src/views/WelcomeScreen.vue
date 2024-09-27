@@ -103,7 +103,7 @@ export default defineComponent({
 
             <form class="d-flex flex-column align-items-center justify-content-center">
                 <div v-if="step === 2" class="col-12 col-md-5 mb-3 text-center">
-                    <h1>Enter current Weight</h1>
+                    <h1>Enter Current Weight</h1>
                     <label for="weight" class="form-label"></label>
                     <input type="number" placeholder="Enter weight in lbs" id="weight" class="form-control"
                         v-model.number="userStats.weight" @keydown.enter="nextStep">
@@ -118,7 +118,7 @@ export default defineComponent({
                 </div>
 
                 <div v-if="step === 3" class="col-12 col-md-5 mb-3 text-center">
-                    <h1>Enter current Height</h1>
+                    <h1>Enter Current Height</h1>
                     <label for="height" class="form-label"></label>
                     <input type="number" placeholder="Enter height in inches" id="height" class="form-control"
                         v-model.number="userStats.height" @keydown.enter="nextStep">
@@ -165,7 +165,7 @@ export default defineComponent({
                 </div>
 
                 <div v-if="step === 6" class="col-12 col-md-5 mb-3 text-center">
-                    <h1>Select Activity level</h1>
+                    <h1>Select Activity Level</h1>
                     <label for="activitylevel" class="form-label"></label>
                     <select class="form-select" id="activitylevel" v-model.number="userStats.activitylevel"
                         @keydown.enter="nextStep">
