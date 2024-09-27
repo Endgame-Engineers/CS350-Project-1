@@ -5,6 +5,7 @@ import axios from "axios";
 
 export interface ProfileStats extends UserStat {
     recommendedcaloriegoal: number;
+    Error?: string;
 }
 
 export const userStats = ref<ProfileStats>({
