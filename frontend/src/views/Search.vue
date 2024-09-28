@@ -3,16 +3,32 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { FoodItem, SearchResult } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
+import router from '@/router';
 
 export default {
   name: 'SearchPage',
   setup() {
+    interface ExtendedFoodItem extends FoodItem{
+      mealType: string;
+    }
+
+    let foodInfo: ExtendedFoodItem = {
+      foodname: '',
+      barcode: '',
+      protein_per_serv: 1,
+      carb_per_serv: 1,
+      fat_per_serv: 1,
+      calories_per_serv: 1,
+      image: '',
+      mealType: '',
+    };
     const route = useRoute();
+    const mealType = ref<string | null>(route.query.mealType as string || null);
     const searchBar = ref('');
     const requestQuery = ref(route.query.string || null);
     const barcode = ref(typeof requestQuery.value === 'string' && /^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
     const searchTerm = ref(typeof requestQuery.value === 'string' && !/^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
-    const foodData = ref<FoodItem[] | null>(null);
+    let foodData = ref<FoodItem[] | null>(null);
     const page = ref(1);
 
     const search = async () => {
@@ -74,7 +90,14 @@ export default {
       }
     };
 
+    const addFoodItem = (item : FoodItem) => {
+      foodInfo = item as ExtendedFoodItem;
+      foodInfo.mealType = mealType.value || '';
+      router.push({ path: '/history', query: { item: JSON.stringify(foodInfo) } });
+    };
+
     onMounted(() => {
+      const route = useRoute();
       if (barcode.value) {
         barcodeNumSearch();
       }
@@ -90,6 +113,7 @@ export default {
       clearSearchBar,
       foodData,
       barcodeNumSearch,
+      addFoodItem,
       loadMore,
     };
   },
@@ -137,6 +161,9 @@ export default {
               <p class="card-text"><strong>Fat:</strong> {{ item.fat_per_serv }}g</p>
               <p class="card-text"><strong>Calories:</strong> {{ item.calories_per_serv }} kcal</p>
               <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
+            </div>
+            <div class="mt-auto text-end pb-2 pe-2">
+              <button @click="addFoodItem(item)" class="btn btn-primary" type="button">Add</button>
             </div>
           </div>
         </div>
