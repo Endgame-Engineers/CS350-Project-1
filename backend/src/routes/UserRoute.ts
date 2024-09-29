@@ -53,13 +53,17 @@ class UserRoute {
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
 
             if (user.id) {
-            UserStats.addUserStats(userStat, user.id)
-                .then((userStats) => {
-                    console.log("User Stat created");
-                    res.status(201).json(userStats);
-                });
+                UserStats.addUserStats(userStat, user.id)
+                    .then((userStats) => {
+                        console.log("User Stat created");
+                        res.status(201).json(userStats);
+                    })
+                    .catch((error) => {
+                        console.error('Error creating user stat:', error);
+                        res.status(500).json({ error: 'Failed to create user stat' });
+                    });
             } else {
-            res.status(400).json({ error: 'User not authenticated' });
+                res.status(400).json({ error: 'User not authenticated' });
             }
         });
 
