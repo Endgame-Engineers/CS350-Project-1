@@ -1,7 +1,7 @@
 // OpenFoodFactsAPI.ts
 
 import axios from 'axios';
-import { FoodItem } from '../models/FoodItems';
+import FoodItems, { FoodItem } from '../models/FoodItems';
 import { ErrorMessage } from '../models/ErrorMessage';
 
 class OpenFoodFactsAPI {
@@ -34,6 +34,8 @@ class OpenFoodFactsAPI {
                         parseFloat(response.data.product.nutriments['energy-kcal_100g']) / 100,
                     image: response.data.product.image_url || "/img/No-Image-Placeholder.svg"
                 };
+
+                FoodItems.addFoodItem(product);
                 return product;
             })
             .catch((error) => {
