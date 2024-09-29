@@ -1,4 +1,6 @@
 import ConnectToDB from '../utils/ConnectToDB';
+import OpenFoodFacts from '../utils/OpenFoodFacts';
+import { ErrorMessage } from './ErrorMessage';
 
 export interface FoodItem {
     foodname: string;
@@ -13,8 +15,11 @@ export interface FoodItem {
 class FoodItems {
     private client: any;
 
-   constructor() {
+    constructor() {
         this.client = ConnectToDB.getClient();
+    }
+    isFoodItem(product: FoodItem | ErrorMessage): product is FoodItem {
+        return (product as FoodItem).foodname !== undefined;
     }
 
     async getFoodItems(barcodes: string[] = []): Promise<FoodItem[]> {
@@ -27,11 +32,26 @@ class FoodItems {
         return result.rows;
     }
 
+
+    // TODO: fix this not not fecthing food item from OpenFoodFacts and just returning null
     async getFoodItem(barcode: string): Promise<FoodItem | null> {
         const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
-        const foodItem = result.rows[0];
+        let foodItem = result.rows[0];
         if (!foodItem) {
-            return null;
+            console.log('Food item not found in database');
+            OpenFoodFacts.fetchProductFromAPI(barcode)
+            .then((product) => {
+                if (this.isFoodItem(product)) {
+                    console.log('Food item found in OpenFoodFacts API');
+                    return this.addFoodItem(product);
+                } else {
+                    console.log('Error fetching product:', product.message);
+                    return null;
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
         }
         return foodItem;
     }

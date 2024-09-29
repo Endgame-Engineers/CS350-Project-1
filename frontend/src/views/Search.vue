@@ -1,27 +1,21 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { FoodItem, SearchResult } from '@/models/Models';
+import { FoodItem, SearchResult, MealLog } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
+import { useMealLogStore } from '@/stores/MealLog';
 import router from '@/router';
 
 export default {
   name: 'SearchPage',
   setup() {
-    interface ExtendedFoodItem extends FoodItem{
-      mealType: string;
-    }
-
-    let foodInfo: ExtendedFoodItem = {
-      foodname: '',
+    const mealLog: MealLog = {
       barcode: '',
-      protein_per_serv: 1,
-      carb_per_serv: 1,
-      fat_per_serv: 1,
-      calories_per_serv: 1,
-      image: '',
-      mealType: '',
+      mealtype: '',
+      dateadded: '',
+      servingconsumed: 0,
     };
+
     const route = useRoute();
     const mealType = ref<string | null>(route.query.mealType as string || null);
     const searchBar = ref('');
@@ -38,7 +32,7 @@ export default {
           barcodeNumSearch();
         } else {
           try {
-            const data = await searchForProducts(searchBar.value, page.value);
+            const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
             if (data && Array.isArray(data.products)) {
               foodData.value = data.products;
             } else {
@@ -91,13 +85,19 @@ export default {
     };
 
     const addFoodItem = (item : FoodItem) => {
-      foodInfo = item as ExtendedFoodItem;
-      foodInfo.mealType = mealType.value || '';
-      router.push({ path: '/history', query: { item: JSON.stringify(foodInfo) } });
+      const foodInfo = {
+        barcode: item.barcode,
+        mealType: mealType.value || '',
+      };
+      mealLog.barcode = item.barcode;
+      mealLog.mealtype = mealType.value || '';
+      mealLog.dateadded = new Date().toISOString();
+      mealLog.servingconsumed = 1;
+      useMealLogStore().setMealLog(mealLog);
+      router.push({ path: '/history' });
     };
 
     onMounted(() => {
-      const route = useRoute();
       if (barcode.value) {
         barcodeNumSearch();
       }
