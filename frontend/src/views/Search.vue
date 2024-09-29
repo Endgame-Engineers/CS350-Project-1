@@ -209,12 +209,12 @@ export default {
               <input type="number" v-model="servingConsumed" class="form-control" id="servingConsumed" />
             </div>
             <div v-if="servingConsumed">
-              <p><strong>Calories:</strong> {{ (selectedFoodItem.calories_per_serv * servingConsumed / 100).toFixed(2)
+              <p><strong>Calories:</strong> {{ (selectedFoodItem.calories_per_serv * servingConsumed).toFixed(2)
                 }} kcal</p>
-              <p><strong>Protein:</strong> {{ (selectedFoodItem.protein_per_serv * servingConsumed / 100).toFixed(2) }}
+              <p><strong>Protein:</strong> {{ (selectedFoodItem.protein_per_serv * servingConsumed).toFixed(2) }}
                 g</p>
-              <p><strong>Carbs:</strong> {{ (selectedFoodItem.carb_per_serv * servingConsumed / 100).toFixed(2) }} g</p>
-              <p><strong>Fat:</strong> {{ (selectedFoodItem.fat_per_serv * servingConsumed / 100).toFixed(2) }} g</p>
+              <p><strong>Carbs:</strong> {{ (selectedFoodItem.carb_per_serv * servingConsumed).toFixed(2) }} g</p>
+              <p><strong>Fat:</strong> {{ (selectedFoodItem.fat_per_serv * servingConsumed).toFixed(2) }} g</p>
             </div>
           </div>
         </div>
