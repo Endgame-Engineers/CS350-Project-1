@@ -22,16 +22,17 @@ class FoodItemsRoute {
         });
 
         this.router.get('/food-items/:barcode', isAuthenticated, (req, res) => {
-            FoodItems.getFoodItem(req.params.barcode)
+            OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
                 .then((foodItem) => {
                     if (foodItem) {
-                        console.log('Returning food item');
                         res.json(foodItem);
+                    } else {
+                        res.status(404).json({ error: 'Food item not found' });
                     }
                 })
                 .catch((error) => {
-                    console.error(error);
-                    res.status(500).json({ error: 'An error occurred' });
+                    console.error('Error fetching food item:', error);
+                    res.status(500).json({ error: (error as Error).message });
                 });
         });
 
