@@ -127,19 +127,25 @@ class UserRoute {
             }
 
             try {
-                // TODO: fix this not not fecthing food item from OpenFoodFacts and just returning null
-                FoodItems.getFoodItem(req.body.barcode)
-                    .then(async (foodItem) => {
-                        if (!foodItem) {
-                            console.log("Invalid barcode");
-                            return res.status(400).json({ error: 'Invalid barcode' });
-                        }
-
-                        const mealLog = { ...req.body, userid: user.id };
-                        const createdMealLog = await MealLogs.addMealLog(mealLog);
-                        console.log("Meal log created");
-                        res.status(201).json(createdMealLog);
-                    });
+                const foodItem = await FoodItems.getFoodItem(req.body.barcode);
+                if (!foodItem) {
+                    console.log("Food item not found in database");
+                    OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
+                        .then(async (product) => {
+                            if (FoodItems.isFoodItem(product)) {
+                                await FoodItems.addFoodItem(product);
+                                console.log("Food item added to database");
+                                const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: new Date() });
+                                res.status(201).json(mealLog);
+                            } else {
+                                res.status(404).json({ error: 'Food item not found' });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            res.status(500).json({ error: 'An error occurred' });
+                        });
+                }
             } catch (error) {
                 console.error(error);
                 res.status(500).json({ error: 'An error occurred' });

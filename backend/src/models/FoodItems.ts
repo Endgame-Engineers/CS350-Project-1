@@ -38,20 +38,7 @@ class FoodItems {
         const result = await (await this.client).query('SELECT foodname, barcode, protein_per_serv, carb_per_serv, fat_per_serv, calories_per_serv, image FROM "FoodItems" WHERE barcode = $1', [barcode]);
         let foodItem = result.rows[0];
         if (!foodItem) {
-            console.log('Food item not found in database');
-            OpenFoodFacts.fetchProductFromAPI(barcode)
-            .then((product) => {
-                if (this.isFoodItem(product)) {
-                    console.log('Food item found in OpenFoodFacts API');
-                    return this.addFoodItem(product);
-                } else {
-                    console.log('Error fetching product:', product.message);
-                    return null;
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            return null;
         }
         return foodItem;
     }
