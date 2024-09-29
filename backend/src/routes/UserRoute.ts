@@ -5,6 +5,7 @@ import UserStats, { UserStat } from '../models/UserStats';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
+import OpenFoodFacts from '../utils/OpenFoodFacts';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
@@ -26,23 +27,23 @@ class UserRoute {
         this.router.get('/user/stats', isAuthenticated, (req, res) => {
             const user = req.user as User;
             if (user.id) {
-                    UserStats.getUserStats(user.id)
-                        .then((userStats) => userStats.map((userStat) => {
-                            const stats = new CalculateUserStats(userStat);
-                            return {
-                                ...userStat,
-                                bmr: stats.calculateBMR(),
-                                tdee: stats.calculateTDEE(),
-                                recommendedcaloriegoal: Math.round(stats.calculateCalorieGoal()),
-                            };
-                        }))
-                        .then((calculatedStats) => {
-                            res.json(calculatedStats);
-                        })
-                        .catch((error) => {
-                            console.error(error);
-                            res.status(500).json({ error: 'An error occurred' });
-                        });
+                UserStats.getUserStats(user.id)
+                    .then((userStats) => userStats.map((userStat) => {
+                        const stats = new CalculateUserStats(userStat);
+                        return {
+                            ...userStat,
+                            bmr: stats.calculateBMR(),
+                            tdee: stats.calculateTDEE(),
+                            recommendedcaloriegoal: Math.round(stats.calculateCalorieGoal()),
+                        };
+                    }))
+                    .then((calculatedStats) => {
+                        res.json(calculatedStats);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
             } else {
                 res.status(400).json({ error: 'User not authenticated' });
             }
@@ -53,13 +54,13 @@ class UserRoute {
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
 
             if (user.id) {
-            UserStats.addUserStats(userStat, user.id)
-                .then((userStats) => {
-                    console.log("User Stat created");
-                    res.status(201).json(userStats);
-                });
+                UserStats.addUserStats(userStat, user.id)
+                    .then((userStats) => {
+                        console.log("User Stat created");
+                        res.status(201).json(userStats);
+                    });
             } else {
-            res.status(400).json({ error: 'User not authenticated' });
+                res.status(400).json({ error: 'User not authenticated' });
             }
         });
 
@@ -75,7 +76,7 @@ class UserRoute {
                 console.log("Calorie goal created");
                 res.status(201).json(caloriegoal);
             } else {
-            res.status(400).json({ error: 'User not authenticated' });
+                res.status(400).json({ error: 'User not authenticated' });
             }
         });
 
@@ -112,17 +113,36 @@ class UserRoute {
             }
         });
 
-        this.router.post('/user/logs', isAuthenticated, (req, res) => {
+        this.router.post('/user/logs', isAuthenticated, async (req, res) => {
             const user = req.user as User;
 
-            if (user.id) {
-                const mealLog = { ...req.body, userid: user.id };
-                MealLogs.addMealLog(mealLog)
-                    .then((mealLog) => {
-                        res.status(201).json(mealLog);
+            if (!user.id) {
+                console.log("User not authenticated");
+                return res.status(400).json({ error: 'User not authenticated' });
+            }
+
+            if (!req.body.barcode || !req.body.mealtype || !req.body.servingconsumed) {
+                console.log("All fields are required");
+                return res.status(400).json({ error: 'All fields are required' });
+            }
+
+            try {
+                // TODO: fix this not not fecthing food item from OpenFoodFacts and just returning null
+                FoodItems.getFoodItem(req.body.barcode)
+                    .then(async (foodItem) => {
+                        if (!foodItem) {
+                            console.log("Invalid barcode");
+                            return res.status(400).json({ error: 'Invalid barcode' });
+                        }
+
+                        const mealLog = { ...req.body, userid: user.id };
+                        const createdMealLog = await MealLogs.addMealLog(mealLog);
+                        console.log("Meal log created");
+                        res.status(201).json(createdMealLog);
                     });
-            } else {
-                res.status(400).json({ error: 'User not authenticated' });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'An error occurred' });
             }
         });
     }

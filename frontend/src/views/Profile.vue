@@ -126,8 +126,11 @@ export default defineComponent({
                             <span v-else-if="userStats.goal = 2">Maintain Weight</span>
                             <span v-else-if="userStats.goal = 3">Gain Weight</span>
                         </div>
-                        <input v-else type="number" placeholder="Enter goal" class="form-control" id="goal"
-                            v-model.number="userStats.goal">
+                        <select v-else class="form-select" id="goal" v-model.number="userStats.goal">
+                            <option value="1">Lose Weight</option>
+                            <option value="2">Maintain Weight</option>
+                            <option value="3">Gain Weight</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row">
