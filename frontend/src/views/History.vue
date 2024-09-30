@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import { FoodItem, MealLog } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
@@ -34,14 +34,15 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
-    const newMeal = reactive<MealLog>({
-      barcode: '',
-      mealtype: '',
-      servingconsumed: 0,
-    });
+    const startDate = ref(new Date());
+    const endDate = ref(new Date());
 
     const routeToSearch = (mealType: string) => {
       router.push({ path: '/search', query: { mealType: mealType } });
+    }
+    const updateMealLogs = async (start: Date, end: Date) => {
+      const response = await getMealLogs(start, end) as ExtendedMealLog[];
+      mealLogs.value = await response;
     }
 
     onMounted(async () => {
@@ -51,19 +52,59 @@ export default defineComponent({
         addMealLog(existingMealLogs);
         mealLogStore.clearMealLog();
       }
-      const response = await getMealLogs(new Date(), new Date()) as ExtendedMealLog[];
-      mealLogs.value = await response;
+      await updateMealLogs(new Date(), new Date());
     });
 
     const prettyDate = (date: Date) => {
       return new Date(date).toLocaleString();
     }
 
+    const newMeal = ref<MealLog>({
+      barcode: '',
+      mealtype: '',
+      servingconsumed: 0
+    });
+
+    const formattedStartDate = computed({
+      get() {
+      if (!startDate.value) {
+        return '';
+      }
+      const date = new Date(startDate.value);
+      return date.toISOString().split('T')[0];
+      },
+      set(value: string) {
+      startDate.value = new Date(value);
+      }
+    });
+
+    const formattedEndDate = computed({
+      get() {
+      if (!endDate.value) {
+        return '';
+      }
+      const date = new Date(endDate.value);
+      return date.toISOString().split('T')[0];
+      },
+      set(value: string) {
+      endDate.value = new Date(value);
+      }
+    });
+
+    watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
+      await updateMealLogs(newStart, newEnd);
+    });
+
     return {
       mealLogs,
       newMeal,
       routeToSearch,
       prettyDate,
+      updateMealLogs,
+      startDate: new Date(),
+      endDate: new Date(),
+      formattedStartDate,
+      formattedEndDate,
     };
   }
 });
@@ -71,15 +112,26 @@ export default defineComponent({
 
 <template>
   <div class="row">
+    <div class="p-3 row">
+      <div class="col">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" class="form-control" v-model="formattedStartDate">
+      </div>
+      <div class="col">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" class="form-control" v-model="formattedEndDate">
+      </div>
+    </div>
     <template v-for="mealType in ['Breakfast', 'Lunch', 'Dinner']" :key="mealType">
       <div class="col-12 col-md mb-3 d-flex">
         <div class="p-3">
           <div class="d-flex flex-row justify-content-between">
             <div class="d-flex align-items-center">
-                <h3>
-                <font-awesome-icon :icon="mealType === 'Breakfast' ? ['fas', 'coffee'] : mealType === 'Lunch' ? ['fas', 'utensils'] : ['fas', 'drumstick-bite']" />
+              <h3>
+                <font-awesome-icon
+                  :icon="mealType === 'Breakfast' ? ['fas', 'coffee'] : mealType === 'Lunch' ? ['fas', 'utensils'] : ['fas', 'drumstick-bite']" />
                 {{ mealType }}
-                </h3>
+              </h3>
             </div>
             <div class="d-flex align-items-center">
               <button @click="routeToSearch(mealType)" class="btn btn-primary">
