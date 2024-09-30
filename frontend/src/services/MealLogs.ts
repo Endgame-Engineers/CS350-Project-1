@@ -2,16 +2,16 @@ import axios from 'axios';
 import { MealLog } from '../models/Models';
 
 export function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> {
-    const uri = '/api/user/logs';
-    console.log(`Requesting meal logs from ${uri} with params:`, {
-        start: start?.toISOString(),
-        end: end?.toISOString()
-    });
+    if (!(start instanceof Date) || !(end instanceof Date)) {
+        console.error('Invalid date objects');
+        return Promise.reject(new Error('Invalid date objects'));
+    }
 
+    const uri = '/api/user/logs';
     return axios.get<MealLog[]>(uri, {
         params: {
-            start: start?.toISOString(),
-            end: end?.toISOString()
+            start: start,
+            end: end
         }
     })
         .then(response => response.data)
