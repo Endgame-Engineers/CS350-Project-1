@@ -160,10 +160,10 @@ export default defineComponent({
                     <img :src="item.foodItem.image" class="card-img-left"
                       style="width: 150px; height: 150px; object-fit: cover;" alt="{{ item.foodItem.foodname }}">
                     <ul class="card-text">
-                      <li>Calories: {{ (item.foodItem.calories_per_serv * item.servingconsumed).toFixed(2) }}kcal</li>
-                      <li>Protein: {{ (item.foodItem.protein_per_serv * item.servingconsumed).toFixed(2) }}g</li>
-                      <li>Carbs: {{ (item.foodItem.carb_per_serv * item.servingconsumed).toFixed(2) }}g</li>
-                      <li>Fat: {{ (item.foodItem.fat_per_serv * item.servingconsumed).toFixed(2) }}g</li>
+                      <li>Calories: {{ (item.foodItem.calories_per_serv * item.servingconsumed).toFixed(1) }}kcal</li>
+                      <li>Protein: {{ (item.foodItem.protein_per_serv * item.servingconsumed).toFixed(1) }}g</li>
+                      <li>Carbs: {{ (item.foodItem.carb_per_serv * item.servingconsumed).toFixed(1) }}g</li>
+                      <li>Fat: {{ (item.foodItem.fat_per_serv * item.servingconsumed).toFixed(1) }}g</li>
                       <li>Serving Consumed: {{ item.servingconsumed }}g</li>
                     </ul>
                   </div>

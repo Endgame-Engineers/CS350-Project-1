@@ -169,10 +169,10 @@ export default {
             <div class="col-md-8">
               <div class="card-body">
                 <h5 class="card-title">{{ item.foodname }}</h5>
-                <p class="card-text"><strong>Protein:</strong> {{ item.protein_per_serv }}g</p>
-                <p class="card-text"><strong>Carbs:</strong> {{ item.carb_per_serv }}g</p>
-                <p class="card-text"><strong>Fat:</strong> {{ item.fat_per_serv }}g</p>
-                <p class="card-text"><strong>Calories:</strong> {{ item.calories_per_serv }} kcal</p>
+                <p class="card-text"><strong>Protein:</strong> {{ item.protein_per_serv.toFixed(2) }}g</p>
+                <p class="card-text"><strong>Carbs:</strong> {{ item.carb_per_serv.toFixed(2) }}g</p>
+                <p class="card-text"><strong>Fat:</strong> {{ item.fat_per_serv.toFixed(2) }}g</p>
+                <p class="card-text"><strong>Calories:</strong> {{ item.calories_per_serv.toFixed(2) }} kcal</p>
                 <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
               </div>
               <div class="mt-auto text-end pb-2 pe-2">

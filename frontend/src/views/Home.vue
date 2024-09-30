@@ -123,13 +123,13 @@ export default defineComponent({
             <h3 class="mb-4">Calories</h3>
             <div class="circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto mb-3">
               <div>
-                <p class="remaining display-4">{{ (userStats.caloriegoal - totalCaloriesConsumed).toFixed(1) }}</p>
+                <p class="remaining display-4">{{ (userStats.caloriegoal - totalCaloriesConsumed).toFixed(0) }}</p>
                 <p>Remaining</p>
               </div>
             </div>
             <div class="d-flex justify-content-between">
               <div>
-                <p class="display-6">{{ totalCaloriesConsumed.toFixed(1) }}</p>
+                <p class="display-6">{{ totalCaloriesConsumed.toFixed(0) }}</p>
                 <p>Consumed</p>
               </div>
               <div>
@@ -137,7 +137,7 @@ export default defineComponent({
                 <p>Burned</p>
               </div>
               <div>
-                <p class="display-6">{{ userStats.caloriegoal.toFixed(1) }}</p>
+                <p class="display-6">{{ userStats.caloriegoal.toFixed(0) }}</p>
                 <p>Goal</p>
               </div>
             </div>
