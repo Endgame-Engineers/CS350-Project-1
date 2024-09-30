@@ -48,6 +48,7 @@ const routes = [
     path: '/welcomescreen',
     name: 'WelcomeScreen',
     component: welcomescreen,
+    // eslint-disable-next-line
     beforeEnter: (to: any, from: any, next: any) => {
       const userStore = useUserStore();
       if (userStore.user.profilecreated) {
