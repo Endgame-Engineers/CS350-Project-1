@@ -9,9 +9,9 @@ export default {
     
     setup() {
         const webCam = ref<HTMLVideoElement | null>(null);
-        let selectedDeviceId = ref<string | null>(null);
+        const selectedDeviceId = ref<string | null>(null);
         const barCodeNum = null as null | string;
-        let stream = ref<MediaStream | null>(null);
+        const stream = ref<MediaStream | null>(null);
 
         onMounted(async () => {
             const initialStream = await navigator.mediaDevices.getUserMedia({ video: true });

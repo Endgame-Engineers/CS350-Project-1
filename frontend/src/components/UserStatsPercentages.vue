@@ -26,7 +26,7 @@ const adjustPercentages = (changedStat: keyof ProfileStats, newValue: number) =>
         const stats: (keyof ProfileStats)[] = ['proteinpercentage', 'fatpercentage', 'carbpercentage'];
         const otherStats = stats.filter(stat => stat !== changedStat);
 
-        for (let stat of otherStats) {
+        for (const stat of otherStats) {
             if (userStats.value[stat] > excess) {
                 userStats.value[stat] -= excess;
                 break;

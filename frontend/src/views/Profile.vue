@@ -9,7 +9,7 @@ export default defineComponent({
         const userStore = useUserStore();
         const user = userStore.user;
         const excludedKeys = ref(['id', 'uuid', 'providerid', 'profilepic', 'profilecreated']);
-        let isEditing = ref(false);
+        const isEditing = ref(false);
 
 
         const fetchUserStats = async () => {

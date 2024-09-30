@@ -23,7 +23,7 @@ export default {
     const requestQuery = ref(route.query.string || null);
     const barcode = ref(typeof requestQuery.value === 'string' && /^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
     const searchTerm = ref(typeof requestQuery.value === 'string' && !/^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
-    let foodData = ref<FoodItem[] | null>(null);
+    const foodData = ref<FoodItem[] | null>(null);
     const page = ref(1);
     const selectedFoodItem = ref<FoodItem | null>(null);
     const servingConsumed = ref<number>(0);
