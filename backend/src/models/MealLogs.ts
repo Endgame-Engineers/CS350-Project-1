@@ -18,8 +18,6 @@ class MealLogs {
     async getMealLogs(userid: number, start?: Date, end?: Date): Promise<any> {
         let query = 'SELECT * FROM "MealLogs" WHERE userid = $1';
         const params: any[] = [userid];
-        console.log('start:', start);
-        console.log('end:', end);
 
         if (start && end) {
             query += ' AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) + INTERVAL \'1 day\' ORDER BY dateadded';

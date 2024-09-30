@@ -67,27 +67,27 @@ export default defineComponent({
 
     const formattedStartDate = computed({
       get() {
-      if (!startDate.value) {
-        return '';
-      }
-      const date = new Date(startDate.value);
-      return date.toISOString().split('T')[0];
+        if (!startDate.value) {
+          return '';
+        }
+        const date = new Date(startDate.value);
+        return date.toISOString().split('T')[0];
       },
       set(value: string) {
-      startDate.value = new Date(value);
+        startDate.value = new Date(value);
       }
     });
 
     const formattedEndDate = computed({
       get() {
-      if (!endDate.value) {
-        return '';
-      }
-      const date = new Date(endDate.value);
-      return date.toISOString().split('T')[0];
+        if (!endDate.value) {
+          return '';
+        }
+        const date = new Date(endDate.value);
+        return date.toISOString().split('T')[0];
       },
       set(value: string) {
-      endDate.value = new Date(value);
+        endDate.value = new Date(value);
       }
     });
 
@@ -114,12 +114,12 @@ export default defineComponent({
   <div class="row">
     <div class="p-3 row">
       <div class="col">
-      <label for="startDate" class="form-label">Start Date</label>
-      <input type="date" class="form-control" v-model="formattedStartDate">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" class="form-control" v-model="formattedStartDate">
       </div>
       <div class="col">
-      <label for="endDate" class="form-label">End Date</label>
-      <input type="date" class="form-control" v-model="formattedEndDate">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" class="form-control" v-model="formattedEndDate">
       </div>
     </div>
     <template v-for="mealType in ['Breakfast', 'Lunch', 'Dinner']" :key="mealType">
@@ -141,16 +141,16 @@ export default defineComponent({
           </div>
           <div class="d-flex flex-row justify-content-between">
             <div class="d-flex align-items-center">
-              <h5>Total Calories: {{ computeTotals(mealType).calories.toFixed(2) }}g</h5>
+              <h5>Total Calories: {{ computeTotals(mealType).calories.toFixed(1) }}g</h5>
             </div>
             <div class="d-flex align-items-center">
-              <h5>Total Protein: {{ computeTotals(mealType).protein.toFixed(2) }}g</h5>
+              <h5>Total Protein: {{ computeTotals(mealType).protein.toFixed(1) }}g</h5>
             </div>
             <div class="d-flex align-items-center">
-              <h5>Total Carbs: {{ computeTotals(mealType).carbs.toFixed(2) }}g</h5>
+              <h5>Total Carbs: {{ computeTotals(mealType).carbs.toFixed(1) }}g</h5>
             </div>
             <div class="d-flex align-items-center">
-              <h5>Total Fat: {{ computeTotals(mealType).fat.toFixed(2) }}g</h5>
+              <h5>Total Fat: {{ computeTotals(mealType).fat.toFixed(1) }}g</h5>
             </div>
           </div>
           <div class="row row-cols-1 row-cols-md-1 g-4">
