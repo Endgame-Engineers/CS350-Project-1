@@ -10,7 +10,7 @@ export interface FoodItem {
 
 export interface MealLog {
   mealtype: string;
-  dateadded: string;
+  dateadded?: Date;
   barcode: string;
   servingconsumed: number;
 }
