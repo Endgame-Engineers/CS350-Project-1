@@ -13,7 +13,6 @@ export default {
     const mealLog: MealLog = {
       barcode: '',
       mealtype: '',
-      dateadded: '',
       servingconsumed: 0,
     };
 
@@ -97,7 +96,7 @@ export default {
       if (selectedFoodItem.value) {
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
-        mealLog.dateadded = new Date().toISOString();
+        mealLog.dateadded = new Date();
         mealLog.servingconsumed = servingConsumed.value;
         useMealLogStore().setMealLog(mealLog);
         router.push({ path: '/history' });

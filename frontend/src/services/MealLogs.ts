@@ -2,7 +2,13 @@ import axios from 'axios';
 import { MealLog } from '../models/Models';
 
 export function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> {
-    return axios.get<MealLog[]>('/api/user/logs', {
+    const uri = '/api/user/logs';
+    console.log(`Requesting meal logs from ${uri} with params:`, {
+        start: start?.toISOString(),
+        end: end?.toISOString()
+    });
+
+    return axios.get<MealLog[]>(uri, {
         params: {
             start: start?.toISOString(),
             end: end?.toISOString()

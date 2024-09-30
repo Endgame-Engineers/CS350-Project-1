@@ -37,7 +37,6 @@ export default defineComponent({
     const newMeal = reactive<MealLog>({
       barcode: '',
       mealtype: '',
-      dateadded: '',
       servingconsumed: 0,
     });
 
@@ -48,15 +47,15 @@ export default defineComponent({
     onMounted(async () => {
       const mealLogStore = useMealLogStore();
       const existingMealLogs = mealLogStore.getMealLog();
-      if (existingMealLogs.barcode !== '' && existingMealLogs.mealtype !== '' && existingMealLogs.dateadded !== '' && existingMealLogs.servingconsumed !== 0) {
+      if (existingMealLogs.barcode !== '' && existingMealLogs.mealtype !== '' && existingMealLogs.dateadded !== undefined && existingMealLogs.servingconsumed !== 0) {
         addMealLog(existingMealLogs);
         mealLogStore.clearMealLog();
       }
-      const response = await getMealLogs() as ExtendedMealLog[];
+      const response = await getMealLogs(new Date(), new Date()) as ExtendedMealLog[];
       mealLogs.value = await response;
     });
 
-    const prettyDate = (date: string) => {
+    const prettyDate = (date: Date) => {
       return new Date(date).toLocaleString();
     }
 
@@ -104,7 +103,7 @@ export default defineComponent({
           </div>
           <div class="row row-cols-1 row-cols-md-1 g-4">
             <template
-              v-for="item in mealLogs.slice().sort((a, b) => new Date(b.dateadded).getTime() - new Date(a.dateadded).getTime())"
+              v-for="item in mealLogs.slice().sort((a, b) => new Date(b.dateadded ?? 0).getTime() - new Date(a.dateadded ?? 0).getTime())"
               :key="item.barcode + item.dateadded">
               <div class="col" v-if="item.mealtype.toLowerCase().includes(mealType.toLowerCase())">
                 <div class="card h-100">
@@ -121,7 +120,7 @@ export default defineComponent({
                     </ul>
                   </div>
                   <div class="card-footer text-end">
-                    <small class="text-muted">{{ prettyDate(item.dateadded) }}</small>
+                    <small class="text-muted">{{ prettyDate(item.dateadded ?? new Date()) }}</small>
                   </div>
                 </div>
               </div>

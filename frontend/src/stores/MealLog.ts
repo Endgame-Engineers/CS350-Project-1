@@ -5,7 +5,6 @@ export const useMealLogStore = defineStore('mealLog', {
     state: () => ({
         mealLog: {
             mealtype: '',
-            dateadded: '',
             barcode: '',
             servingconsumed: 0,
         } as MealLog,
@@ -23,7 +22,7 @@ export const useMealLogStore = defineStore('mealLog', {
         clearMealLog() {
             this.mealLog = {
                 mealtype: '',
-                dateadded: '',
+                dateadded: undefined,
                 barcode: '',
                 servingconsumed: 0,
             } as MealLog
