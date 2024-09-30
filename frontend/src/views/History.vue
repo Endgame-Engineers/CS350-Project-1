@@ -1,13 +1,9 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import { FoodItem, MealLog } from '@/models/Models';
+import { MealLog, ExtendedMealLog } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog } from '@/services/MealLogs';
-
-interface ExtendedMealLog extends MealLog {
-  foodItem: FoodItem;
-}
 
 export default defineComponent({
   name: 'HistoryPage',

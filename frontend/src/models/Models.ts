@@ -57,3 +57,7 @@ export interface UserStat {
   dateofbirth: Date;
   updatedon: Date;
 }
+
+export interface ExtendedMealLog extends MealLog {
+  foodItem: FoodItem;
+}
