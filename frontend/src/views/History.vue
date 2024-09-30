@@ -11,6 +11,27 @@ interface ExtendedMealLog extends MealLog {
 
 export default defineComponent({
   name: 'HistoryPage',
+  methods: {
+    computeTotals(mealType: string) {
+      const totals = {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0
+      };
+
+      this.mealLogs.forEach(item => {
+        if (item.mealtype.toLowerCase().includes(mealType.toLowerCase())) {
+          totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+          totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+        }
+      });
+
+      return totals;
+    }
+  },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const newMeal = reactive<MealLog>({
@@ -52,16 +73,33 @@ export default defineComponent({
 <template>
   <div class="row">
     <template v-for="mealType in ['Breakfast', 'Lunch', 'Dinner']" :key="mealType">
-      <div class="col-12 col-md-4 mb-3 d-flex">
+      <div class="col-12 col-md mb-3 d-flex">
         <div class="p-3">
           <div class="d-flex flex-row justify-content-between">
             <div class="d-flex align-items-center">
-              <h3>{{ mealType }}</h3>
+                <h3>
+                <font-awesome-icon :icon="mealType === 'Breakfast' ? ['fas', 'coffee'] : mealType === 'Lunch' ? ['fas', 'utensils'] : ['fas', 'drumstick-bite']" />
+                {{ mealType }}
+                </h3>
             </div>
             <div class="d-flex align-items-center">
               <button @click="routeToSearch(mealType)" class="btn btn-primary">
                 <font-awesome-icon :icon="['fas', 'plus']" />
               </button>
+            </div>
+          </div>
+          <div class="d-flex flex-row justify-content-between">
+            <div class="d-flex align-items-center">
+              <h5>Total Calories: {{ computeTotals(mealType).calories.toFixed(2) }}g</h5>
+            </div>
+            <div class="d-flex align-items-center">
+              <h5>Total Protein: {{ computeTotals(mealType).protein.toFixed(2) }}g</h5>
+            </div>
+            <div class="d-flex align-items-center">
+              <h5>Total Carbs: {{ computeTotals(mealType).carbs.toFixed(2) }}g</h5>
+            </div>
+            <div class="d-flex align-items-center">
+              <h5>Total Fat: {{ computeTotals(mealType).fat.toFixed(2) }}g</h5>
             </div>
           </div>
           <div class="row row-cols-1 row-cols-md-1 g-4">

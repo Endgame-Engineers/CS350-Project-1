@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import e, { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
@@ -82,13 +82,12 @@ class UserRoute {
 
         this.router.get('/user/logs', isAuthenticated, (req, res) => {
             const { start, end } = req.query;
-            const startDate = start ? new Date(start as string) : new Date();
-            const endDate = end ? new Date(end as string) : new Date();
-            const all = req.query.all === 'true';
+            const startDate = start ? new Date(start as string) : undefined;
+            const endDate = end ? new Date(end as string) : undefined;
             const user = req.user as User;
             if (user.id) {
-                if (all) {
-                    MealLogs.getMealLogs(user.id)
+                if (startDate && endDate) {
+                    MealLogs.getMealLogs(user.id, startDate, endDate)
                         .then((mealLogs) => {
                             const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
                                 const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
@@ -103,11 +102,21 @@ class UserRoute {
                             res.json(mappedMealLogs);
                         });
                 } else {
-                    MealLogs.getMealLog(user.id, startDate, endDate)
+                    MealLogs.getMealLogs(user.id)
                         .then((mealLogs) => {
-                            res.json(mealLogs);
+                            const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
+                                const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
+                                if (foodItem) {
+                                    mealLog.foodItem = foodItem;
+                                }
+                                return mealLog;
+                            });
+                            return Promise.all(mealLogPromises);
+                        })
+                        .then((mappedMealLogs) => {
+                            res.json(mappedMealLogs);
                         });
-                }
+                } 
             } else {
                 res.status(400).json({ error: 'User not authenticated' });
             }

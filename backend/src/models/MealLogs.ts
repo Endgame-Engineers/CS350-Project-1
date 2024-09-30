@@ -15,16 +15,16 @@ class MealLogs {
         this.client = ConnectToDB.getClient();
     }
 
-    async getMealLogs(userid: number): Promise<any> {
-        const result = await (await this.client).query('SELECT * FROM "MealLogs" WHERE userid = $1', [userid]);
-        return result.rows;
-    }
+    async getMealLogs(userid: number, start?: Date, end?: Date): Promise<any> {
+        let query = 'SELECT * FROM "MealLogs" WHERE userid = $1';
+        const params: any[] = [userid];
 
-    async getMealLog(userid: number, start: Date, end: Date): Promise<any> {
-        const result = await (await this.client).query(
-            `SELECT * FROM "MealLogs" WHERE userid = $1 AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) ORDER BY dateadded`,
-            [userid, start, end]
-        );
+        if (start && end) {
+            query += ' AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) ORDER BY dateadded';
+            params.push(start, end);
+        }
+
+        const result = await (await this.client).query(query, params);
         return result.rows;
     }
 

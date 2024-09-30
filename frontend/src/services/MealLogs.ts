@@ -1,12 +1,17 @@
 import axios from 'axios';
 import { MealLog } from '../models/Models';
 
-export function getMealLogs(): Promise<MealLog[]> {
-    return axios.get<MealLog[]>('/api/user/logs?all=true')
+export function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> {
+    return axios.get<MealLog[]>('/api/user/logs', {
+        params: {
+            start: start?.toISOString(),
+            end: end?.toISOString()
+        }
+    })
         .then(response => response.data)
         .catch(error => {
-            console.error("Error fetching meal logs", error);
-            throw new Error("Could not fetch meal logs.");
+            console.error("Error getting meal logs", error);
+            throw new Error("Could not get meal logs.");
         });
 }
 
