@@ -15,16 +15,6 @@ module.exports = defineConfig({
   outputDir: '../backend/dist/public/',
   publicPath: '/',
   transpileDependencies: true,
-  devServer: {
-    proxy: {
-      '/': {
-        target: 'https://8081--main--cs350--perc85.coder.galifrey.dev/',
-        changeOrigin: true,
-        ws: true,
-      },
-    },
-    allowedHosts: 'all',
-  },
   chainWebpack: config => {
     config.plugin('html').tap(args => {
       args[0].title = 'Carbio.fit'; // Default title

@@ -95,10 +95,6 @@ export default {
 
     const confirmAddFoodItem = () => {
       if (selectedFoodItem.value) {
-        const foodInfo = {
-          barcode: selectedFoodItem.value.barcode,
-          mealType: mealType.value || '',
-        };
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
         mealLog.dateadded = new Date().toISOString();

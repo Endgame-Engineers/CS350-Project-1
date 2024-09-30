@@ -20,7 +20,3 @@ createApp(App)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('user-stats-percentages', UserStatsPercentages)
   .mount('#app');
-
-function mount(arg0: string) {
-    throw new Error('Function not implemented.');
-}

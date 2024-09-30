@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { userStats } from '@/services/UserStats';
-import { watch, ref , defineProps} from 'vue';
+import { watch, defineProps} from 'vue';
 
 const props = defineProps<{
   isEditing: boolean;
