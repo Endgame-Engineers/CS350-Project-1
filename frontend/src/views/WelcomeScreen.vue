@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useUserStore } from '@/stores/User';
-import { defineComponent, ref, computed, onUnmounted } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserStat } from '@/models/Models';
 import { addUserStats, fetchCalorieGoal } from '@/services/UserStats';
