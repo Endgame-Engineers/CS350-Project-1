@@ -1,5 +1,4 @@
 import ConnectToDB from '../utils/ConnectToDB';
-import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { ErrorMessage } from './ErrorMessage';
 
 export interface FoodItem {
@@ -18,6 +17,7 @@ class FoodItems {
     constructor() {
         this.client = ConnectToDB.getClient();
     }
+
     isFoodItem(product: FoodItem | ErrorMessage): product is FoodItem {
         return (product as FoodItem).foodname !== undefined;
     }
@@ -43,17 +43,25 @@ class FoodItems {
         return foodItem;
     }
 
-
     async addFoodItem(foodItem: FoodItem): Promise<FoodItem> {
         const existingItem = await this.getFoodItem(foodItem.barcode);
         if (existingItem) {
             return existingItem;
         }
 
-        await (await this.client).query(
-            'INSERT INTO "FoodItems" (FoodName, Barcode, protein_per_serv, carb_per_serv, fat_per_serv, calories_per_serv, image) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            [foodItem.foodname, foodItem.barcode, foodItem.protein_per_serv, foodItem.carb_per_serv, foodItem.fat_per_serv, foodItem.calories_per_serv, foodItem.image]
-        );
+        try {
+            await (await this.client).query(
+                'INSERT INTO "FoodItems" (FoodName, Barcode, protein_per_serv, carb_per_serv, fat_per_serv, calories_per_serv, image) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [foodItem.foodname, foodItem.barcode, foodItem.protein_per_serv, foodItem.carb_per_serv, foodItem.fat_per_serv, foodItem.calories_per_serv, foodItem.image]
+            );
+        } catch (error: any) {
+            if (error.code === '23505') {
+                console.error('Barcode must be unique:', error.detail);
+                throw new Error('Barcode must be unique');
+            } else {
+                throw error;
+            }
+        }
 
         return foodItem;
     }
