@@ -31,7 +31,7 @@ export default {
     const search = async () => {
       if (searchBar.value) {
         logger.info('Searching for:', searchBar.value);
-        logger.info('Testing for ')
+        logger.info('Testing for all digits');
         if (/^\d+$/.test(searchBar.value)) {
           logger.info('Found all digits in search bar');
           barcode.value = searchBar.value;
