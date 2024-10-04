@@ -7,4 +7,5 @@ backend/core
 backend/core.*
 frontend/core
 frontend/core.*
-backend/tslog.log
+backend/app.log
+backend/app.log.*
