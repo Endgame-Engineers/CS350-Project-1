@@ -2,6 +2,7 @@
   "name": "cs350-project1",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "serve": "npm run build && serve -s dist",
     "build": "vue-cli-service build",
@@ -23,6 +24,7 @@
     "core-js": "^3.38.1",
     "pinia": "^2.2.3",
     "register-service-worker": "^1.7.2",
+    "tslog": "^4.9.3",
     "vue": "^3.5.10",
     "vue-chartjs": "^5.3.1",
     "vue-router": "^4.4.5"

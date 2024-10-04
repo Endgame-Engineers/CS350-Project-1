@@ -4,6 +4,7 @@ import { MealLog, ExtendedMealLog } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog } from '@/services/MealLogs';
+import { logger } from '@/services/Logger';
 
 export default defineComponent({
   name: 'HistoryPage',
@@ -34,6 +35,7 @@ export default defineComponent({
     const endDate = ref(new Date());
 
     const routeToSearch = (mealType: string) => {
+      logger.info('Routing to search page with meal type:', mealType);
       router.push({ path: '/search', query: { mealType: mealType } });
     }
 
@@ -42,23 +44,18 @@ export default defineComponent({
       mealLogs.value = await response;
     }
 
-    const pollMealLogs = async () => {
-      const interval = 30; // seconds
-      setInterval(async () => {
-        await updateMealLogs(startDate.value, endDate.value);
-      }, interval);
-    }
-
     onMounted(async () => {
       const mealLogStore = useMealLogStore();
       const existingMealLogs = mealLogStore.getMealLog();
       if (existingMealLogs.barcode !== '' && existingMealLogs.mealtype !== '' && existingMealLogs.dateadded !== undefined && existingMealLogs.servingconsumed !== 0) {
+        logger.info('Adding existing meal log to meal logs:', existingMealLogs);
         addMealLog(existingMealLogs);
+        logger.info('Clearing existing meal log');
         mealLogStore.clearMealLog();
       }
 
+      logger.info('Fetching meal logs');
       await updateMealLogs(startDate.value, endDate.value);
-      pollMealLogs();
     });
 
     const prettyDate = (date: Date) => {
@@ -98,6 +95,10 @@ export default defineComponent({
     });
 
     watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
+      // check if start and end dates have changed
+      if (newStart.getTime() === startDate.value.getTime() && newEnd.getTime() === endDate.value.getTime()) {
+        return;
+      }
       await updateMealLogs(newStart, newEnd);
     });
 

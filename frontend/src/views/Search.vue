@@ -6,6 +6,7 @@ import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
 import { useMealLogStore } from '@/stores/MealLog';
 import router from '@/router';
 import * as bootstrap from 'bootstrap';
+import { logger } from '@/services/Logger';
 
 export default {
   name: 'SearchPage',
@@ -29,19 +30,24 @@ export default {
 
     const search = async () => {
       if (searchBar.value) {
+        logger.info('Searching for:', searchBar.value);
+        logger.info('Testing for ')
         if (/^\d+$/.test(searchBar.value)) {
+          logger.info('Found all digits in search bar');
           barcode.value = searchBar.value;
           barcodeNumSearch();
         } else {
+          logger.info('Found non-digits in search bar');
           try {
             const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
             if (data && Array.isArray(data.products)) {
+              logger.info('Search results:', data.products);
               foodData.value = data.products;
             } else {
               foodData.value = [];
             }
           } catch (error) {
-            console.error('Error during search:', error);
+            logger.error('Error during search:', error);
             foodData.value = [];
           }
         }
@@ -75,13 +81,15 @@ export default {
 
     const barcodeNumSearch = async () => {
       if (barcode.value) {
+        logger.info('Searching for barcode:', barcode.value);
         const data = await barcodeLookup(barcode.value as string);
 
         if ('foodname' in data) {
+          logger.info('Found food item:', data);
           foodData.value = [data];
         } else {
           foodData.value = [];
-          console.log('Error during barcode lookup:', data.message);
+          logger.info('No food item found');
         }
       }
     };
@@ -94,11 +102,15 @@ export default {
 
     const confirmAddFoodItem = () => {
       if (selectedFoodItem.value) {
+        logger.info('Adding food item:', selectedFoodItem.value);
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
         mealLog.dateadded = new Date();
         mealLog.servingconsumed = servingConsumed.value;
+        logger.info('Adding meal log to store:', mealLog);
         useMealLogStore().setMealLog(mealLog);
+
+        logger.info('Navigating to history page');
         router.push({ path: '/history' });
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
@@ -110,9 +122,11 @@ export default {
 
     onMounted(() => {
       if (barcode.value) {
+        logger.info('Barcode found in query:', barcode.value);
         barcodeNumSearch();
       }
       if (searchTerm.value) {
+        logger.info('Search term found in query:', searchTerm.value);
         searchBar.value = searchTerm.value;
         search();
       }

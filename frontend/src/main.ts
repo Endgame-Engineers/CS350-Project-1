@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router'; 
 import './assets/scss/custom.scss';
 import UserStatsPercentages from './components/UserStatsPercentages.vue';
+import { logger } from './services/Logger';
 
 // Font Awesome imports
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -20,3 +21,5 @@ createApp(App)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('user-stats-percentages', UserStatsPercentages)
   .mount('#app');
+
+logger.info('Vue app started');
