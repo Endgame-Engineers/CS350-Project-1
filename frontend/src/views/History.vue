@@ -49,7 +49,8 @@ export default defineComponent({
       const existingMealLogs = mealLogStore.getMealLog();
       if (existingMealLogs.barcode !== '' && existingMealLogs.mealtype !== '' && existingMealLogs.dateadded !== undefined && existingMealLogs.servingconsumed !== 0) {
         logger.info('Adding existing meal log to meal logs:', existingMealLogs);
-        addMealLog(existingMealLogs);
+        const addingMealLog = await addMealLog(existingMealLogs);
+        logger.info('Added existing meal log to meal logs:', addingMealLog);
         logger.info('Clearing existing meal log');
         mealLogStore.clearMealLog();
       }

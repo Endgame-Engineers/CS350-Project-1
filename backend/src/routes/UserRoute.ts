@@ -143,7 +143,7 @@ class UserRoute {
                             logger.info('Returning meal logs');
                             res.json(mappedMealLogs);
                         });
-                } 
+                }
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
@@ -165,27 +165,24 @@ class UserRoute {
             }
 
             try {
-                const foodItem = await FoodItems.getFoodItem(req.body.barcode);
-                if (!foodItem) {
-                    logger.info('Food item not found in database');
-                    OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
-                        .then(async (product) => {
-                            logger.info('Food item fetched from API');
-                            if (FoodItems.isFoodItem(product)) {
-                                logger.info('Food item is valid');
-                                const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: new Date() });
-                                logger.info('Meal log created');
-                                res.status(201).json(mealLog);
-                            } else {
-                                logger.error('Food item is not valid');
-                                res.status(404).json({ error: 'Food item not found' });
-                            }
-                        })
-                        .catch((error) => {
-                            logger.error(error);
-                            res.status(500).json({ error: 'An error occurred' });
-                        });
-                }
+                logger.info('Checking if food item exists');
+                OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
+                    .then(async (product) => {
+                        logger.info('Food item fetched from API');
+                        if (FoodItems.isFoodItem(product)) {
+                            logger.info('Food item is valid');
+                            const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: new Date() });
+                            logger.info('Meal log created');
+                            res.status(201).json(mealLog);
+                        } else {
+                            logger.error('Food item is not valid');
+                            res.status(404).json({ error: 'Food item not found' });
+                        }
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({ error: 'An error occurred' });

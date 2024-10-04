@@ -1,35 +1,41 @@
 import axios from 'axios';
 import { MealLog } from '../models/Models';
+import { logger } from './Logger';
 
-export function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> {
+export async function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> {
     if (!(start instanceof Date) || !(end instanceof Date)) {
-        console.error('Invalid date objects');
+        logger.error('Invalid date objects');
         return Promise.reject(new Error('Invalid date objects'));
     }
 
     const uri = '/api/user/logs';
-    return axios.get<MealLog[]>(uri, {
-        params: {
-            start: start,
-            end: end
-        }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error("Error getting meal logs", error);
-            throw new Error("Could not get meal logs.");
+    try {
+        const response = await axios.get<MealLog[]>(uri, {
+            params: {
+                start: start,
+                end: end
+            }
         });
+        logger.info('Meal logs retrieved');
+        return response.data;
+    } catch (error) {
+        logger.error('Error getting meal logs', error);
+        throw new Error("Could not get meal logs.");
+    }
 }
 
-export function addMealLog(mealLog: MealLog): Promise<MealLog> {
-    return axios.post<MealLog>('/api/user/logs', mealLog, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error("Error adding meal log", error);
-            throw new Error("Could not add meal log.");
+export async function addMealLog(mealLog: MealLog): Promise<MealLog> {
+    logger.info('Adding meal log');
+    try {
+        const response = await axios.post<MealLog>('/api/user/logs', mealLog, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
+        logger.info('Meal log added');
+        return response.data;
+    } catch (error) {
+        console.error("Error adding meal log", error);
+        throw new Error("Could not add meal log.");
+    }
 }

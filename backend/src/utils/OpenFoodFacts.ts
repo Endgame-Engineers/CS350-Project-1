@@ -13,6 +13,13 @@ class OpenFoodFactsAPI {
      */
 
     async fetchProductFromAPI(barcode: string): Promise<FoodItem | ErrorMessage> {
+        logger.info('Fetching product from database');
+        const foodItem = await FoodItems.getFoodItem(barcode);
+        if (foodItem) {
+            logger.info('Product found in database');
+            return foodItem;
+        }
+        
         logger.info('Fetching product from OpenFoodFacts API');
         return axios
             .get<{ product: any }>(
