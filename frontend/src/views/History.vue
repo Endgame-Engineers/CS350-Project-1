@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { MealLog, ExtendedMealLog } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
@@ -48,62 +49,68 @@ export default defineComponent({
         addMealLog(existingMealLogs);
         mealLogStore.clearMealLog();
       }
-      setTimeout(async () => {
-        await updateMealLogs(new Date(), new Date());
-      });
-  });
 
-const prettyDate = (date: Date) => {
-  return new Date(date).toLocaleString();
-}
+      await updateMealLogs(new Date(), new Date());
+    });
 
-const newMeal = ref<MealLog>({
-  barcode: '',
-  mealtype: '',
-  servingconsumed: 0
-});
-
-const formattedStartDate = computed({
-  get() {
-    if (!startDate.value) {
-      return '';
+    const prettyDate = (date: Date) => {
+      return new Date(date).toLocaleString();
     }
-    const date = new Date(startDate.value);
-    return date.toISOString().split('T')[0];
-  },
-  set(value: string) {
-    startDate.value = new Date(value);
-  }
-});
 
-const formattedEndDate = computed({
-  get() {
-    if (!endDate.value) {
-      return '';
-    }
-    const date = new Date(endDate.value);
-    return date.toISOString().split('T')[0];
-  },
-  set(value: string) {
-    endDate.value = new Date(value);
-  }
-});
+    const newMeal = ref<MealLog>({
+      barcode: '',
+      mealtype: '',
+      servingconsumed: 0
+    });
 
-watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
-  await updateMealLogs(newStart, newEnd);
-});
+    const formattedStartDate = computed({
+      get() {
+        if (!startDate.value) {
+          return '';
+        }
+        const date = new Date(startDate.value);
+        return date.toISOString().split('T')[0];
+      },
+      set(value: string) {
+        startDate.value = new Date(value);
+      }
+    });
 
-return {
-  mealLogs,
-  newMeal,
-  routeToSearch,
-  prettyDate,
-  updateMealLogs,
-  startDate: new Date(),
-  endDate: new Date(),
-  formattedStartDate,
-  formattedEndDate,
-};
+    const formattedEndDate = computed({
+      get() {
+        if (!endDate.value) {
+          return '';
+        }
+        const date = new Date(endDate.value);
+        return date.toISOString().split('T')[0];
+      },
+      set(value: string) {
+        endDate.value = new Date(value);
+      }
+    });
+
+    watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
+      await updateMealLogs(newStart, newEnd);
+    });
+
+    const route = useRoute();
+    watch(route, async (newRoute) => {
+      const newStart = newRoute.query.startDate ? new Date(newRoute.query.startDate as string) : new Date();
+      const newEnd = newRoute.query.endDate ? new Date(newRoute.query.endDate as string) : new Date();
+      await updateMealLogs(newStart, newEnd);
+    });
+
+    return {
+      mealLogs,
+      newMeal,
+      routeToSearch,
+      prettyDate,
+      updateMealLogs,
+      startDate: new Date(),
+      endDate: new Date(),
+      formattedStartDate,
+      formattedEndDate,
+    };
   }
 });
 </script>
