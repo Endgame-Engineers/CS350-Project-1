@@ -2,7 +2,6 @@
   "name": "cs350-project1",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "serve": "npm run build && serve -s dist",
     "build": "vue-cli-service build",
