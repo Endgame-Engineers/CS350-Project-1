@@ -37,9 +37,17 @@ export default defineComponent({
     const routeToSearch = (mealType: string) => {
       router.push({ path: '/search', query: { mealType: mealType } });
     }
+
     const updateMealLogs = async (start: Date, end: Date) => {
       const response = await getMealLogs(start, end) as ExtendedMealLog[];
       mealLogs.value = await response;
+    }
+
+    const pollMealLogs = async () => {
+      const interval = 60000; // 1 minute
+      setInterval(async () => {
+        await updateMealLogs(startDate.value, endDate.value);
+      }, interval);
     }
 
     onMounted(async () => {
@@ -50,7 +58,8 @@ export default defineComponent({
         mealLogStore.clearMealLog();
       }
 
-      await updateMealLogs(new Date(), new Date());
+      await updateMealLogs(startDate.value, endDate.value);
+      pollMealLogs();
     });
 
     const prettyDate = (date: Date) => {
@@ -90,13 +99,6 @@ export default defineComponent({
     });
 
     watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
-      await updateMealLogs(newStart, newEnd);
-    });
-
-    const route = useRoute();
-    watch(route, async (newRoute) => {
-      const newStart = newRoute.query.startDate ? new Date(newRoute.query.startDate as string) : new Date();
-      const newEnd = newRoute.query.endDate ? new Date(newRoute.query.endDate as string) : new Date();
       await updateMealLogs(newStart, newEnd);
     });
 
