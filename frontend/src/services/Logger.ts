@@ -9,7 +9,7 @@ const stream = createStream("tslog.log", {
 
 const logger: Logger<ILogObj> = new Logger();
 logger.attachTransport((logObj) => {
-    stream.write(JSON.stringify(logObj) + "\n");
+    stream._write(JSON.stringify(logObj) + "\n", 'utf8', () => {});
   });
 
 export { logger };
