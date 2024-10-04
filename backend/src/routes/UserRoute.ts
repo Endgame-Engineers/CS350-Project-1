@@ -142,7 +142,6 @@ class UserRoute {
                     OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
                         .then(async (product) => {
                             if (FoodItems.isFoodItem(product)) {
-                                await FoodItems.addFoodItem(product);
                                 console.log("Food item added to database");
                                 const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: new Date() });
                                 res.status(201).json(mealLog);
