@@ -48,60 +48,62 @@ export default defineComponent({
         addMealLog(existingMealLogs);
         mealLogStore.clearMealLog();
       }
-      await updateMealLogs(new Date(), new Date());
-    });
+      setTimeout(async () => {
+        await updateMealLogs(new Date(), new Date());
+      });
+  });
 
-    const prettyDate = (date: Date) => {
-      return new Date(date).toLocaleString();
+const prettyDate = (date: Date) => {
+  return new Date(date).toLocaleString();
+}
+
+const newMeal = ref<MealLog>({
+  barcode: '',
+  mealtype: '',
+  servingconsumed: 0
+});
+
+const formattedStartDate = computed({
+  get() {
+    if (!startDate.value) {
+      return '';
     }
+    const date = new Date(startDate.value);
+    return date.toISOString().split('T')[0];
+  },
+  set(value: string) {
+    startDate.value = new Date(value);
+  }
+});
 
-    const newMeal = ref<MealLog>({
-      barcode: '',
-      mealtype: '',
-      servingconsumed: 0
-    });
+const formattedEndDate = computed({
+  get() {
+    if (!endDate.value) {
+      return '';
+    }
+    const date = new Date(endDate.value);
+    return date.toISOString().split('T')[0];
+  },
+  set(value: string) {
+    endDate.value = new Date(value);
+  }
+});
 
-    const formattedStartDate = computed({
-      get() {
-        if (!startDate.value) {
-          return '';
-        }
-        const date = new Date(startDate.value);
-        return date.toISOString().split('T')[0];
-      },
-      set(value: string) {
-        startDate.value = new Date(value);
-      }
-    });
+watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
+  await updateMealLogs(newStart, newEnd);
+});
 
-    const formattedEndDate = computed({
-      get() {
-        if (!endDate.value) {
-          return '';
-        }
-        const date = new Date(endDate.value);
-        return date.toISOString().split('T')[0];
-      },
-      set(value: string) {
-        endDate.value = new Date(value);
-      }
-    });
-
-    watch([startDate, endDate], async ([newStart, newEnd]: [Date, Date]) => {
-      await updateMealLogs(newStart, newEnd);
-    });
-
-    return {
-      mealLogs,
-      newMeal,
-      routeToSearch,
-      prettyDate,
-      updateMealLogs,
-      startDate: new Date(),
-      endDate: new Date(),
-      formattedStartDate,
-      formattedEndDate,
-    };
+return {
+  mealLogs,
+  newMeal,
+  routeToSearch,
+  prettyDate,
+  updateMealLogs,
+  startDate: new Date(),
+  endDate: new Date(),
+  formattedStartDate,
+  formattedEndDate,
+};
   }
 });
 </script>
