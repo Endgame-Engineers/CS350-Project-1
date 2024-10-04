@@ -35,8 +35,15 @@ export default defineComponent({
     const endDate = ref(new Date());
 
     const routeToSearch = (mealType: string) => {
+      logger.info('Adding Meal Typr to meal log store')
+      const mealLogStore = useMealLogStore();
+      mealLogStore.setMealLog({
+        barcode: '',
+        mealtype: mealType,
+        servingconsumed: 0
+      });
       logger.info('Routing to search page with meal type:', mealType);
-      router.push({ path: '/search', query: { mealType: mealType } });
+      router.push({ path: '/search'});
     }
 
     const updateMealLogs = async (start: Date, end: Date) => {

@@ -18,7 +18,6 @@ export default {
     };
 
     const route = useRoute();
-    const mealType = ref<string | null>(route.query.mealType as string || null);
     const searchBar = ref('');
     const requestQuery = ref(route.query.string || null);
     const barcode = ref(typeof requestQuery.value === 'string' && /^\d+$/.test(requestQuery.value) ? requestQuery.value : null);
@@ -27,6 +26,9 @@ export default {
     const page = ref(1);
     const selectedFoodItem = ref<FoodItem | null>(null);
     const servingConsumed = ref<number>(0);
+
+    logger.info('Checking if Mealog store container mealtype');
+    const mealType = ref(useMealLogStore().getMealLog().mealtype);
 
     const search = async () => {
       if (searchBar.value) {
