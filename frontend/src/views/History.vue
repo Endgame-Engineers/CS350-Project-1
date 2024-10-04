@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import { useRoute } from 'vue-router';
 import { MealLog, ExtendedMealLog } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
@@ -44,7 +43,7 @@ export default defineComponent({
     }
 
     const pollMealLogs = async () => {
-      const interval = 60000; // 1 minute
+      const interval = 30; // seconds
       setInterval(async () => {
         await updateMealLogs(startDate.value, endDate.value);
       }, interval);
