@@ -42,6 +42,20 @@ class MealLogs {
         );
         logger.info('Meal log added to database');
     }
+
+    async deleteMealLog(mealLog: MealLog): Promise<void> {
+        logger.info('Deleting meal log from database');
+        try {
+            await (await this.client).query(
+                'DELETE FROM "MealLogs" WHERE userid = $1 AND dateadded = $2 and mealtype = $3 and barcode = $4 and servingconsumed = $5', 
+                [mealLog.userid, mealLog.dateadded, mealLog.mealtype, mealLog.barcode, mealLog.servingconsumed]
+            );
+            logger.info('Meal log deleted from database');
+        } catch (error) {
+            logger.error('Error deleting meal log from database:', error);
+            throw new Error('Failed to delete meal log');
+        }
+    }
 }
 
 export default new MealLogs();
