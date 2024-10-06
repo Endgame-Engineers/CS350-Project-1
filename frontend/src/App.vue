@@ -8,7 +8,9 @@
         </button>
       </div>
       <div class="col-auto text-center">
-        <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+        <a href="/" class="navbar-brand">
+          <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
+        </a>
       </div>
       <div class="col text-end">
         <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/api/auth/logout" class="btn btn-primary"
@@ -52,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, computed } from 'vue';
+import { defineComponent, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({

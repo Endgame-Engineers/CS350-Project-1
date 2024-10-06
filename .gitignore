@@ -7,3 +7,6 @@ backend/core
 backend/core.*
 frontend/core
 frontend/core.*
+backend/app.log
+backend/app.log.*
+backend/*.log.gz

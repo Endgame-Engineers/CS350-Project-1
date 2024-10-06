@@ -5,12 +5,12 @@
     "strict": true,
     "jsx": "preserve",
     "moduleResolution": "node",
+    "inlineSourceMap": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true,
-    "sourceMap": true,
     "baseUrl": ".",
     "types": [
       "webpack-env", "vue"

@@ -3,20 +3,21 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import BarcodeScanner from '@/services/BarcodeScanner';
 import { checkForBackCamera } from '@/services/CheckForBackCamera';
 import router from '@/router';
+import { logger } from '@/services/Logger';
 
 export default {
     name: 'ScannerPage',
     
     setup() {
         const webCam = ref<HTMLVideoElement | null>(null);
-        let selectedDeviceId = ref<string | null>(null);
+        const selectedDeviceId = ref<string | null>(null);
         const barCodeNum = null as null | string;
-        let stream = ref<MediaStream | null>(null);
+        const stream = ref<MediaStream | null>(null);
 
         onMounted(async () => {
+            logger.info('ScannerPage mounted');
             const initialStream = await navigator.mediaDevices.getUserMedia({ video: true });
             selectedDeviceId.value = await checkForBackCamera();
-            console.log(selectedDeviceId.value);
             initialStream.getTracks().forEach(track => track.stop());
 
             const constraints = {
@@ -30,15 +31,16 @@ export default {
 
                     stream.value = await navigator.mediaDevices.getUserMedia(constraints);
                     if (webCam.value) {
+                        logger.info('Webcam found');
                         webCam.value.srcObject = stream.value;
                         const barCodeNum = await BarcodeScanner.barcodeReader(webCam.value, selectedDeviceId.value)
                         if (barCodeNum) {
-                            
+                            logger.info('Barcode found: ' + barCodeNum);
                             router.push({ path: '/Search', query: { string: barCodeNum } });
                         }
                     }
                 } catch (error) {
-                    console.error(error);
+                    logger.error('Error accessing the camera: ' + error);
                     router.push('/');
                 }
             });
@@ -46,9 +48,11 @@ export default {
             onUnmounted(()=>{
                 if(stream.value){
                     stream.value.getTracks().forEach(track => track.stop());
+                    logger.info('ScannerPage unmounted');
                 }
 
                 BarcodeScanner.closeBarcodeReader();
+                logger.info('Barcode reader closed');
             });
 
         return {

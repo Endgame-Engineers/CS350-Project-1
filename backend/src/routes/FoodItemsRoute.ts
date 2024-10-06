@@ -22,26 +22,18 @@ class FoodItemsRoute {
         });
 
         this.router.get('/food-items/:barcode', isAuthenticated, (req, res) => {
-            FoodItems.getFoodItem(req.params.barcode)
+            OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
                 .then((foodItem) => {
-                if (foodItem !== null) {
-                    console.log('Food item found in database');
-                    res.json(foodItem);
-                }
-                else {
-                    console.log('Food item not found in database');
-                    OpenFoodFacts.fetchProductFromAPI(req.params.barcode)
-                        .then((product) => {
-                        if (product && 'foodname' in product) {
-                            FoodItems.addFoodItem(product as FoodItem);
-                            res.json(product);
-                        }
-                        else {
-                            res.status(404).json({ message: 'Food item not found' });
-                        }
-                    });
-                }
-            });
+                    if (foodItem) {
+                        res.json(foodItem);
+                    } else {
+                        res.status(404).json({ error: 'Food item not found' });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching food item:', error);
+                    res.status(500).json({ error: (error as Error).message });
+                });
         });
 
         this.router.post('/food-items/bulk', isAuthenticated, (req, res) => {
@@ -56,19 +48,19 @@ class FoodItemsRoute {
                 .then((foodItems) => {
                     console.log('Returning food items');
                     res.json(foodItems);
-            });
+                });
         });
 
         this.router.get('/food-items/search/:searchTerm', isAuthenticated, (req, res) => {
             const searchTerm = req.params.searchTerm;
             const page = parseInt(req.query.page as string, 10) || 1;
-        
+
             OpenFoodFacts.searchForProductFromAPI(searchTerm, page)
                 .then((result) => {
                     res.json(result);
                 })
                 .catch((error) => {
-                    res.status(500).json({  error: (error as Error).message });
+                    res.status(500).json({ error: (error as Error).message });
                 });
         });
 
@@ -86,28 +78,28 @@ class FoodItemsRoute {
                     barcodes.map(async (barcode: string) => {
                         FoodItems.getFoodItem(barcode)
                             .then((foodItem) => {
-                            if (foodItem) {
-                                console.log('Food item found in database');
-                                return foodItem;
-                            } else {
-                                OpenFoodFacts.fetchProductFromAPI(barcode)
-                                    .then((product) => {
-                                    if (product) {
-                                        console.log('Food item not found in database');
-                                        if ('foodname' in product) {
-                                            FoodItems.addFoodItem(product as FoodItem);
-                                        }
-                                        return product;
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.log('Error fetching food item:', error);
-                                });
-                            }
-                        })
-                        .catch((error) => {
-                            console.log('Error fetching food item:', error);
-                        });
+                                if (foodItem) {
+                                    console.log('Food item found in database');
+                                    return foodItem;
+                                } else {
+                                    OpenFoodFacts.fetchProductFromAPI(barcode)
+                                        .then((product) => {
+                                            if (product) {
+                                                console.log('Food item not found in database');
+                                                if ('foodname' in product) {
+                                                    FoodItems.addFoodItem(product as FoodItem);
+                                                }
+                                                return product;
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            console.log('Error fetching food item:', error);
+                                        });
+                                }
+                            })
+                            .catch((error) => {
+                                console.log('Error fetching food item:', error);
+                            });
                     })
                 );
 

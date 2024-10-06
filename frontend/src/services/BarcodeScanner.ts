@@ -7,6 +7,8 @@ class BarcodeScanner {
     async barcodeReader(video: HTMLVideoElement, selectedDeviceId: string | null): Promise<string | null> {
         try {
             return new Promise((resolve, reject) => {
+                // TODO: should fix to be type safe.
+                // eslint-disable-next-line
                 this.codeReader.decodeFromVideoDevice(selectedDeviceId, video, (result: Result | null, error: any) => {
                     if (result) {
                         console.log(result.getText());

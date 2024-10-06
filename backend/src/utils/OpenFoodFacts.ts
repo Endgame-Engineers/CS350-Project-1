@@ -1,8 +1,9 @@
 // OpenFoodFactsAPI.ts
 
 import axios from 'axios';
-import { FoodItem } from '../models/FoodItems';
+import FoodItems, { FoodItem } from '../models/FoodItems';
 import { ErrorMessage } from '../models/ErrorMessage';
+import { logger } from './Logging';
 
 class OpenFoodFactsAPI {
     /**
@@ -12,6 +13,14 @@ class OpenFoodFactsAPI {
      */
 
     async fetchProductFromAPI(barcode: string): Promise<FoodItem | ErrorMessage> {
+        logger.info('Fetching product from database');
+        const foodItem = await FoodItems.getFoodItem(barcode);
+        if (foodItem) {
+            logger.info('Product found in database');
+            return foodItem;
+        }
+        
+        logger.info('Fetching product from OpenFoodFacts API');
         return axios
             .get<{ product: any }>(
                 `https://world.openfoodfacts.org/api/v3/product/${barcode}.json`,
@@ -22,6 +31,12 @@ class OpenFoodFactsAPI {
                 }
             )
             .then((response) => {
+                if (!response.data.product) {
+                    logger.info('Barcode does not exist');
+                    return { message: 'Barcode does not exist', type: 'not_found' };
+                }
+
+                logger.info('Product fetched from API');
                 const product: FoodItem = {
                     foodname: response.data.product.product_name,
                     barcode: barcode,
@@ -34,6 +49,11 @@ class OpenFoodFactsAPI {
                         parseFloat(response.data.product.nutriments['energy-kcal_100g']) / 100,
                     image: response.data.product.image_url || "/img/No-Image-Placeholder.svg"
                 };
+
+                logger.info('Adding food item to database');
+                FoodItems.addFoodItem(product);
+
+                logger.info('Returning product');
                 return product;
             })
             .catch((error) => {
@@ -41,21 +61,27 @@ class OpenFoodFactsAPI {
                     if (error.response) {
                         switch (error.response.status) {
                             case 404:
+                                logger.error('Barcode does not exist');
                                 return { message: 'Barcode does not exist', type: 'not_found' };
                             case 500:
+                                logger.error('Server error');
                                 return { message: 'Server error', type: 'server_error' };
                             default:
+                                logger.error('Unknown error');
                                 return { message: 'Unknown error', type: 'unknown' };
                         }
                     } else if (error.request) {
+                        logger.error('Request error');
                         return { message: 'Request error', type: 'request_error' };
                     }
                 }
+                logger.error('Unknown error');
                 return { message: 'Unknown error', type: 'unknown' };
             });
     }
 
     async searchForProductFromAPI(searchTerm: string, page: number = 1): Promise<{ products: FoodItem[], page: number, page_count: number }> {
+        logger.info('Searching for product from OpenFoodFacts API');
         const response = await axios.get<{ products: any[], page: number, page_count: number }>(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${searchTerm}&search_simple=1&action=process&json=1&page_size=10&page=${page}`, {
             headers: {
                 'User-Agent': 'Carbio.fit - Web - Version 1.0.0 - https://carbio.fit'
@@ -65,6 +91,7 @@ class OpenFoodFactsAPI {
         const pageCount = response.data.page_count;
 
         const foodItems = products.map((product) => {
+            logger.info('Mapping product');
             return {
                 foodname: product.product_name,
                 barcode: product.code,
@@ -76,6 +103,7 @@ class OpenFoodFactsAPI {
             };
         });
 
+        logger.info('Returning products');
         return {
             products: foodItems,
             page: response.data.page,

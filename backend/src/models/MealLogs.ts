@@ -1,4 +1,5 @@
 import ConnectToDB from "../utils/ConnectToDB";
+import { logger } from "../utils/Logging";
 
 export interface MealLog {
     mealtype: string;
@@ -15,31 +16,31 @@ class MealLogs {
         this.client = ConnectToDB.getClient();
     }
 
-    async getMealLogs(userid: number): Promise<any> {
-        const result = await (await this.client).query('SELECT * FROM "MealLogs" WHERE userid = $1', [userid]);
-        return result.rows;
-    }
+    async getMealLogs(userid: number, start?: Date, end?: Date): Promise<any> {
+        logger.info('Fetching meal logs from database');
+        let query = 'SELECT * FROM "MealLogs" WHERE userid = $1';
+        const params: any[] = [userid];
 
-    async getMealLog(userid: number, start: Date, end: Date): Promise<any> {
-        const result = await (await this.client).query(
-            `SELECT * FROM "MealLogs" WHERE userid = $1 AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) ORDER BY dateadded`,
-            [userid, start, end]
-        );
+        if (start && end) {
+            logger.info('Using date range');
+            query += ' AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) + INTERVAL \'1 day\' ORDER BY dateadded';
+            params.push(start, end);
+        }
+
+        logger.info('Querying database');
+        const result = await (await this.client).query(query, params);
+
+        logger.info('Returning meal logs');
         return result.rows;
     }
 
     async addMealLog(mealLog: MealLog): Promise<void> {
+        logger.info('Adding meal log to database');
         await (await this.client).query(
             'INSERT INTO "MealLogs" (mealtype, dateadded, barcode, userid, servingconsumed) VALUES ($1, $2, $3, $4, $5)',
             [mealLog.mealtype, mealLog.dateadded, mealLog.barcode, mealLog.userid, mealLog.servingconsumed]
         );
-    }
-
-    async updateMealLogItem(userid: number, barcode: string, servingconsumed: number, dateadded: Date): Promise<void> {
-        await (await this.client).query(
-            'UPDATE "MealLogs" SET servingconsumed = $1 WHERE userid = $2 AND barcode = $3 AND dateadded = $4',
-            [servingconsumed, userid, barcode, dateadded]
-        );
+        logger.info('Meal log added to database');
     }
 }
 
