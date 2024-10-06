@@ -97,7 +97,6 @@ export default defineComponent({
                 </div>
                 <!-- Weight, height, age, calorie goal, date of birth, activity level, sex -->
                 <div class="card-body">
-
                     <form @submit.prevent="saveUserStats">
                         <div class="row">
                             <div class="col-12 col-md-6 mb-3">
