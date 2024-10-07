@@ -4,21 +4,11 @@
     <div class="row mb-4">
       <div class="col-12 col-md-6">
         <label for="startDate" class="form-label">Start Date</label>
-        <input
-          type="date"
-          class="form-control"
-          id="startDate"
-          v-model="formattedStartDate"
-        />
+        <input type="date" class="form-control" id="startDate" v-model="formattedStartDate" />
       </div>
       <div class="col-12 col-md-6">
         <label for="endDate" class="form-label">End Date</label>
-        <input
-          type="date"
-          class="form-control"
-          id="endDate"
-          v-model="formattedEndDate"
-        />
+        <input type="date" class="form-control" id="endDate" v-model="formattedEndDate" />
       </div>
     </div>
 
@@ -26,28 +16,19 @@
     <div class="row mb-4">
       <div class="col-12 text-center">
         <div class="btn-group" role="group" aria-label="Meal Type Switcher">
-          <button
-            type="button"
-            class="btn"
+          <button type="button" class="btn"
             :class="selectedMealType === 'Breakfast' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedMealType = 'Breakfast'"
-          >
+            @click="selectedMealType = 'Breakfast'">
             <font-awesome-icon icon="coffee" class="me-2" /> Breakfast
           </button>
-          <button
-            type="button"
-            class="btn"
+          <button type="button" class="btn"
             :class="selectedMealType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedMealType = 'Lunch'"
-          >
+            @click="selectedMealType = 'Lunch'">
             <font-awesome-icon icon="hamburger" class="me-2" /> Lunch
           </button>
-          <button
-            type="button"
-            class="btn"
+          <button type="button" class="btn"
             :class="selectedMealType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedMealType = 'Dinner'"
-          >
+            @click="selectedMealType = 'Dinner'">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
         </div>
@@ -59,16 +40,12 @@
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h3 class="mb-0">
-            <font-awesome-icon
-              :icon="
-                selectedMealType === 'Breakfast'
-                  ? 'coffee'
-                  : selectedMealType === 'Lunch'
+            <font-awesome-icon :icon="selectedMealType === 'Breakfast'
+                ? 'coffee'
+                : selectedMealType === 'Lunch'
                   ? 'hamburger'
                   : 'drumstick-bite'
-              "
-              class="me-2"
-            />
+              " class="me-2" />
             {{ selectedMealType }}
           </h3>
           <button @click="routeToSearch(selectedMealType)" class="btn btn-primary">
@@ -99,18 +76,11 @@
 
           <!-- Meal Logs -->
           <div class="row">
-            <div
-              v-for="item in filteredMealLogs"
-              :key="item.barcode + item.dateadded"
-              class="col-12 col-md-6 col-lg-4 mb-4"
-            >
+            <div v-for="item in filteredMealLogs" :key="item.barcode + item.dateadded"
+              class="col-12 col-md-6 col-lg-4 mb-4">
               <div class="card h-100">
-                <img
-                  :src="item.foodItem.image"
-                  class="card-img-top"
-                  alt="{{ item.foodItem.foodname }}"
-                  style="height: 200px; object-fit: cover;"
-                />
+                <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
+                  style="height: 200px; object-fit: cover;" />
                 <div class="card-body">
                   <h5 class="card-title">{{ item.foodItem.foodname }}</h5>
                   <ul class="list-group list-group-flush">
@@ -138,10 +108,7 @@
             </div>
 
             <!-- No Meals Message -->
-            <div
-              v-if="filteredMealLogs.length === 0"
-              class="col-12 text-center my-3"
-            >
+            <div v-if="filteredMealLogs.length === 0" class="col-12 text-center my-3">
               <p>No meals logged for {{ selectedMealType }} during this period.</p>
             </div>
           </div>
@@ -281,12 +248,11 @@ export default defineComponent({
       [startDate, endDate],
       async ([newStart, newEnd]: [Date, Date]) => {
         if (
-          newStart.getTime() === startDate.value.getTime() &&
-          newEnd.getTime() === endDate.value.getTime()
+          newStart.getTime() !== startDate.value.getTime() ||
+          newEnd.getTime() !== endDate.value.getTime()
         ) {
-          return;
+          await updateMealLogs(newStart, newEnd);
         }
-        await updateMealLogs(newStart, newEnd);
       }
     );
 
