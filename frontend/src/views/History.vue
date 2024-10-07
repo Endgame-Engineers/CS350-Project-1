@@ -41,10 +41,10 @@
         <div class="card-header d-flex justify-content-between align-items-center">
           <h3 class="mb-0">
             <font-awesome-icon :icon="selectedMealType === 'Breakfast'
-                ? 'coffee'
-                : selectedMealType === 'Lunch'
-                  ? 'hamburger'
-                  : 'drumstick-bite'
+              ? 'coffee'
+              : selectedMealType === 'Lunch'
+                ? 'hamburger'
+                : 'drumstick-bite'
               " class="me-2" />
             {{ selectedMealType }}
           </h3>
@@ -244,17 +244,11 @@ export default defineComponent({
       );
     });
 
-    watch(
-      [startDate, endDate],
-      async ([newStart, newEnd]: [Date, Date]) => {
-        if (
-          newStart.getTime() !== startDate.value.getTime() ||
-          newEnd.getTime() !== endDate.value.getTime()
-        ) {
-          await updateMealLogs(newStart, newEnd);
-        }
+    watch([startDate, endDate], ([newStartDate, newEndDate]) => {
+      if (newStartDate && newEndDate) {
+        updateMealLogs(newStartDate, newEndDate);
       }
-    );
+    });
 
     return {
       mealLogs,
