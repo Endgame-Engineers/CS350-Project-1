@@ -190,6 +190,44 @@ class UserRoute {
                 res.status(500).json({ error: 'An error occurred' });
             }
         });
+
+        this.router.delete('/user/logs/:id', isAuthenticated, (req, res) => {
+            logger.info('/user/logs/:id DELETE');
+            const user = req.user as User;
+
+            if (req.params.id === undefined) {
+                logger.error('ID is required');
+                return res.status(400).json({ error: 'ID is required' });
+            }
+
+            let id: number;
+            try {
+                id = Number(req.params.id);
+                if (isNaN(id)) {
+                    logger.error('Invalid ID');
+                    return res.status(400).json({ error: 'Invalid ID' });
+                }
+            } catch (error) {
+                logger.error('Invalid ID:', (error as Error).message);
+                return res.status(400).json({ error: 'Invalid ID' });
+            }
+
+            if (user.id) {
+                logger.info('User authenticated');
+                MealLogs.deleteMealLog(id, user.id)
+                    .then((mealLog) => {
+                        logger.info('Meal log deleted');
+                        res.json(mealLog);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
     }
 }
 

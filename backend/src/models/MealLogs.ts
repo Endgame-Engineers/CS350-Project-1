@@ -43,12 +43,12 @@ class MealLogs {
         logger.info('Meal log added to database');
     }
 
-    async deleteMealLog(mealLog: MealLog): Promise<void> {
+    async deleteMealLog(id: number, userid: number): Promise<void> {
         logger.info('Deleting meal log from database');
         try {
             await (await this.client).query(
-                'DELETE FROM "MealLogs" WHERE userid = $1 AND dateadded = $2 and mealtype = $3 and barcode = $4 and servingconsumed = $5', 
-                [mealLog.userid, mealLog.dateadded, mealLog.mealtype, mealLog.barcode, mealLog.servingconsumed]
+                'DELETE FROM "MealLogs" WHERE userid = $1 AND id = $2', 
+                [userid, id]
             );
             logger.info('Meal log deleted from database');
         } catch (error) {
