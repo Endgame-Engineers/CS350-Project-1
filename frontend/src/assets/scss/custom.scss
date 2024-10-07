@@ -50,3 +50,40 @@ video {
   height: 100vh; /* Ensure the video fits the full height */
   object-fit: cover; /* Ensure the video covers the screen, cropping if needed */
 }
+
+.container-fluid {
+  padding: 1rem;
+}
+
+.btn-group .btn {
+  min-width: 120px;
+}
+
+.card-header h3 {
+  display: flex;
+  align-items: center;
+}
+
+.card-header .btn {
+  display: flex;
+  align-items: center;
+}
+
+.list-group-item {
+  padding: 0.5rem 1rem;
+}
+
+@media (max-width: 576px) {
+  .card-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .card-header .btn {
+    font-size: 0.9rem;
+  }
+
+  .btn-group .btn {
+    font-size: 0.9rem;
+    min-width: 100px;
+  }
+}

@@ -100,6 +100,11 @@
                       Serving Consumed: {{ item.servingconsumed }}
                     </li>
                   </ul>
+                  <div class="text-end">
+                    <button class="btn btn-outline-primary" @click="removeMeal(item)">
+                      <font-awesome-icon :icon="['fas', 'trash']" /> Remove Meal
+                    </button>
+                  </div>
                 </div>
                 <div class="card-footer text-muted text-end">
                   <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
@@ -123,7 +128,7 @@ import { defineComponent, ref, onMounted, computed, watch } from 'vue';
 import { ExtendedMealLog } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
-import { getMealLogs, addMealLog } from '@/services/MealLogs';
+import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
 
 export default defineComponent({
@@ -250,6 +255,12 @@ export default defineComponent({
       }
     });
 
+    const removeMeal = async (item: ExtendedMealLog) => {
+
+      await deleteMealLog(item.id);
+      mealLogs.value = mealLogs.value.filter((log) => log !== item);
+    };
+
     return {
       mealLogs,
       routeToSearch,
@@ -262,46 +273,8 @@ export default defineComponent({
       sortedMealLogs,
       filteredMealLogs,
       selectedMealType,
+      removeMeal,
     };
   },
 });
 </script>
-
-<style scoped>
-.container-fluid {
-  padding: 1rem;
-}
-
-.btn-group .btn {
-  min-width: 120px;
-}
-
-.card-header h3 {
-  display: flex;
-  align-items: center;
-}
-
-.card-header .btn {
-  display: flex;
-  align-items: center;
-}
-
-.list-group-item {
-  padding: 0.5rem 1rem;
-}
-
-@media (max-width: 576px) {
-  .card-header h3 {
-    font-size: 1.25rem;
-  }
-
-  .card-header .btn {
-    font-size: 0.9rem;
-  }
-
-  .btn-group .btn {
-    font-size: 0.9rem;
-    min-width: 100px;
-  }
-}
-</style>

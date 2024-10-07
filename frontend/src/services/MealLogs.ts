@@ -39,3 +39,23 @@ export async function addMealLog(mealLog: MealLog): Promise<MealLog> {
         throw new Error("Could not add meal log.");
     }
 }
+
+
+export async function deleteMealLog(numberID: number): Promise<MealLog> {
+    logger.info('Deleting meal log');
+    try {
+        const response = await axios.delete<MealLog>(`/api/user/logs/${numberID}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        logger.info('Meal log deleted');
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting meal log", error);
+        throw new Error("Could not delete meal log.");
+    }
+}
+
+
+
