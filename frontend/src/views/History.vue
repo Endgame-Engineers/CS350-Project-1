@@ -116,11 +116,30 @@
             <div v-if="filteredMealLogs.length === 0" class="col-12 text-center my-3">
               <p>No meals logged for {{ selectedMealType }} during this period.</p>
             </div>
+
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true" ref="confirmDeleteModal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">
+                      Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                  <div class="modal-body">
+                    Are you sure you want to remove this item?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete()">Confirm</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script lang="ts">
@@ -130,6 +149,7 @@ import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
+import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'HistoryPage',
@@ -161,6 +181,7 @@ export default defineComponent({
     const startDate = ref(new Date());
     const endDate = ref(new Date());
     const selectedMealType = ref('Breakfast');
+    const itemToDelete = ref<ExtendedMealLog | null>(null);
 
     const routeToSearch = (mealType: string) => {
       logger.info('Adding Meal Type to meal log store');
@@ -256,10 +277,24 @@ export default defineComponent({
     });
 
     const removeMeal = async (item: ExtendedMealLog) => {
-
-      await deleteMealLog(item.id);
-      mealLogs.value = mealLogs.value.filter((log) => log !== item);
+      const modal = new Modal(document.getElementById('confirmDeleteModal')!);
+      itemToDelete.value = item;
+      modal.show();
     };
+
+    const confirmDelete = async () => {
+      if (itemToDelete.value) {
+        await deleteMealLog(itemToDelete.value.id);
+        mealLogs.value = mealLogs.value.filter((log) => log !== itemToDelete.value);
+        itemToDelete.value = null;
+      }
+    }
+
+    const cancelDelete = () => {
+      if (itemToDelete.value) {
+        itemToDelete.value = null;
+      }
+    }
 
     return {
       mealLogs,
@@ -274,6 +309,8 @@ export default defineComponent({
       filteredMealLogs,
       selectedMealType,
       removeMeal,
+      confirmDelete,
+      cancelDelete,
     };
   },
 });
