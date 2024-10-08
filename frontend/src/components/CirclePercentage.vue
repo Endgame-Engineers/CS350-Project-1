@@ -9,8 +9,9 @@
             <path class="circle" :stroke-dasharray="props.progress + ', 100'" d="M18 2.0845
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <text x="18" y="20.35" class="percentage">{{ props.progress }}%</text>
-        </svg>
+            <text x="18" y="18" class="percentage">{{ props.progress }}%</text>
+            <text v-if="props.title" x="18" y="22" class="circle-title">{{ props.title }}</text>
+        </svg> 
     </div>
 </template>
 <script setup lang="ts">
@@ -19,5 +20,6 @@ import { defineProps } from 'vue';
 const props = defineProps<{
     progress: number;
     size: number;
+    title?: string;
 }>();
 </script>

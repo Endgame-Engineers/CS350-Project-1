@@ -1,26 +1,26 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useUserStore } from '@/stores/User';
-import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import { getUserStat, userStats } from '@/services/UserStats';
 import { getMealLogs } from '@/services/MealLogs';
 import { ExtendedMealLog, UserStat } from '@/models/Models';
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default defineComponent({
   name: 'HomePage',
-  components: {
-    BarChart: Bar,
-  },
   setup() {
     const userStore = useUserStore();
     const user = userStore.user;
     const totalCaloriesConsumed = ref(0);
+    const totalCarbs = ref(0);
+    const totalProteins = ref(0);
+    const totalFats = ref(0);
 
     const fetchMealLogs = async () => {
       const mealLogs = await getMealLogs(new Date(), new Date()) as ExtendedMealLog[];
-      totalCaloriesConsumed.value = mealLogs.reduce((total, log) => total + log.foodItem.calories_per_serv * log.servingconsumed, 0);
+      totalCaloriesConsumed.value = Math.round(mealLogs.reduce((total, log) => total + log.foodItem.calories_per_serv * log.servingconsumed, 0));
+      totalCarbs.value = mealLogs.reduce((total, log) => total + log.foodItem.carb_per_serv * log.servingconsumed, 0);
+      totalProteins.value = mealLogs.reduce((total, log) => total + log.foodItem.protein_per_serv * log.servingconsumed, 0);
+      totalFats.value = mealLogs.reduce((total, log) => total + log.foodItem.fat_per_serv * log.servingconsumed, 0);
     };
 
     fetchMealLogs();
@@ -70,20 +70,35 @@ export default defineComponent({
       userStats,
       chartData,
       chartOptions,
-      totalCaloriesConsumed
+      totalCaloriesConsumed,
+      totalCarbs,
+      totalProteins,
+      totalFats,
     };
   },
 });
 </script>
 <template>
   <div class="container">
-    <div class="row">
+    <div class="row d-flex justify-content-center">
       <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <circle-percentage :progress="useStats.caloriegoal ? totalCaloriesConsumed / userStats.caloriegoal * 100 : 0" size="10" />
-          </div>
+      <div class="row">
+        <h3>Today's Stats</h3>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
+          <circle-percentage :progress="Math.round(totalCaloriesConsumed / userStats.caloriegoal * 100)" size="8"
+            title="Calories" />
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
+          <circle-percentage :progress="Math.round((totalCarbs / (totalCarbs + totalProteins + totalFats)) * 100)"
+            size="8" title="Carbs" />
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
+          <circle-percentage :progress="Math.round((totalProteins / (totalCarbs + totalProteins + totalFats)) * 100)"
+            size="8" title="Proteins" />
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
+          <circle-percentage :progress="Math.round((totalFats / (totalCarbs + totalProteins + totalFats)) * 100)"
+            size="8" title="Fats" />
         </div>
       </div>
     </div>
