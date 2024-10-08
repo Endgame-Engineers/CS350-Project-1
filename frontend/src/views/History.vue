@@ -1,29 +1,5 @@
 <template>
   <div class="container-fluid">
-    <div class="row mb-4">
-      <div class="col-12 col-md-6">
-        <button type="button" class="btn btn-primary" @click="adjustDates(-1)">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" /> Go Back One Day
-        </button>
-      </div>
-      <div class="col-12 col-md-6 text-md-end">
-        <button type="button" class="btn btn-primary" @click="adjustDates(1)">
-          Go Forward One Day <font-awesome-icon :icon="['fas', 'arrow-right']" />
-        </button>
-      </div>
-    </div>
-    <!-- Date Range Selection -->
-    <div class="row mb-4">
-      <div class="col-12 col-md-6">
-        <label for="startDate" class="form-label">Start Date</label>
-        <input type="date" class="form-control" id="startDate" v-model="formattedStartDate" />
-      </div>
-      <div class="col-12 col-md-6">
-        <label for="endDate" class="form-label">End Date</label>
-        <input type="date" class="form-control" id="endDate" v-model="formattedEndDate" />
-      </div>
-    </div>
-
     <!-- Meal Type Switcher -->
     <div class="row mb-4">
       <div class="col-12 text-center">
@@ -47,6 +23,21 @@
       </div>
     </div>
 
+    <!-- Date Range Selection -->
+    <div class="row mb-4 d-grid grid-template-columns-2 gap-3">
+      <div class="input-group">
+        <button type="button" class="btn btn-primary" @click="adjustDates(-1)">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        </button>
+        <input type="date" class="form-control" id="startDate" v-model="formattedStartDate" />
+      </div>
+      <div class="input-group">
+        <input type="date" class="form-control" id="endDate" v-model="formattedEndDate" />
+        <button type="button" class="btn btn-primary" @click="adjustDates(1)">
+          <font-awesome-icon :icon="['fas', 'arrow-right']" />
+        </button>
+      </div>
+    </div>
     <!-- Selected Meal Type Section -->
     <div class="mb-5">
       <div class="card">
@@ -113,12 +104,18 @@
                     </li>
                   </ul>
                 </div>
-                <div class="card-footer text-muted d-grid grid-template-columns-2 align-items-center">
-                  <button class="btn btn-outline-primary mb-2" @click="removeItem(item)">
-                  <font-awesome-icon :icon="['fas', 'trash']" />
-                  </button>
-                  <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
+                <div class="card-footer text-muted d-grid grid-template-columns-1-2 align-items-center">
+                  <div class="text-start">
+                    <button class="btn btn-outline-primary mb-2" @click="removeItem(item)">
+                      <font-awesome-icon :icon="['fas', 'trash']" />
+                    </button>
+                  </div>
+                  <div class="text-end">
+                    <font-awesome-icon :icon="['fas', 'calendar-alt']" class="me-2" />
+                    <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
+                  </div>
                 </div>
+
               </div>
             </div>
 
@@ -127,20 +124,28 @@
               <p>No meals logged for {{ selectedMealType }} during this period.</p>
             </div>
 
-            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true" ref="confirmDeleteModal">
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+              aria-hidden="true" ref="confirmDeleteModal">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title" id="confirmDeleteModalLabel">
                       Confirm Deletion
                     </h5>
-                    <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                    <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
+                      aria-label="Close"></button>
+                  </div>
                   <div class="modal-body">
-                    Are you sure you want to remove this item?
+                    <p>Are you sure you want to remove {{ itemToDelete?.foodItem.foodname }} from your meal log?</p>
+                    <img :src="itemToDelete?.foodItem.image" alt="{{ itemToDelete?.foodItem.foodname }}"
+                      style="height: 200px; object-fit: cover;" />
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">Cancel</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete()">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      @click="cancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                      @click="confirmDelete()">Confirm</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -149,7 +154,6 @@
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
@@ -332,6 +336,7 @@ export default defineComponent({
       confirmDelete,
       cancelDelete,
       adjustDates,
+      itemToDelete,
     };
   },
 });
