@@ -8,7 +8,7 @@ import Profile from '@/views/Profile.vue';
 import welcomescreen from '@/views/WelcomeScreen.vue';
 import { createPinia } from 'pinia';
 import { useUserStore } from '@/stores/User';
-import MealLogs from '@/views/MealLogs.vue';
+import MealLogs from '../views/MealLogs.vue';
 
 const pinia = createPinia();
 const userStore = useUserStore(pinia);
