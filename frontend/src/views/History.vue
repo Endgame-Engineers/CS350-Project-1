@@ -100,13 +100,11 @@
                       Serving Consumed: {{ item.servingconsumed }}
                     </li>
                   </ul>
-                  <div class="text-end">
-                    <button class="btn btn-outline-primary" @click="removeMeal(item)">
-                      <font-awesome-icon :icon="['fas', 'trash']" /> Remove Meal
-                    </button>
-                  </div>
                 </div>
-                <div class="card-footer text-muted text-end">
+                <div class="card-footer text-muted d-grid grid-template-columns-2 align-items-center">
+                  <button class="btn btn-outline-primary mb-2" @click="removeItem(item)">
+                  <font-awesome-icon :icon="['fas', 'trash']" />
+                  </button>
                   <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
                 </div>
               </div>
@@ -276,7 +274,7 @@ export default defineComponent({
       }
     });
 
-    const removeMeal = async (item: ExtendedMealLog) => {
+    const removeItem = async (item: ExtendedMealLog) => {
       const modal = new Modal(document.getElementById('confirmDeleteModal')!);
       itemToDelete.value = item;
       modal.show();
@@ -308,7 +306,7 @@ export default defineComponent({
       sortedMealLogs,
       filteredMealLogs,
       selectedMealType,
-      removeMeal,
+      removeItem,
       confirmDelete,
       cancelDelete,
     };
