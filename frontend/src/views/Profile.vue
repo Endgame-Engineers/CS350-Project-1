@@ -11,7 +11,6 @@ export default defineComponent({
         const excludedKeys = ref(['id', 'uuid', 'providerid', 'profilepic', 'profilecreated']);
         const isEditing = ref(false);
 
-
         const fetchUserStats = async () => {
             try {
                 const stats = await getUserStat() as ProfileStats

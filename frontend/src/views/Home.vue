@@ -3,9 +3,9 @@ import { defineComponent, ref } from 'vue';
 import { useUserStore } from '@/stores/User';
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import { getUserStat } from '@/services/UserStats';
+import { getUserStat, userStats } from '@/services/UserStats';
 import { getMealLogs } from '@/services/MealLogs';
-import { ExtendedMealLog } from '@/models/Models';
+import { ExtendedMealLog, UserStat } from '@/models/Models';
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default defineComponent({
@@ -16,7 +16,6 @@ export default defineComponent({
   setup() {
     const userStore = useUserStore();
     const user = userStore.user;
-    const userStats = ref({ caloriegoal: 0 });
     const totalCaloriesConsumed = ref(0);
 
     const fetchMealLogs = async () => {
@@ -28,18 +27,13 @@ export default defineComponent({
 
     const fetchUserStats = async () => {
       try {
-        const stats = await getUserStat();
+        const stats = await getUserStat() as UserStat;
 
         if (stats) {
-          userStats.value = {
-            ...stats,
-            caloriegoal: 'caloriegoal' in stats && stats.caloriegoal !== null ? stats.caloriegoal : 0,
-          };
-        } else {
-          console.error('Failed to fetch user stats:', stats);
+          userStats.value = stats;
         }
       } catch (error) {
-        console.error('Failed to fetch user stats:', error);
+        console.error(error);
       }
     };
 
@@ -64,26 +58,6 @@ export default defineComponent({
       ],
     });
 
-    const fetchChartData = async () => {
-      const now = new Date();
-      const pastThreeMonths = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-      const mealLogs = await getMealLogs(pastThreeMonths, now) as ExtendedMealLog[];
-
-      const monthlyData = mealLogs.reduce((acc, log) => {
-        const month = log.dateadded ? new Date(log.dateadded).toLocaleString('default', { month: 'long' }) : 'Unknown';
-        if (!acc[month]) {
-          acc[month] = { consumed: 0, goal: userStats.value.caloriegoal };
-        }
-        acc[month].consumed += log.foodItem.calories_per_serv * log.servingconsumed;
-        return acc;
-      }, {} as Record<string, { consumed: number, goal: number }>);
-
-      chartData.value.labels = Object.keys(monthlyData);
-      chartData.value.datasets[0].data = Object.values(monthlyData).map(data => data.consumed);
-      chartData.value.datasets[1].data = Object.keys(monthlyData).map(() => userStats.value.caloriegoal);
-    };
-
-    fetchChartData();
 
     const chartOptions = ref({
       responsive: true,
@@ -96,8 +70,7 @@ export default defineComponent({
       userStats,
       chartData,
       chartOptions,
-      totalCaloriesConsumed,
-      progress: 50,
+      totalCaloriesConsumed
     };
   },
 });
@@ -109,8 +82,7 @@ export default defineComponent({
       <div class="col">
         <div class="card">
           <div class="card-body">
-
-            <circle-percentage :progress="progress" size="200" />
+            <circle-percentage :progress="useStats.caloriegoal ? totalCaloriesConsumed / userStats.caloriegoal * 100 : 0" size="10" />
           </div>
         </div>
       </div>

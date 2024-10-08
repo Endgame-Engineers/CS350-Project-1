@@ -4,7 +4,7 @@ import axios from "axios";
 
 
 export interface ProfileStats extends UserStat {
-    recommendedcaloriegoal: number;
+    recommendedcaloriegoal?: number;
     Error?: string;
 }
 
