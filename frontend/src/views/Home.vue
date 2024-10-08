@@ -81,19 +81,16 @@ export default defineComponent({
 <template>
   <div class="container">
     <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
-    <div class="d-flex justify-content-center">
-      <div v-if="userStats.caloriegoal !== null && totalCaloriesConsumed > userStats.caloriegoal" class="alert alert-danger" role="alert">
-        You have consumed <i>{{ totalCaloriesConsumed }}</i> calories today, which is more than your daily goal of
-        <i>{{ userStats.caloriegoal }}</i> calories.
-      </div>
-      <div v-else-if="userStats.caloriegoal !== null && totalCaloriesConsumed === userStats.caloriegoal" class="alert alert-success" role="alert">
-        You have consumed <i>{{ totalCaloriesConsumed }}</i> calories today, which is exactly your daily goal of
-        <i>{{ userStats.caloriegoal }}</i> calories.
-      </div>
-      <div v-else class="alert alert-info" role="alert">
-        You have consumed <i>{{ totalCaloriesConsumed }}</i> calories today and have <i>{{ userStats.caloriegoal ? userStats.caloriegoal -
-          totalCaloriesConsumed : 0  }}</i> calories left to consume.
-      </div>
+    <div class="d-grid todays-stats">
+      <circle-percentage :progress="Math.round(totalCaloriesConsumed / userStats.caloriegoal * 100)" size="8"
+        title="Calories" />
+      <circle-percentage :progress="Math.round((totalCarbs / (totalCarbs + totalProteins + totalFats)) * 100)" size="8"
+        title="Carbs" />
+      <circle-percentage :progress="Math.round((totalProteins / (totalCarbs + totalProteins + totalFats)) * 100)"
+        size="8" title="Proteins" />
+
+      <circle-percentage :progress="Math.round((totalFats / (totalCarbs + totalProteins + totalFats)) * 100)" size="8"
+        title="Fats" />
     </div>
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
