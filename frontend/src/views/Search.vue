@@ -152,7 +152,7 @@ export default {
 
 <template>
   <div class="row">
-    <div class="col-12 col-md-4 mb-3">
+    <div class="col-12 mb-3">
       <div class="input-group mb-4">
         <!-- Search Bar and Barcode Scanner -->
         <router-link to="/barscanner">
@@ -170,38 +170,41 @@ export default {
         </button>
       </div>
     </div>
-    <div class="col-12 col-md-4 mb-3">
+  </div>
+  <div class="row">
+    <div class="col-12 mb-3">
       <!-- Error message -->
       <div v-if="foodData && !foodData.length" class="alert alert-danger" role="alert">
         No results found
       </div>
       <!-- Food Data Display -->
-      <div v-if="foodData && foodData.length" style="max-height: 80%; overflow-y: auto;">
-        <div v-for="item in foodData" :key="item.barcode" class="card mb-3">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img :src="item.image" class="img-fluid rounded-start" alt="Food image">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">{{ item.foodname }}</h5>
-                <p class="card-text"><strong>Protein:</strong> {{ item.protein_per_serv.toFixed(2) }}g</p>
-                <p class="card-text"><strong>Carbs:</strong> {{ item.carb_per_serv.toFixed(2) }}g</p>
-                <p class="card-text"><strong>Fat:</strong> {{ item.fat_per_serv.toFixed(2) }}g</p>
-                <p class="card-text"><strong>Calories:</strong> {{ item.calories_per_serv.toFixed(2) }} kcal</p>
-                <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
-              </div>
-              <div class="mt-auto text-end pb-2 pe-2">
-                <button @click="addFoodItem(item)" class="btn btn-primary" type="button">Add</button>
+      <div v-if="foodData && foodData.length">
+        <div class="row row-cols-1 row-cols-md-2 g-4 h-auto">
+          <div v-for="item in foodData" :key="item.barcode" class="col">
+            <div class="card h-100 border rounded shadow-sm p-2">
+              <div class="row g-0">
+                <div class="col-md-4 d-flex align-items-center">
+                  <img :src="item.image" class="img-fluid rounded-start" alt="Food image" style="max-height: 150px; object-fit: cover;">
+                </div>
+                <div class="col-md-8 d-flex flex-column">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.foodname }}</h5>
+                    <p class="card-text mb-1"><strong>Protein:</strong> {{ item.protein_per_serv.toFixed(2) }}g</p>
+                    <p class="card-text mb-1"><strong>Carbs:</strong> {{ item.carb_per_serv.toFixed(2) }}g</p>
+                    <p class="card-text mb-1"><strong>Fat:</strong> {{ item.fat_per_serv.toFixed(2) }}g</p>
+                    <p class="card-text mb-1"><strong>Calories:</strong> {{ item.calories_per_serv.toFixed(2) }} kcal</p>
+                    <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
+                  </div>
+                  <div class="mt-auto d-flex justify-content-end p-2">
+                    <button @click="addFoodItem(item)" class="btn btn-primary w-100" type="button">Add</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <button @click="loadMore" class="btn btn-primary mt-3">Load More</button>
       </div>
-    </div>
-    <div class="col-12 col-md-4 mb-3">
-      <h1>Coming Soonish</h1>
     </div>
   </div>
 
