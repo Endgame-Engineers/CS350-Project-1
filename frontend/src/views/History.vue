@@ -1,5 +1,17 @@
 <template>
   <div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col-12 col-md-6">
+        <button type="button" class="btn btn-primary" @click="adjustDates(-1)">
+          <font-awesome-icon :icon="['fas', 'arrow-left']" /> Go Back One Day
+        </button>
+      </div>
+      <div class="col-12 col-md-6 text-md-end">
+        <button type="button" class="btn btn-primary" @click="adjustDates(1)">
+          Go Forward One Day <font-awesome-icon :icon="['fas', 'arrow-right']" />
+        </button>
+      </div>
+    </div>
     <!-- Date Range Selection -->
     <div class="row mb-4">
       <div class="col-12 col-md-6">
@@ -201,6 +213,16 @@ export default defineComponent({
       mealLogs.value = await response;
     };
 
+    const adjustDates = (days: number) => {
+      logger.info('Adjusting dates by', days, 'days');
+      const newStartDate = new Date(startDate.value);
+      const newEndDate = new Date(endDate.value);
+      newStartDate.setDate(newStartDate.getDate() + days);
+      newEndDate.setDate(newEndDate.getDate() + days);
+      startDate.value = newStartDate;
+      endDate.value = newEndDate;
+    };
+
     onMounted(async () => {
       const mealLogStore = useMealLogStore();
       const existingMealLogs = mealLogStore.getMealLog();
@@ -309,6 +331,7 @@ export default defineComponent({
       removeItem,
       confirmDelete,
       cancelDelete,
+      adjustDates,
     };
   },
 });
