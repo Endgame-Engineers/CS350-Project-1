@@ -390,6 +390,7 @@ export default defineComponent({
       cancelDelete,
       adjustDates,
       itemToDelete,
+      computeTotals, // Make sure to return computeTotals
       water,
     };
   },
