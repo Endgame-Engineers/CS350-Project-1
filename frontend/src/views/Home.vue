@@ -80,27 +80,17 @@ export default defineComponent({
 </script>
 <template>
   <div class="container">
-    <div class="row d-flex justify-content-center">
-      <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
-      <div class="row">
-        <h3>Today's Stats</h3>
-        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
-          <circle-percentage :progress="Math.round(totalCaloriesConsumed / userStats.caloriegoal * 100)" size="8"
-            title="Calories" />
-        </div>
-        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
-          <circle-percentage :progress="Math.round((totalCarbs / (totalCarbs + totalProteins + totalFats)) * 100)"
-            size="8" title="Carbs" />
-        </div>
-        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
-          <circle-percentage :progress="Math.round((totalProteins / (totalCarbs + totalProteins + totalFats)) * 100)"
-            size="8" title="Proteins" />
-        </div>
-        <div class="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center">
-          <circle-percentage :progress="Math.round((totalFats / (totalCarbs + totalProteins + totalFats)) * 100)"
-            size="8" title="Fats" />
-        </div>
-      </div>
+    <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
+    <div class="d-grid todays-stats">
+      <circle-percentage :progress="Math.round(totalCaloriesConsumed / userStats.caloriegoal * 100)" size="8"
+        title="Calories" />
+      <circle-percentage :progress="Math.round((totalCarbs / (totalCarbs + totalProteins + totalFats)) * 100)" size="8"
+        title="Carbs" />
+      <circle-percentage :progress="Math.round((totalProteins / (totalCarbs + totalProteins + totalFats)) * 100)"
+        size="8" title="Proteins" />
+
+      <circle-percentage :progress="Math.round((totalFats / (totalCarbs + totalProteins + totalFats)) * 100)" size="8"
+        title="Fats" />
     </div>
   </div>
 </template>
