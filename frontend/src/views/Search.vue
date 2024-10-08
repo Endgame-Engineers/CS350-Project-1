@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { FoodItem, SearchResult, MealLog } from '@/models/Models';
+import { FoodItem, SearchResult, MealLog, MealType } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
 import { useMealLogStore } from '@/stores/MealLog';
 import router from '@/router';
@@ -13,7 +13,7 @@ export default {
   setup() {
     const mealLog: MealLog = {
       barcode: '',
-      mealtype: '',
+      mealtype: 'Breakfast' as MealType,
       servingconsumed: 0,
     };
 
