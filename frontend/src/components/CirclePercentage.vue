@@ -1,5 +1,5 @@
 <template>
-    <div class="circle-container" :style="{ width: props.size + 'em', height: props.size + 'em' }">
+    <div class="circle-container p-2" :style="{ width: props.size + 'em', height: props.size + 'em' }">
         <svg class="progress-circle" viewBox="0 0 36 36">
             <!-- Background circle -->
             <path class="circle-bg" d="M18 2.0845
