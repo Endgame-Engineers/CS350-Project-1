@@ -8,8 +8,10 @@ export interface FoodItem {
   image: string;
 }
 
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water';
+
 export interface MealLog {
-  mealtype: string;
+  mealtype: MealType;
   dateadded?: Date;
   barcode: string;
   servingconsumed: number;

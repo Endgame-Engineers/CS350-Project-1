@@ -159,7 +159,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import { ExtendedMealLog } from '@/models/Models';
+import { ExtendedMealLog, MealType } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
@@ -168,37 +168,14 @@ import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'MealLogs',
-  methods: {
-    computeTotals(mealType: string) {
-      const totals = {
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fat: 0,
-      };
-
-      this.mealLogs.forEach((item) => {
-        if (item.mealtype.toLowerCase() === mealType.toLowerCase()) {
-          totals.calories +=
-            item.foodItem.calories_per_serv * item.servingconsumed;
-          totals.protein +=
-            item.foodItem.protein_per_serv * item.servingconsumed;
-          totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
-          totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
-        }
-      });
-
-      return totals;
-    },
-  },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const startDate = ref(new Date());
     const endDate = ref(new Date());
-    const selectedMealType = ref('Breakfast');
+    const selectedMealType = ref<MealType>('Breakfast');
     const itemToDelete = ref<ExtendedMealLog | null>(null);
 
-    const routeToSearch = (mealType: string) => {
+    const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
       const mealLogStore = useMealLogStore();
       mealLogStore.setMealLog({
@@ -211,11 +188,11 @@ export default defineComponent({
     };
 
     const updateMealLogs = async (start: Date, end: Date) => {
-      const response = (await getMealLogs(
-        start,
-        end
-      )) as ExtendedMealLog[];
-      mealLogs.value = await response;
+      const response = (await getMealLogs(start, end)) as ExtendedMealLog[];
+      mealLogs.value = response.map((item) => ({
+        ...item,
+        dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
+      }));
     };
 
     const adjustDates = (days: number) => {
@@ -230,15 +207,14 @@ export default defineComponent({
 
     onMounted(async () => {
       const mealLogStore = useMealLogStore();
-      const existingMealLogs = mealLogStore.getMealLog();
+      const existingMealLog = mealLogStore.getMealLog();
       if (
-        existingMealLogs.barcode !== '' &&
-        existingMealLogs.mealtype !== '' &&
-        existingMealLogs.dateadded !== undefined &&
-        existingMealLogs.servingconsumed !== 0
+        existingMealLog.barcode !== '' &&
+        existingMealLog.dateadded !== undefined &&
+        existingMealLog.servingconsumed !== 0
       ) {
-        logger.info('Adding existing meal log to meal logs:', existingMealLogs);
-        await addMealLog(existingMealLogs);
+        logger.info('Adding existing meal log to meal logs:', existingMealLog);
+        await addMealLog(existingMealLog);
         logger.info('Added existing meal log to meal logs');
         logger.info('Clearing existing meal log');
         mealLogStore.clearMealLog();
@@ -290,8 +266,7 @@ export default defineComponent({
 
     const filteredMealLogs = computed(() => {
       return sortedMealLogs.value.filter(
-        (item) =>
-          item.mealtype.toLowerCase() === selectedMealType.value.toLowerCase()
+        (item) => item.mealtype === selectedMealType.value
       );
     });
 
@@ -301,7 +276,29 @@ export default defineComponent({
       }
     });
 
-    const removeItem = async (item: ExtendedMealLog) => {
+    const computeTotals = (mealType: MealType) => {
+      const totals = {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+      };
+
+      mealLogs.value.forEach((item) => {
+        if (item.mealtype === mealType) {
+          totals.calories +=
+            item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.protein +=
+            item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+          totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+        }
+      });
+
+      return totals;
+    };
+
+    const removeItem = (item: ExtendedMealLog) => {
       const modal = new Modal(document.getElementById('confirmDeleteModal')!);
       itemToDelete.value = item;
       modal.show();
@@ -310,16 +307,16 @@ export default defineComponent({
     const confirmDelete = async () => {
       if (itemToDelete.value) {
         await deleteMealLog(itemToDelete.value.id);
-        mealLogs.value = mealLogs.value.filter((log) => log !== itemToDelete.value);
+        mealLogs.value = mealLogs.value.filter(
+          (log) => log.id !== itemToDelete.value!.id
+        );
         itemToDelete.value = null;
       }
-    }
+    };
 
     const cancelDelete = () => {
-      if (itemToDelete.value) {
-        itemToDelete.value = null;
-      }
-    }
+      itemToDelete.value = null;
+    };
 
     return {
       mealLogs,
@@ -338,6 +335,7 @@ export default defineComponent({
       cancelDelete,
       adjustDates,
       itemToDelete,
+      computeTotals, // Make sure to return computeTotals
     };
   },
 });
