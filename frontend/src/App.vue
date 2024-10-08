@@ -1,6 +1,6 @@
 <template>
-  <header class="container-fuild fixed-top bg-dark p-3">
-    <div class="row mb-4">
+  <header class="fixed-top bg-dark pt-3 ps-3 pe-3 pb-2">
+    <div class="row">
       <div class="col text-start">
         <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
           class="btn btn-primary">
