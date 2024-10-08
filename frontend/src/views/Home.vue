@@ -109,7 +109,8 @@ export default defineComponent({
       <div class="col">
         <div class="card">
           <div class="card-body">
-            
+
+            <circle-percentage :progress="progress" size="200" />
           </div>
         </div>
       </div>
