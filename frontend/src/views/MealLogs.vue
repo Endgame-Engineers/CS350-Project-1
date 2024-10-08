@@ -166,7 +166,7 @@ import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
 
 export default defineComponent({
-  name: 'MealLogsPage',
+  name: 'MealLogs',
   methods: {
     computeTotals(mealType: string) {
       const totals = {
