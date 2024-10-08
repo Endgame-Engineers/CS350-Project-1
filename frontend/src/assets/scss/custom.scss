@@ -17,6 +17,12 @@ $box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
   /* Full viewport height */
   overflow: hidden;
   /* Hide any overflow */
+  width: 100vw;
+  /* Full viewport width */
+  height: 100vh;
+  /* Full viewport height */
+  overflow: hidden;
+  /* Hide any overflow */
   display: flex;
   justify-content: center;
   align-items: center;
