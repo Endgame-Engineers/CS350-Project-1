@@ -71,7 +71,7 @@ export default defineComponent({
 <template>
     <div class="row">
         <div class="col-12 col-md-4 mb-3 d-flex">
-            <div class="card text-center flex-fill">
+            <div class="card flex-fill">
                 <div class="card-header">
                     <h2 class="mb-0">{{ user?.username }}</h2>
                 </div>
@@ -80,7 +80,11 @@ export default defineComponent({
                         <img :src="user?.profilepic" alt="avatar" class="img-fluid rounded-circle">
                     </div>
                     <div v-for="(value, key) in user" :key="key">
-                        <p v-if="!excludedKeys.includes(key)"><strong>{{ key }}</strong>: {{ value }}</p>
+                        <p v-if="!excludedKeys.includes(key)">
+                            <strong>{{ key.charAt(0).toUpperCase() + key.slice(1) }}</strong>: 
+                            <span v-if="key === 'lastlogin' && value">{{ new Date(value as Date).toLocaleString() }}</span>
+                            <span v-else>{{ value }}</span>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -114,10 +118,12 @@ export default defineComponent({
                         </div>
                         <div class="row">
                             <div class="col-12 col-md-6 mb-3">
-                                <label for="calorieGoal" class="form-label">Calorie Goal</label>
-                                <div v-if="!isEditing">{{ userStats.caloriegoal }} kcal</div>
-                                <input v-else type="number" placeholder="Enter calorie goal" class="form-control"
-                                    id="calorieGoal" v-model.number="userStats.caloriegoal">
+                                <div v-if="!isEditing">Calorie Goal: {{ userStats.caloriegoal }}</div>
+                                <div v-else>
+                                    <label for="calorieGoal" class="form-label">Calorie Goal</label>
+                                    <input type="number" placeholder="Enter calorie goal" class="form-control"
+                                        id="calorieGoal" v-model.number="userStats.caloriegoal">
+                                </div>
                                 <div class="form-text">Recommended calorie goal: {{ userStats.recommendedcaloriegoal }}</div>
                             </div>
                             <div class="col-12 col-md-6 mb-3">
