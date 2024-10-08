@@ -97,6 +97,15 @@ video {
   height: 100%;
 }
 
+$circle-text-size: 0.3rem;
+
+.circle-title {
+  font-size: $circle-text-size;
+  text-anchor: middle;
+  align-baseline: middle;
+  fill: $primary;
+}
+
 .circle-bg {
   fill: none;
   stroke: $secondary;
@@ -112,7 +121,8 @@ video {
 }
 
 .percentage {
-  font-size: 0.5rem;
+  font-size: $circle-text-size;
   text-anchor: middle;
+  align-baseline: middle;
   fill: $primary;
 }
