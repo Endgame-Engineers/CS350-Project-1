@@ -1,6 +1,6 @@
 <template>
   <header class="container-fuild fixed-top bg-dark p-3">
-    <div class="row">
+    <div class="row mb-4">
       <div class="col text-start">
         <button v-if="$route.path.toLocaleLowerCase() !== '/login' && canGoBack" @click="goBack"
           class="btn btn-primary">
@@ -20,23 +20,23 @@
       </div>
     </div>
   </header>
-  <main v-if="$route.path.toLocaleLowerCase() !== '/welcomescreen' && $route.path.toLocaleLowerCase() !== '/login'" class="container mt-4 pt-5 pb-5">
-    <div class="container mt-4 pb-2">
+  <main v-if="$route.path.toLocaleLowerCase() !== '/welcomescreen' && $route.path.toLocaleLowerCase() !== '/login'" class="container mt-4 pt-5 pb-5 mt-4">
+    <div class="container mt-4 pb-3">
       <router-view></router-view>
     </div>
   </main>
   <router-view v-else></router-view>
-  <footer class="container-fluid fixed-bottom bg-dark">
-    <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark', { 'pb-4': isMobile }]">
-      <div class="container-fluid">
+  <footer class="pb-1 fixed-bottom bg-dark">
+    <nav :class="['navbar', 'navbar-expand-lg', 'navbar-dark']">
+      <div class="d-flex justify-content-center flex-fill">
         <div class="d-flex w-100 align-items-center">
           <div class="d-flex justify-content-start w-100 d-none d-md-block">
-            <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/" class="navbar-brand">
+            <a v-if="$route.path.toLocaleLowerCase() !== '/login'" href="/" class="navbar-brand ps-1">
               <img src="@/assets/images/CarbioFit.svg" alt="Carbio.fit Logo" height="30">
             </a>
           </div>
           <div v-if="$route.path.toLocaleLowerCase() !== '/login' && $route.path.toLocaleLowerCase() !== '/welcomescreen'"
-            class="d-flex justify-content-center justify-content-lg-end w-100">
+            class="d-flex justify-content-center justify-content-md-end justify-content-lg-end w-100">
             <router-link to="/" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'house']" />
             </router-link>
