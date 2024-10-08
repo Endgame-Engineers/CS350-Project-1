@@ -70,10 +70,10 @@ export default defineComponent({
 
 <template>
     <div class="row">
-        <div class="col-12 col-md-4 mb-3">
-            <div class="card text-center">
+        <div class="col-12 col-md-4 mb-3 d-flex">
+            <div class="card text-center flex-fill">
                 <div class="card-header">
-                    <h1>{{ user?.username }}</h1>
+                    <h2 class="mb-0">{{ user?.username }}</h2>
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-center mb-3">
@@ -85,10 +85,10 @@ export default defineComponent({
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-8 mb-3">
-            <div class="card">
+        <div class="col-12 col-md-8 mb-3 d-flex">
+            <div class="card flex-fill">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h1 class="mb-0">Profile Details</h1>
+                    <h2 class="mb-0">Profile Details</h2>
                     <div class="d-flex justify-content-end">
                         <button v-if="!isEditing" class="btn btn-outline-primary me-2" @click="toggleIsEditing">
                             <font-awesome-icon :icon="['fas', 'pencil']"/> Edit
