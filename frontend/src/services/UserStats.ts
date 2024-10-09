@@ -27,9 +27,9 @@ export const userStats = ref<ProfileStats>({
 });
 
 // Function to fetch user stats from the backend
-export async function getUserStats(): Promise<UserStat> {
+export async function getUserStats(): Promise<UserStat[]> {
     try {
-        const response = await axios.get<UserStat>('/api/user/stats');
+        const response = await axios.get<UserStat[]>('/api/user/stats');
         return response.data;
     } catch (error) {
         console.error("Error fetching user stats", error);

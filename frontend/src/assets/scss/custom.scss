@@ -80,6 +80,10 @@ video {
   /* One column that takes up 1/3 of the space and one that takes up 2/3 */
 }
 
+.grid-template-columns-small1-3 {
+  grid-template-columns: .1fr 1fr 1fr;
+}
+
 .grid-template-columns-4 {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   /* Four equal columns */
