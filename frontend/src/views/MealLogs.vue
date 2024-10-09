@@ -2,8 +2,8 @@
     set the button that is selected to primary 
     add quotes around the delete message
     remove date scrolling and make it date picker
-    add snacks tracker
-    add water tracker
+    add snacks to the meal type switcher
+    add water to the meal type switcher
     -->
 <template>
   <div class="container-fluid">
@@ -31,15 +31,12 @@
     </div>
 
     <!-- Date Range Selection -->
-    <div class="row mb-4 d-grid grid-template-columns-2 gap-3">
+    <div class="row mb-4">
       <div class="input-group">
-        <button type="button" class="btn btn-primary" @click="adjustDates(-1)">
+        <button type="button" class="btn-outline-primary" @click="adjustDates(-1)">
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
-        <input type="date" class="form-control" id="startDate" v-model="formattedStartDate" />
-      </div>
-      <div class="input-group">
-        <input type="date" class="form-control" id="endDate" v-model="formattedEndDate" />
+          <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
         <button type="button" class="btn btn-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
