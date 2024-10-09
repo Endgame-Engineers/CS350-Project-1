@@ -138,14 +138,23 @@ export default defineComponent({
       let currentGoal = 0;
 
       // Populate labels and calories consumed
+      const dailyCalories: { [key: string]: number } = {};
+
       this.mealLogs.forEach((log: ExtendedMealLog) => {
         if (log.dateadded) {
-          const date = new Date(log.dateadded);
-          const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
-          labels.push(weekStart.toISOString().split('T')[0]);
-          caloriesConsumed.push(log.servingconsumed * log.foodItem.calories_per_serv);
+          const date = new Date(log.dateadded).toISOString().split('T')[0];
+          if (!dailyCalories[date]) {
+        dailyCalories[date] = 0;
+          }
+          dailyCalories[date] += log.servingconsumed * log.foodItem.calories_per_serv;
         }
       });
+
+      Object.keys(dailyCalories).forEach((date) => {
+        labels.push(date);
+        caloriesConsumed.push(dailyCalories[date]);
+      });
+      
       logger.info('Calories Consumed Calculated');
 
       labels.forEach((labelDate) => {
