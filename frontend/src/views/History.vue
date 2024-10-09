@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartData, ChartOptions } from 'chart.js';
 import { ExtendedMealLog, UserStat } from '@/models/Models';
@@ -45,7 +45,7 @@ import { logger } from '@/services/Logger';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-export default {
+export default defineComponent({
   name: 'HistoryPage',
   components: {
     Bar,
@@ -86,18 +86,18 @@ export default {
           },
         },
       } as ChartOptions<'bar'>,
-      startDate: ref(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
-      endDate: ref(new Date()),
+      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1) as Date,
+      endDate: new Date() as Date,
       mealLogs: ref([] as ExtendedMealLog[]),
       userStats: ref([] as UserStat[]),
     };
   },
 
   computed: {
-    startDateFormatted() {
+    startDateFormatted(): string {
       return this.startDate.toISOString().split('T')[0];
     },
-    endDateFormatted() {
+    endDateFormatted(): string {
       return this.endDate.toISOString().split('T')[0];
     },
   },
@@ -207,5 +207,5 @@ export default {
       this.endDate = new Date(input.value);
     },
   },
-};
+});
 </script>
