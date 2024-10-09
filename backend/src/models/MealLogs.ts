@@ -11,6 +11,11 @@ export interface MealLog {
     servingconsumed: number;
 }
 
+function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
+    const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water'];
+    return mealTypes.includes(mealLog.mealtype);
+}
+
 class MealLogs {
     private client: any;
 
@@ -37,6 +42,11 @@ class MealLogs {
     }
 
     async addMealLog(mealLog: MealLog): Promise<void> {
+
+        if(!isValidMealLog(mealLog)) {
+            throw new Error('Invalid meal log');
+        }
+
         logger.info('Adding meal log to database');
         await (await this.client).query(
             'INSERT INTO "MealLogs" (mealtype, dateadded, barcode, userid, servingconsumed) VALUES ($1, $2, $3, $4, $5)',
