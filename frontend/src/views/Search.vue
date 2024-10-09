@@ -179,26 +179,32 @@ export default {
       </div>
       <!-- Food Data Display -->
       <div v-if="foodData && foodData.length">
-        <div class="row row-cols-1 row-cols-md-2 g-4 h-auto">
-          <div v-for="item in foodData" :key="item.barcode" class="col">
-            <div class="card h-100 border rounded shadow-sm p-2">
-              <div class="row g-0">
-                <div class="col-md-4 d-flex align-items-center">
-                  <img :src="item.image" class="img-fluid rounded-start" alt="Food image" style="max-height: 150px; object-fit: cover;">
-                </div>
-                <div class="col-md-8 d-flex flex-column">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ item.foodname }}</h5>
-                    <p class="card-text mb-1"><strong>Protein:</strong> {{ item.protein_per_serv.toFixed(2) }}g</p>
-                    <p class="card-text mb-1"><strong>Carbs:</strong> {{ item.carb_per_serv.toFixed(2) }}g</p>
-                    <p class="card-text mb-1"><strong>Fat:</strong> {{ item.fat_per_serv.toFixed(2) }}g</p>
-                    <p class="card-text mb-1"><strong>Calories:</strong> {{ item.calories_per_serv.toFixed(2) }} kcal</p>
-                    <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
-                  </div>
-                  <div class="mt-auto d-flex justify-content-end p-2">
-                    <button @click="addFoodItem(item)" class="btn btn-primary w-100" type="button">Add</button>
-                  </div>
-                </div>
+        <div class="row">
+          <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+              <img :src="item.image" class="card-img-top" alt="Food image" style="height: 200px; object-fit: cover;"/>
+              <div class="card-body">
+                <h5 class="card-title">{{ item.foodname }}</h5>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    Calories: {{ item.calories_per_serv.toFixed(2) }} kcal
+                  </li>
+                  <li class="list-group-item">
+                    Protein: {{ item.protein_per_serv.toFixed(2) }} g
+                  </li>
+                  <li class="list-group-item">
+                    Carbs: {{ item.carb_per_serv.toFixed(2) }} g
+                  </li>
+                  <li class="list-group-item">
+                    Fat: {{ item.fat_per_serv.toFixed(2) }} g
+                  </li>
+                  <li class="list-group-item">
+                    Barcode: {{ item.barcode }}
+                  </li>
+                </ul>
+              </div>
+              <div class="card-footer text-muted d-flex justify-content-end align-items-center">
+                <button @click="addFoodItem(item)" class="btn btn-primary" type="button">Add</button>
               </div>
             </div>
           </div>
