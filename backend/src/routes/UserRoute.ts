@@ -171,6 +171,7 @@ class UserRoute {
                 OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
                     .then(async (product) => {
                         logger.info('Food item fetched from API');
+                        logger.info(product);
                         if (FoodItems.isFoodItem(product)) {
                             logger.info('Food item is valid');
                             const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: new Date() });
