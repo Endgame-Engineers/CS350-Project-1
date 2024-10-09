@@ -112,8 +112,8 @@ export default {
         logger.info('Adding meal log to store:', mealLog);
         useMealLogStore().setMealLog(mealLog);
 
-        logger.info('Navigating to history page');
-        router.push({ path: '/history' });
+        logger.info('Navigating to meal logs page');
+        router.push({ path: '/meallogs' });
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
         if (modal) {
