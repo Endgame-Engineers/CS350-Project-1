@@ -146,3 +146,11 @@ $circle-text-size: 0.3rem;
   grid-template-columns: repeat(auto-fit, minmax(7em, 1fr));
   margin-top: 2rem;
 }
+
+.cal-chart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 30em;
+}
