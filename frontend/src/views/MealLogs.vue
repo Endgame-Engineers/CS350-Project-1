@@ -51,7 +51,7 @@
           <button type="button" class="btn"
             :class="selectedMealType === 'Snacks' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Snacks'">
-            <font-awesome-icon icon="chips" class="me-2" /> Snacks
+            <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>          
         </div>
       </div>
@@ -60,11 +60,11 @@
     <!-- Date Range Selection -->
     <div class="row mb-4">
       <div class="input-group">
-        <button type="button" class="btn-outline-primary" @click="adjustDates(-1)">
+        <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
           <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
-        <button type="button" class="btn-outline-primary" @click="adjustDates(1)">
+        <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
       </div>
@@ -83,7 +83,7 @@
               " class="me-2" />
             {{ selectedMealType }}
           </h3>
-          <button @click="routeToSearch(selectedMealType)" class="btn-outline-primary">
+          <button @click="routeToSearch(selectedMealType)" class="btn btn-primary">
             <font-awesome-icon :icon="['fas', 'plus']" /> Add Meal
           </button>
         </div>
