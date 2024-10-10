@@ -1,4 +1,4 @@
-<!-- set all buttons to outlined 
+<!--
     set the button that is selected to primary 
     add quotes around the delete message
     remove date scrolling and make it date picker
