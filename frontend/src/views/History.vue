@@ -144,9 +144,11 @@ export default defineComponent({
         if (log.dateadded) {
           const date = new Date(log.dateadded).toISOString().split('T')[0];
           if (!dailyCalories[date]) {
-        dailyCalories[date] = 0;
+            dailyCalories[date] = 0;
           }
-          dailyCalories[date] += log.servingconsumed * log.foodItem.calories_per_serv;
+          if (log.foodItem && log.foodItem.calories_per_serv) {
+            dailyCalories[date] += log.servingconsumed * log.foodItem.calories_per_serv;
+          }
         }
       });
 
@@ -154,7 +156,7 @@ export default defineComponent({
         labels.push(date);
         caloriesConsumed.push(dailyCalories[date]);
       });
-      
+
       logger.info('Calories Consumed Calculated');
 
       labels.forEach((labelDate) => {
@@ -162,7 +164,7 @@ export default defineComponent({
 
         while (currentIndex < sortedStats.length && new Date(sortedStats[currentIndex].updatedon).getTime() <= labelDateTime) {
           currentGoal = sortedStats[currentIndex].caloriegoal ?? 0;
-          currentIndex++; 
+          currentIndex++;
         }
 
         calorieGoals.push(currentGoal);

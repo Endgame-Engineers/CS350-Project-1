@@ -17,10 +17,10 @@ export default defineComponent({
 
     const fetchMealLogs = async () => {
       const mealLogs = await getMealLogs(new Date(), new Date()) as ExtendedMealLog[];
-      totalCaloriesConsumed.value = Math.round(mealLogs.reduce((total, log) => total + log.foodItem.calories_per_serv * log.servingconsumed, 0));
-      totalCarbs.value = Math.round(mealLogs.reduce((total, log) => total + log.foodItem.carb_per_serv * log.servingconsumed, 0));
-      totalProteins.value = Math.round(mealLogs.reduce((total, log) => total + log.foodItem.protein_per_serv * log.servingconsumed, 0));
-      totalFats.value = Math.round(mealLogs.reduce((total, log) => total + log.foodItem.fat_per_serv * log.servingconsumed, 0));
+      totalCaloriesConsumed.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.calories_per_serv ?? 0) * log.servingconsumed, 0));
+      totalCarbs.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.carb_per_serv ?? 0) * log.servingconsumed, 0));
+      totalProteins.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.protein_per_serv ?? 0) * log.servingconsumed, 0));
+      totalFats.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.fat_per_serv ?? 0) * log.servingconsumed, 0));
     };
 
     fetchMealLogs();
