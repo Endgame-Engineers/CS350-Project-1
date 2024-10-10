@@ -331,28 +331,6 @@ export default defineComponent({
       }
     });
 
-    const computeTotals = (mealType: MealType) => {
-      const totals = {
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fat: 0,
-      };
-
-      mealLogs.value.forEach((item) => {
-        if (item.mealtype === mealType) {
-          totals.calories +=
-            item.foodItem.calories_per_serv * item.servingconsumed;
-          totals.protein +=
-            item.foodItem.protein_per_serv * item.servingconsumed;
-          totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
-          totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
-        }
-      });
-
-      return totals;
-    };
-
     const removeItem = (item: ExtendedMealLog) => {
       const modal = new Modal(document.getElementById('confirmDeleteModal')!);
       itemToDelete.value = item;
@@ -390,7 +368,6 @@ export default defineComponent({
       cancelDelete,
       adjustDates,
       itemToDelete,
-      computeTotals, // Make sure to return computeTotals
       water,
     };
   },
