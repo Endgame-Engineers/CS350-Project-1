@@ -26,6 +26,11 @@
             @click="selectedMealType = 'Dinner'">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
+          <button type="button" class="btn"
+            :class="selectedMealType === 'Snacks' ? 'btn-primary' : 'btn-outline-primary'"
+            @click="selectedMealType = 'Snacks'">
+            <font-awesome-icon icon="chips" class="me-2" /> Snacks
+          </button>
         </div>
       </div>
     </div>
