@@ -26,17 +26,20 @@ export default {
     const page = ref(1);
     const selectedFoodItem = ref<FoodItem | null>(null);
     const servingConsumed = ref<number>(0);
+    const isBarcode = ref(false);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useMealLogStore().getMealLog().mealtype);
 
     const search = async () => {
+      isBarcode.value = false;
       if (searchBar.value) {
         logger.info('Searching for:', searchBar.value);
         logger.info('Testing for all digits');
         if (/^\d+$/.test(searchBar.value)) {
           logger.info('Found all digits in search bar');
           barcode.value = searchBar.value;
+          isBarcode.value = true;
           barcodeNumSearch();
         } else {
           logger.info('Found non-digits in search bar');
@@ -44,7 +47,7 @@ export default {
             const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
             if (data && Array.isArray(data.products)) {
               logger.info('Search results:', data.products);
-              foodData.value = data.products;
+              foodData.value = data.products.slice(0, 9);
             } else {
               foodData.value = [];
             }
@@ -71,7 +74,7 @@ export default {
           try {
             const data = await searchForProducts(searchBar.value, page.value);
             if (data && Array.isArray(data.products)) {
-              foodData.value = [...(foodData.value || []), ...data.products];
+              foodData.value = [...(foodData.value || []), ...data.products.slice(0, 9)];
             }
           } catch (error) {
             console.error('Error during search:', error);
@@ -145,6 +148,7 @@ export default {
       selectedFoodItem,
       servingConsumed,
       confirmAddFoodItem,
+      isBarcode,
     };
   },
 };
@@ -182,7 +186,7 @@ export default {
         <div class="row">
           <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
             <div class="card h-100">
-              <img :src="item.image" class="card-img-top" alt="Food image" style="height: 200px; object-fit: cover;"/>
+              <img :src="item.image" class="card-img-top food-image" alt="Food image"/>
               <div class="card-body">
                 <h5 class="card-title">{{ item.foodname }}</h5>
                 <ul class="list-group list-group-flush">
@@ -209,7 +213,7 @@ export default {
             </div>
           </div>
         </div>
-        <button @click="loadMore" class="btn btn-primary mt-3">Load More</button>
+        <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
       </div>
     </div>
   </div>
