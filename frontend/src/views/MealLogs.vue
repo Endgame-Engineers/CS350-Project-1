@@ -37,7 +37,7 @@
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
           <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
-        <button type="button" class="btn btn-primary" @click="adjustDates(1)">
+        <button type="button" class="btn-outline-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
       </div>
@@ -56,7 +56,7 @@
               " class="me-2" />
             {{ selectedMealType }}
           </h3>
-          <button @click="routeToSearch(selectedMealType)" class="btn btn-primary">
+          <button @click="routeToSearch(selectedMealType)" class="btn-outline-primary">
             <font-awesome-icon :icon="['fas', 'plus']" /> Add Meal
           </button>
         </div>
