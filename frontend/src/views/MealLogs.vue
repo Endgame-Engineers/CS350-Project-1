@@ -38,6 +38,7 @@
         </button>
       </div>
     </div>
+    
     <!-- Selected Meal Type Section -->
     <div class="mb-5">
       <div class="card">
