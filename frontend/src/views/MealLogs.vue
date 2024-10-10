@@ -1,11 +1,33 @@
 <!--
-    set the button that is selected to primary 
-    add quotes around the delete message
+    set the button that is selected to primaryx 
+    add quotes around the delete messagex
     remove date scrolling and make it date picker
-    add snacks to the meal type switcher
+    add snacks to the meal type switcherx
     add water to the meal type switcher
     -->
 <template>
+<!-- Water Consumption Tracker -->
+    <div>
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="mb-0">
+            <font-awesome-icon icon="tint" class="me-2" /> Water Consumption
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="input-group mb-3">
+            <input type="number" class="form-control" v-model="water" placeholder="Enter amount in Oz" />
+          </div>
+          <ul class="list-group">
+            <!-- <li v-for="log in waterLogs" :key="log.id" class="list-group-item">
+              {{ log.amount }} ml - {{ log.dateadded }}
+            </li> -->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
     <div class="row mb-4">
@@ -30,7 +52,7 @@
             :class="selectedMealType === 'Snacks' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Snacks'">
             <font-awesome-icon icon="chips" class="me-2" /> Snacks
-          </button>
+          </button>          
         </div>
       </div>
     </div>
@@ -91,7 +113,7 @@
           <div class="row">
             <div v-for="item in filteredMealLogs" :key="item.barcode + item.dateadded"
               class="col-12 col-md-6 col-lg-4 mb-4">
-              <div class="card h-100">
+              <div v-if="item.foodItem" class="card h-100">
                 <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
                   style="height: 200px; object-fit: cover;" />
                 <div class="card-body">
@@ -145,8 +167,8 @@
                     <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
                       aria-label="Close"></button>
                   </div>
-                  <div class="modal-body">
-                    <p>Are you sure you want to remove {{ itemToDelete?.foodItem.foodname }} from your meal log?</p>
+                  <div v-if="itemToDelete?.foodItem" class="modal-body">
+                    <p>Are you sure you want to remove "{{ itemToDelete?.foodItem.foodname }}" from your meal log?</p>
                     <img :src="itemToDelete?.foodItem.image" alt="{{ itemToDelete?.foodItem.foodname }}"
                       style="height: 200px; object-fit: cover;" />
                   </div>
@@ -177,8 +199,32 @@ import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'MealLogs',
+  methods: {
+    computeTotals(mealType: string) {
+      const totals = {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+      };
+
+      this.mealLogs.forEach((item) => {
+        if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
+          totals.calories +=
+            item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.protein +=
+            item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+          totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+        }
+      });
+
+      return totals;
+    },
+  },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
+    const water = ref<number>(0);
     const startDate = ref(new Date());
     const endDate = ref(new Date());
     const selectedMealType = ref<MealType>('Breakfast');
@@ -344,7 +390,7 @@ export default defineComponent({
       cancelDelete,
       adjustDates,
       itemToDelete,
-      computeTotals, // Make sure to return computeTotals
+      water,
     };
   },
 });
