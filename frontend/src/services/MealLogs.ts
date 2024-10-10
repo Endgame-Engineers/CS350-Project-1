@@ -26,7 +26,7 @@ export async function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> 
 
 function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
     const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water'];
-    return mealTypes.includes(mealLog.mealtype);
+    return mealTypes.includes(mealLog.mealtype) && mealLog.servingconsumed > 0;
 }
 
 export async function addMealLog(mealLog: MealLog): Promise<MealLog> {
