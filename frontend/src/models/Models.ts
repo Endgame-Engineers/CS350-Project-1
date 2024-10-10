@@ -62,5 +62,5 @@ export interface UserStat {
 
 export interface ExtendedMealLog extends MealLog {
   id: number;
-  foodItem: FoodItem;
+  foodItem?: FoodItem;
 }
