@@ -6,26 +6,26 @@
     add water to the meal type switcher
     -->
 <template>
-<!-- Water Consumption Tracker -->
-    <div>
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h3 class="mb-0">
-            <font-awesome-icon icon="tint" class="me-2" /> Water Consumption
-          </h3>
+  <!-- Water Consumption Tracker -->
+  <div>
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <font-awesome-icon icon="tint" class="me-2" /> Water Consumption
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="input-group mb-3">
+          <input type="number" class="form-control" v-model="water" placeholder="Enter amount in Oz" />
         </div>
-        <div class="card-body">
-          <div class="input-group mb-3">
-            <input type="number" class="form-control" v-model="water" placeholder="Enter amount in Oz" />
-          </div>
-          <ul class="list-group">
-            <!-- <li v-for="log in waterLogs" :key="log.id" class="list-group-item">
+        <ul class="list-group">
+          <!-- <li v-for="log in waterLogs" :key="log.id" class="list-group-item">
               {{ log.amount }} ml - {{ log.dateadded }}
             </li> -->
-          </ul>
-        </div>
+        </ul>
       </div>
     </div>
+  </div>
 
 
   <div class="container-fluid">
@@ -52,7 +52,7 @@
             :class="selectedMealType === 'Snacks' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Snacks'">
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
-          </button>          
+          </button>
         </div>
       </div>
     </div>
@@ -63,13 +63,13 @@
         <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
-          <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
+        <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
         <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
       </div>
     </div>
-    
+
     <!-- Selected Meal Type Section -->
     <div class="mb-5">
       <div class="card">
@@ -79,7 +79,11 @@
               ? 'coffee'
               : selectedMealType === 'Lunch'
                 ? 'hamburger'
-                : 'drumstick-bite'
+                : selectedMealType === 'Dinner'
+                  ? 'drumstick-bite'
+                  : selectedMealType === 'Snacks'
+                    ? 'cookie-bite'
+                    : 'ban'
               " class="me-2" />
             {{ selectedMealType }}
           </h3>
