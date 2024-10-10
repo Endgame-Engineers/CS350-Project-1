@@ -202,13 +202,11 @@ export default {
                   <li class="list-group-item">
                     Fat: {{ item.fat_per_serv.toFixed(2) }} g
                   </li>
-                  <li class="list-group-item">
-                    Barcode: {{ item.barcode }}
-                  </li>
                 </ul>
               </div>
-              <div class="card-footer text-muted d-flex justify-content-end align-items-center">
-                <button @click="addFoodItem(item)" class="btn btn-primary" type="button">Add</button>
+              <div class="card-footer text-muted d-flex align-items-center">
+                <div class="justify-content-center"><font-awesome-icon :icon="['fas', 'barcode']" /> {{ item.barcode }}</div>
+                <button @click="addFoodItem(item)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
               </div>
             </div>
           </div>
