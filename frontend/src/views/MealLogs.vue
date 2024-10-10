@@ -49,8 +49,8 @@
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
           <button type="button" class="btn"
-            :class="selectedMealType === 'Snacks' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedMealType = 'Snacks'">
+            :class="selectedMealType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
+            @click="selectedMealType = 'Snack'">
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>
         </div>
@@ -81,7 +81,7 @@
                 ? 'hamburger'
                 : selectedMealType === 'Dinner'
                   ? 'drumstick-bite'
-                  : selectedMealType === 'Snacks'
+                  : selectedMealType === 'Snack'
                     ? 'cookie-bite'
                     : 'ban'
               " class="me-2" />
