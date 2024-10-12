@@ -27,12 +27,26 @@ export default {
     const selectedFoodItem = ref<FoodItem | null>(null);
     const servingConsumed = ref<number>(0);
     const isBarcode = ref(false);
+    const invalidSearch = ref(false);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useMealLogStore().getMealLog().mealtype);
 
+    function containValidCharacters(str: string) {
+      const alphanumericMatches = str.match(/[a-zA-Z0-9]/g) || [];
+      const alphanumericRatio = alphanumericMatches.length / str.length;
+      console.log(alphanumericRatio);
+      if (alphanumericRatio < .5) {
+        invalidSearch.value = true;
+        return true;
+      }
+      console.log('VALUEEEE', invalidSearch.value);
+      return false;
+    }
+
     const search = async () => {
       isBarcode.value = false;
+      invalidSearch.value = false;
       if (searchBar.value) {
         logger.info('Searching for:', searchBar.value);
         logger.info('Testing for all digits');
@@ -44,6 +58,9 @@ export default {
         } else {
           logger.info('Found non-digits in search bar');
           try {
+            if(containValidCharacters(searchBar.value)){
+              throw new Error('Special characters found in search bar');
+            }
             const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
             if (data && Array.isArray(data.products)) {
               logger.info('Search results:', data.products);
@@ -149,6 +166,7 @@ export default {
       servingConsumed,
       confirmAddFoodItem,
       isBarcode,
+      invalidSearch,
     };
   },
 };
@@ -178,7 +196,10 @@ export default {
   <div class="row">
     <div class="col-12 mb-3">
       <!-- Error message -->
-      <div v-if="foodData && !foodData.length" class="alert alert-danger" role="alert">
+      <div v-if="invalidSearch" class="alert alert-danger" role="alert">
+        Invalid Input
+      </div>
+      <div v-if="foodData && !foodData.length && !invalidSearch" class="alert alert-danger" role="alert">
         No results found
       </div>
       <!-- Food Data Display -->
