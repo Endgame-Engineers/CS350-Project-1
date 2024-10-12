@@ -25,7 +25,7 @@ export default {
     const foodData = ref<FoodItem[] | null>(null);
     const page = ref(1);
     const selectedFoodItem = ref<FoodItem | null>(null);
-    const servingConsumed = ref<number>(0);
+    const servingConsumed = ref<number | null>(null);
     const isBarcode = ref(false);
     const invalidSearch = ref(false);
 
@@ -128,7 +128,9 @@ export default {
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
         mealLog.dateadded = new Date();
-        mealLog.servingconsumed = servingConsumed.value;
+        if(servingConsumed.value){
+          mealLog.servingconsumed = servingConsumed.value;
+        }
         logger.info('Adding meal log to store:', mealLog);
         useMealLogStore().setMealLog(mealLog);
 
@@ -139,6 +141,16 @@ export default {
         if (modal) {
           modal.hide();
         }
+      }
+    };
+
+    const handleInputChange = (event: Event) => {
+      const value = (event.target as HTMLInputElement).value;
+
+      if (value === '') {
+        servingConsumed.value = null;
+      } else {
+        servingConsumed.value = Number(value);
       }
     };
 
@@ -167,6 +179,7 @@ export default {
       confirmAddFoodItem,
       isBarcode,
       invalidSearch,
+      handleInputChange,
     };
   },
 };
@@ -242,16 +255,16 @@ export default {
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="servingModalLabel">Enter Serving Consumed</h5>
+          <h5 class="modal-title" id="servingModalLabel">Enter Grams Consumed</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div v-if="selectedFoodItem">
             <div class="mb-3">
-              <label for="servingConsumed" class="form-label">Serving Consumed (grams)</label>
-              <input type="number" v-model="servingConsumed" class="form-control" id="servingConsumed" />
+              <label for="servingConsumed" class="form-label">Grams Consumed</label>
+              <input type="number" placeholder="Enter the amount in grams" v-model="servingConsumed" class="form-control" id="servingConsumed" @input="handleInputChange" />
             </div>
-            <div v-if="servingConsumed">
+            <div v-if="servingConsumed && servingConsumed > 0">
               <p><strong>Calories:</strong> {{ (selectedFoodItem.calories_per_serv * servingConsumed).toFixed(2)
                 }} kcal</p>
               <p><strong>Protein:</strong> {{ (selectedFoodItem.protein_per_serv * servingConsumed).toFixed(2) }}
@@ -259,11 +272,14 @@ export default {
               <p><strong>Carbs:</strong> {{ (selectedFoodItem.carb_per_serv * servingConsumed).toFixed(2) }} g</p>
               <p><strong>Fat:</strong> {{ (selectedFoodItem.fat_per_serv * servingConsumed).toFixed(2) }} g</p>
             </div>
+            <div v-if="servingConsumed !== null && servingConsumed <= 0" class="alert alert-danger" role="alert">
+              Must be greater than 0
+            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button @click="confirmAddFoodItem" type="button" class="btn btn-primary">Add</button>
+          <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0" type="button" class="btn btn-primary">Add</button>
         </div>
       </div>
     </div>
