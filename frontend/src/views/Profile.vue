@@ -2,18 +2,27 @@
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/User';
 import { addUserStats, getUserStat, userStats, ProfileStats } from '@/services/UserStats';
+import UserStatsPercentages from '@/components/UserStatsPercentages.vue';
 
 export default defineComponent({
     name: 'ProfilePage',
-    setup() {
+    components: {
+        UserStatsPercentages
+    },
+    setup(props, { emit }) { // Correctly destructure emit
         const userStore = useUserStore();
         const user = userStore.user;
         const excludedKeys = ref(['id', 'uuid', 'providerid', 'profilepic', 'profilecreated']);
         const isEditing = ref(false);
+        const isFormValid = ref(true);
+
+        const handleValidityUpdate = (isValid: boolean) => {
+            isFormValid.value = isValid;
+        };
 
         const fetchUserStats = async () => {
             try {
-                const stats = await getUserStat() as ProfileStats
+                const stats = await getUserStat() as ProfileStats;
                 if (stats && 'weight' in stats && 'height' in stats) {
                     userStats.value = stats;
                 }
@@ -47,6 +56,10 @@ export default defineComponent({
 
         const toggleIsEditing = () => {
             isEditing.value = !isEditing.value;
+            if (!isEditing.value) {
+                // Emit event to reset warning state
+                emit('reset-warning');
+            }
         };
 
         onMounted(() => {
@@ -61,7 +74,9 @@ export default defineComponent({
             fetchUserStats,
             excludedKeys,
             isEditing,
-            toggleIsEditing
+            isFormValid,
+            toggleIsEditing,
+            handleValidityUpdate
         };
     },
 });
@@ -165,7 +180,6 @@ export default defineComponent({
                             </div>
                         </div>
                         <div class="row">
-                
                             <div class="col-12 col-md-6 mb-3">
                                 <label for="sex" class="form-label">Sex</label>
                                 <div v-if="!isEditing">{{ userStats.sex === 1 ? 'Male' : 'Female' }}</div>
@@ -174,10 +188,10 @@ export default defineComponent({
                                     <option value="2">Female</option>
                                 </select>
                             </div>
-                            <user-stats-percentages :is-editing="isEditing" />
+                            <user-stats-percentages :is-editing="isEditing" @update-validity="handleValidityUpdate" @reset-warning="handleValidityUpdate(false)" />
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button v-if="isEditing" type="submit" class="btn btn-primary">Save Changes</button>
+                            <button v-if="isEditing" type="submit" class="btn btn-primary" :disabled="!isFormValid">Save Changes</button>
                             <button v-if="isEditing" type="button" class="btn btn-secondary ms-2" @click="toggleIsEditing">Cancel</button>
                         </div>
                     </form>
