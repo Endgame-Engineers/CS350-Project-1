@@ -78,7 +78,7 @@ watch(() => props.isEditing, (newVal) => {
   <div class="row">
     <!-- Protein Percentage -->
     <div class="col-12 col-md-4 mb-3">
-      <label for="proteinPercentage" class="form-label">Protein Percentage</label>
+      <label for="proteinPercentage" class="form-label"><strong>Protein Percentage</strong></label>
       <div class="d-flex justify-content-between">
         <span v-if="props.isEditing">1%</span>
         <span v-if="props.isEditing">{{ userStats.proteinpercentage }}%</span>
@@ -99,7 +99,7 @@ watch(() => props.isEditing, (newVal) => {
 
     <!-- Fat Percentage -->
     <div class="col-12 col-md-4 mb-3">
-      <label for="fatPercentage" class="form-label">Fat Percentage</label>
+      <label for="fatPercentage" class="form-label"><strong>Fat Percentage</strong></label>
       <div class="d-flex justify-content-between">
         <span v-if="props.isEditing">1%</span>
         <span v-if="props.isEditing">{{ userStats.fatpercentage }}%</span>
@@ -120,7 +120,7 @@ watch(() => props.isEditing, (newVal) => {
 
     <!-- Carb Percentage -->
     <div class="col-12 col-md-4 mb-3">
-      <label for="carbPercentage" class="form-label">Carb Percentage</label>
+      <label for="carbPercentage" class="form-label"><strong>Carb Percentage</strong></label>
       <div class="d-flex justify-content-between">
         <span v-if="props.isEditing">1%</span>
         <span v-if="props.isEditing">{{ userStats.carbpercentage }}%</span>
