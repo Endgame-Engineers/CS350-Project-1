@@ -275,11 +275,14 @@ export default {
             <div v-if="servingConsumed !== null && servingConsumed <= 0" class="alert alert-danger" role="alert">
               Must be greater than 0
             </div>
+            <div v-if="servingConsumed !== null && servingConsumed > 1000" class="alert alert-danger" role="alert">
+              Larger cannot be greater than 1000
+            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0" type="button" class="btn btn-primary">Add</button>
+          <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0 || servingConsumed > 1000" type="button" class="btn btn-primary">Add</button>
         </div>
       </div>
     </div>
