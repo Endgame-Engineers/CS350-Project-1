@@ -277,7 +277,7 @@ export default {
               Must be greater than 0
             </div>
             <div v-if="servingConsumed !== null && servingConsumed > 1000" class="alert alert-danger" role="alert">
-              Larger cannot be greater than 1000
+              Consumed amount must be less than or equal to 1000 grams
             </div>
           </div>
         </div>
