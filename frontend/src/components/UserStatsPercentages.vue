@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { userStats, ProfileStats } from '@/services/UserStats';
 import { watch, defineProps, ref, computed, defineEmits } from 'vue';
 
 const props = defineProps<{
@@ -10,9 +9,9 @@ const props = defineProps<{
 
 
 type ProfileStats = {
-    proteinpercentage: number;
-    fatpercentage: number;
-    carbpercentage: number;
+  proteinpercentage: number;
+  fatpercentage: number;
+  carbpercentage: number;
 };
 
 const currentStats = computed<ProfileStats>(() => {
@@ -28,15 +27,15 @@ const showWarning = ref(false);
 const adjustPercentages = (changedStat: PercentageKeys, newValue: number) => {
   currentStats.value[changedStat] = newValue;
 
-const total =
-  currentStats.value.proteinpercentage +
-  currentStats.value.fatpercentage +
-  currentStats.value.carbpercentage;
-  
-totalPercentage.value = total;
-showWarning.value = total !== 100;
-// Emit the validity state
-emit('update-validity', isValid.value);
+  const total =
+    currentStats.value.proteinpercentage +
+    currentStats.value.fatpercentage +
+    currentStats.value.carbpercentage;
+
+  totalPercentage.value = total;
+  showWarning.value = total !== 100;
+  // Emit the validity state
+  emit('update-validity', isValid.value);
   let excess = total - 100;
 
   if (excess > 0) {
@@ -83,7 +82,7 @@ watch(
   <div class="row">
     <!-- Protein Percentage -->
     <div class="col-12 col-md-4 mb-3">
-      <label for="proteinPercentage" class="form-label">Protein Percentage</label>
+      <label for="proteinPercentage" class="form-label"><strong>Protein Percentage</strong></label>
       <div class="d-flex justify-content-between">
         <span v-if="isEditing">1%</span>
         <span v-if="isEditing">{{ currentStats.proteinpercentage }}%</span>
@@ -92,16 +91,8 @@ watch(
         </span>
         <span v-if="isEditing">100%</span>
       </div>
-      <input
-        v-if="isEditing"
-        type="range"
-        step="5"
-        min="1"
-        max="100"
-        class="form-control"
-        id="proteinPercentage"
-        v-model.number="currentStats.proteinpercentage"
-      />
+      <input v-if="isEditing" type="range" step="5" min="1" max="100" class="form-control" id="proteinPercentage"
+        v-model.number="currentStats.proteinpercentage" />
     </div>
 
     <!-- Fat Percentage -->
@@ -115,16 +106,8 @@ watch(
         </span>
         <span v-if="isEditing">100%</span>
       </div>
-      <input
-        v-if="isEditing"
-        type="range"
-        step="5"
-        min="1"
-        max="100"
-        class="form-control"
-        id="fatPercentage"
-        v-model.number="currentStats.fatpercentage"
-      />
+      <input v-if="isEditing" type="range" step="5" min="1" max="100" class="form-control" id="fatPercentage"
+        v-model.number="currentStats.fatpercentage" />
     </div>
 
     <!-- Carb Percentage -->
@@ -138,20 +121,15 @@ watch(
         </span>
         <span v-if="isEditing">100%</span>
       </div>
-      <input
-        v-if="isEditing"
-        type="range"
-        step="5"
-        min="1"
-        max="100"
-        class="form-control"
-        id="carbPercentage"
-        v-model.number="currentStats.carbpercentage"
-      />
+      <input v-if="isEditing" type="range" step="5" min="1" max="100" class="form-control" id="carbPercentage"
+        v-model.number="currentStats.carbpercentage" />
     </div>
   </div>
 
-  <div v-if="showWarning" class="alert alert-warning" role="alert">
-    The total percentage must add up to 100%.
+
+  <div class="p-4">
+    <div v-if="showWarning" class="alert alert-warning" role="alert">
+      The total percentage must add up to 100%.
+    </div>
   </div>
 </template>
