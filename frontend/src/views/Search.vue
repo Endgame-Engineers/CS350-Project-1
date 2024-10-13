@@ -180,6 +180,7 @@ export default {
       isBarcode,
       invalidSearch,
       handleInputChange,
+      setServingConsumedNull: () => servingConsumed.value = null,
     };
   },
 };
@@ -256,7 +257,7 @@ export default {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="servingModalLabel">Enter Grams Consumed</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="setServingConsumedNull"></button>
         </div>
         <div class="modal-body">
           <div v-if="selectedFoodItem">
@@ -281,7 +282,7 @@ export default {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="setServingConsumedNull">Close</button>
           <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0 || servingConsumed > 1000" type="button" class="btn btn-primary">Add</button>
         </div>
       </div>
