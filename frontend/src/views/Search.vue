@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { FoodItem, SearchResult, MealLog } from '@/models/Models';
+import { FoodItem, SearchResult, MealLog, MealType } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
 import { useMealLogStore } from '@/stores/MealLog';
 import router from '@/router';
@@ -13,7 +13,7 @@ export default {
   setup() {
     const mealLog: MealLog = {
       barcode: '',
-      mealtype: '',
+      mealtype: 'Breakfast' as MealType,
       servingconsumed: 0,
     };
 
@@ -25,26 +25,46 @@ export default {
     const foodData = ref<FoodItem[] | null>(null);
     const page = ref(1);
     const selectedFoodItem = ref<FoodItem | null>(null);
-    const servingConsumed = ref<number>(0);
+    const servingConsumed = ref<number | null>(null);
+    const isBarcode = ref(false);
+    const invalidSearch = ref(false);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useMealLogStore().getMealLog().mealtype);
 
+    function containValidCharacters(str: string) {
+      const alphanumericMatches = str.match(/[a-zA-Z0-9]/g) || [];
+      const alphanumericRatio = alphanumericMatches.length / str.length;
+      console.log(alphanumericRatio);
+      if (alphanumericRatio < .5) {
+        invalidSearch.value = true;
+        return true;
+      }
+      console.log('VALUEEEE', invalidSearch.value);
+      return false;
+    }
+
     const search = async () => {
+      isBarcode.value = false;
+      invalidSearch.value = false;
       if (searchBar.value) {
         logger.info('Searching for:', searchBar.value);
         logger.info('Testing for all digits');
         if (/^\d+$/.test(searchBar.value)) {
           logger.info('Found all digits in search bar');
           barcode.value = searchBar.value;
+          isBarcode.value = true;
           barcodeNumSearch();
         } else {
           logger.info('Found non-digits in search bar');
           try {
+            if(containValidCharacters(searchBar.value)){
+              throw new Error('Special characters found in search bar');
+            }
             const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
             if (data && Array.isArray(data.products)) {
               logger.info('Search results:', data.products);
-              foodData.value = data.products;
+              foodData.value = data.products.slice(0, 9);
             } else {
               foodData.value = [];
             }
@@ -71,7 +91,7 @@ export default {
           try {
             const data = await searchForProducts(searchBar.value, page.value);
             if (data && Array.isArray(data.products)) {
-              foodData.value = [...(foodData.value || []), ...data.products];
+              foodData.value = [...(foodData.value || []), ...data.products.slice(0, 9)];
             }
           } catch (error) {
             console.error('Error during search:', error);
@@ -108,17 +128,29 @@ export default {
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
         mealLog.dateadded = new Date();
-        mealLog.servingconsumed = servingConsumed.value;
+        if(servingConsumed.value){
+          mealLog.servingconsumed = servingConsumed.value;
+        }
         logger.info('Adding meal log to store:', mealLog);
         useMealLogStore().setMealLog(mealLog);
 
-        logger.info('Navigating to history page');
-        router.push({ path: '/history' });
+        logger.info('Navigating to meal logs page');
+        router.push({ path: '/meallogs' });
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
         if (modal) {
           modal.hide();
         }
+      }
+    };
+
+    const handleInputChange = (event: Event) => {
+      const value = (event.target as HTMLInputElement).value;
+
+      if (value === '') {
+        servingConsumed.value = null;
+      } else {
+        servingConsumed.value = Number(value);
       }
     };
 
@@ -145,6 +177,10 @@ export default {
       selectedFoodItem,
       servingConsumed,
       confirmAddFoodItem,
+      isBarcode,
+      invalidSearch,
+      handleInputChange,
+      setServingConsumedNull: () => servingConsumed.value = null,
     };
   },
 };
@@ -174,36 +210,43 @@ export default {
   <div class="row">
     <div class="col-12 mb-3">
       <!-- Error message -->
-      <div v-if="foodData && !foodData.length" class="alert alert-danger" role="alert">
+      <div v-if="invalidSearch" class="alert alert-danger" role="alert">
+        Invalid Input
+      </div>
+      <div v-if="foodData && !foodData.length && !invalidSearch" class="alert alert-danger" role="alert">
         No results found
       </div>
       <!-- Food Data Display -->
       <div v-if="foodData && foodData.length">
-        <div class="row row-cols-1 row-cols-md-2 g-4 h-auto">
-          <div v-for="item in foodData" :key="item.barcode" class="col">
-            <div class="card h-100 border rounded shadow-sm p-2">
-              <div class="row g-0">
-                <div class="col-md-4 d-flex align-items-center">
-                  <img :src="item.image" class="img-fluid rounded-start" alt="Food image" style="max-height: 150px; object-fit: cover;">
-                </div>
-                <div class="col-md-8 d-flex flex-column">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ item.foodname }}</h5>
-                    <p class="card-text mb-1"><strong>Protein:</strong> {{ item.protein_per_serv.toFixed(2) }}g</p>
-                    <p class="card-text mb-1"><strong>Carbs:</strong> {{ item.carb_per_serv.toFixed(2) }}g</p>
-                    <p class="card-text mb-1"><strong>Fat:</strong> {{ item.fat_per_serv.toFixed(2) }}g</p>
-                    <p class="card-text mb-1"><strong>Calories:</strong> {{ item.calories_per_serv.toFixed(2) }} kcal</p>
-                    <p class="card-text"><strong>Barcode:</strong> {{ item.barcode }}</p>
-                  </div>
-                  <div class="mt-auto d-flex justify-content-end p-2">
-                    <button @click="addFoodItem(item)" class="btn btn-primary w-100" type="button">Add</button>
-                  </div>
-                </div>
+        <div class="row">
+          <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+              <img :src="item.image" class="card-img-top food-image" alt="Food image"/>
+              <div class="card-body">
+                <h5 class="card-title">{{ item.foodname }}</h5>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    Calories: {{ item.calories_per_serv.toFixed(2) }} kcal
+                  </li>
+                  <li class="list-group-item">
+                    Protein: {{ item.protein_per_serv.toFixed(2) }} g
+                  </li>
+                  <li class="list-group-item">
+                    Carbs: {{ item.carb_per_serv.toFixed(2) }} g
+                  </li>
+                  <li class="list-group-item">
+                    Fat: {{ item.fat_per_serv.toFixed(2) }} g
+                  </li>
+                </ul>
+              </div>
+              <div class="card-footer text-muted d-flex align-items-center">
+                <div class="justify-content-center"><font-awesome-icon :icon="['fas', 'barcode']" /> {{ item.barcode }}</div>
+                <button @click="addFoodItem(item)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
               </div>
             </div>
           </div>
         </div>
-        <button @click="loadMore" class="btn btn-primary mt-3">Load More</button>
+        <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
       </div>
     </div>
   </div>
@@ -213,16 +256,16 @@ export default {
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="servingModalLabel">Enter Serving Consumed</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="servingModalLabel">Enter Grams Consumed</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="setServingConsumedNull"></button>
         </div>
         <div class="modal-body">
           <div v-if="selectedFoodItem">
             <div class="mb-3">
-              <label for="servingConsumed" class="form-label">Serving Consumed (grams)</label>
-              <input type="number" v-model="servingConsumed" class="form-control" id="servingConsumed" />
+              <label for="servingConsumed" class="form-label">Grams Consumed</label>
+              <input type="number" placeholder="Enter the amount in grams" v-model="servingConsumed" class="form-control" id="servingConsumed" @input="handleInputChange" />
             </div>
-            <div v-if="servingConsumed">
+            <div v-if="servingConsumed && servingConsumed > 0">
               <p><strong>Calories:</strong> {{ (selectedFoodItem.calories_per_serv * servingConsumed).toFixed(2)
                 }} kcal</p>
               <p><strong>Protein:</strong> {{ (selectedFoodItem.protein_per_serv * servingConsumed).toFixed(2) }}
@@ -230,11 +273,17 @@ export default {
               <p><strong>Carbs:</strong> {{ (selectedFoodItem.carb_per_serv * servingConsumed).toFixed(2) }} g</p>
               <p><strong>Fat:</strong> {{ (selectedFoodItem.fat_per_serv * servingConsumed).toFixed(2) }} g</p>
             </div>
+            <div v-if="servingConsumed !== null && servingConsumed <= 0" class="alert alert-danger" role="alert">
+              Must be greater than 0
+            </div>
+            <div v-if="servingConsumed !== null && servingConsumed > 1000" class="alert alert-danger" role="alert">
+              Consumed amount must be less than or equal to 1000 grams
+            </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button @click="confirmAddFoodItem" type="button" class="btn btn-primary">Add</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="setServingConsumedNull">Close</button>
+          <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0 || servingConsumed > 1000" type="button" class="btn btn-primary">Add</button>
         </div>
       </div>
     </div>

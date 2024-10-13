@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MealLog } from '../models/Models';
+import { MealLog, MealType } from '../models/Models';
 import { logger } from './Logger';
 
 export async function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> {
@@ -24,8 +24,20 @@ export async function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> 
     }
 }
 
+function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
+    const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water'];
+    return mealTypes.includes(mealLog.mealtype) && mealLog.servingconsumed > 0;
+}
+
 export async function addMealLog(mealLog: MealLog): Promise<MealLog> {
     logger.info('Adding meal log');
+
+    if (!isValidMealLog(mealLog)) {
+        logger.error('Invalid meal log');
+        console.log('Invalid meal log');
+        return Promise.reject(new Error('Invalid meal log'));
+    }
+
     try {
         const response = await axios.post<MealLog>('/api/user/logs', mealLog, {
             headers: {

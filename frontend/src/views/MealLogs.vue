@@ -1,4 +1,33 @@
+<!--
+    set the button that is selected to primaryx 
+    add quotes around the delete messagex
+    remove date scrolling and make it date picker
+    add snacks to the meal type switcherx
+    add water to the meal type switcher
+    -->
 <template>
+  <!-- Water Consumption Tracker -->
+  <div>
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <font-awesome-icon icon="tint" class="me-2" /> Water Consumption
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="input-group mb-3">
+          <input type="number" class="form-control" v-model="water" placeholder="Enter amount in Oz" />
+        </div>
+        <ul class="list-group">
+          <!-- <li v-for="log in waterLogs" :key="log.id" class="list-group-item">
+              {{ log.amount }} ml - {{ log.dateadded }}
+            </li> -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
     <div class="row mb-4">
@@ -19,25 +48,28 @@
             @click="selectedMealType = 'Dinner'">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
+          <button type="button" class="btn"
+            :class="selectedMealType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
+            @click="selectedMealType = 'Snack'">
+            <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Date Range Selection -->
-    <div class="row mb-4 d-grid grid-template-columns-2 gap-3">
+    <div class="row mb-4">
       <div class="input-group">
-        <button type="button" class="btn btn-primary" @click="adjustDates(-1)">
+        <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
-        <input type="date" class="form-control" id="startDate" v-model="formattedStartDate" />
-      </div>
-      <div class="input-group">
-        <input type="date" class="form-control" id="endDate" v-model="formattedEndDate" />
-        <button type="button" class="btn btn-primary" @click="adjustDates(1)">
+        <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
+        <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
       </div>
     </div>
+
     <!-- Selected Meal Type Section -->
     <div class="mb-5">
       <div class="card">
@@ -47,7 +79,11 @@
               ? 'coffee'
               : selectedMealType === 'Lunch'
                 ? 'hamburger'
-                : 'drumstick-bite'
+                : selectedMealType === 'Dinner'
+                  ? 'drumstick-bite'
+                  : selectedMealType === 'Snack'
+                    ? 'cookie-bite'
+                    : 'ban'
               " class="me-2" />
             {{ selectedMealType }}
           </h3>
@@ -81,7 +117,7 @@
           <div class="row">
             <div v-for="item in filteredMealLogs" :key="item.barcode + item.dateadded"
               class="col-12 col-md-6 col-lg-4 mb-4">
-              <div class="card h-100">
+              <div v-if="item.foodItem" class="card h-100">
                 <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
                   style="height: 200px; object-fit: cover;" />
                 <div class="card-body">
@@ -135,8 +171,8 @@
                     <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
                       aria-label="Close"></button>
                   </div>
-                  <div class="modal-body">
-                    <p>Are you sure you want to remove {{ itemToDelete?.foodItem.foodname }} from your meal log?</p>
+                  <div v-if="itemToDelete?.foodItem" class="modal-body">
+                    <p>Are you sure you want to remove "{{ itemToDelete?.foodItem.foodname }}" from your meal log?</p>
                     <img :src="itemToDelete?.foodItem.image" alt="{{ itemToDelete?.foodItem.foodname }}"
                       style="height: 200px; object-fit: cover;" />
                   </div>
@@ -158,7 +194,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import { ExtendedMealLog } from '@/models/Models';
+import { ExtendedMealLog, MealType } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
@@ -177,7 +213,7 @@ export default defineComponent({
       };
 
       this.mealLogs.forEach((item) => {
-        if (item.mealtype.toLowerCase() === mealType.toLowerCase()) {
+        if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
           totals.calories +=
             item.foodItem.calories_per_serv * item.servingconsumed;
           totals.protein +=
@@ -192,12 +228,13 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
+    const water = ref<number>(0);
     const startDate = ref(new Date());
     const endDate = ref(new Date());
-    const selectedMealType = ref('Breakfast');
+    const selectedMealType = ref<MealType>('Breakfast');
     const itemToDelete = ref<ExtendedMealLog | null>(null);
 
-    const routeToSearch = (mealType: string) => {
+    const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
       const mealLogStore = useMealLogStore();
       mealLogStore.setMealLog({
@@ -210,11 +247,11 @@ export default defineComponent({
     };
 
     const updateMealLogs = async (start: Date, end: Date) => {
-      const response = (await getMealLogs(
-        start,
-        end
-      )) as ExtendedMealLog[];
-      mealLogs.value = await response;
+      const response = (await getMealLogs(start, end)) as ExtendedMealLog[];
+      mealLogs.value = response.map((item) => ({
+        ...item,
+        dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
+      }));
     };
 
     const adjustDates = (days: number) => {
@@ -229,15 +266,14 @@ export default defineComponent({
 
     onMounted(async () => {
       const mealLogStore = useMealLogStore();
-      const existingMealLogs = mealLogStore.getMealLog();
+      const existingMealLog = mealLogStore.getMealLog();
       if (
-        existingMealLogs.barcode !== '' &&
-        existingMealLogs.mealtype !== '' &&
-        existingMealLogs.dateadded !== undefined &&
-        existingMealLogs.servingconsumed !== 0
+        existingMealLog.barcode !== '' &&
+        existingMealLog.dateadded !== undefined &&
+        existingMealLog.servingconsumed !== 0
       ) {
-        logger.info('Adding existing meal log to meal logs:', existingMealLogs);
-        await addMealLog(existingMealLogs);
+        logger.info('Adding existing meal log to meal logs:', existingMealLog);
+        await addMealLog(existingMealLog);
         logger.info('Added existing meal log to meal logs');
         logger.info('Clearing existing meal log');
         mealLogStore.clearMealLog();
@@ -289,8 +325,7 @@ export default defineComponent({
 
     const filteredMealLogs = computed(() => {
       return sortedMealLogs.value.filter(
-        (item) =>
-          item.mealtype.toLowerCase() === selectedMealType.value.toLowerCase()
+        (item) => item.mealtype === selectedMealType.value
       );
     });
 
@@ -300,7 +335,7 @@ export default defineComponent({
       }
     });
 
-    const removeItem = async (item: ExtendedMealLog) => {
+    const removeItem = (item: ExtendedMealLog) => {
       const modal = new Modal(document.getElementById('confirmDeleteModal')!);
       itemToDelete.value = item;
       modal.show();
@@ -309,16 +344,16 @@ export default defineComponent({
     const confirmDelete = async () => {
       if (itemToDelete.value) {
         await deleteMealLog(itemToDelete.value.id);
-        mealLogs.value = mealLogs.value.filter((log) => log !== itemToDelete.value);
+        mealLogs.value = mealLogs.value.filter(
+          (log) => log.id !== itemToDelete.value!.id
+        );
         itemToDelete.value = null;
       }
-    }
+    };
 
     const cancelDelete = () => {
-      if (itemToDelete.value) {
-        itemToDelete.value = null;
-      }
-    }
+      itemToDelete.value = null;
+    };
 
     return {
       mealLogs,
@@ -337,6 +372,7 @@ export default defineComponent({
       cancelDelete,
       adjustDates,
       itemToDelete,
+      water,
     };
   },
 });

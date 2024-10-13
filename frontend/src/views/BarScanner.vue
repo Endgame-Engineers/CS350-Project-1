@@ -36,7 +36,7 @@ export default {
                         const barCodeNum = await BarcodeScanner.barcodeReader(webCam.value, selectedDeviceId.value)
                         if (barCodeNum) {
                             logger.info('Barcode found: ' + barCodeNum);
-                            router.push({ path: '/Search', query: { string: barCodeNum } });
+                            router.push({ path: '/search', query: { string: barCodeNum } });
                         }
                     }
                 } catch (error) {
