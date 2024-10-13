@@ -133,9 +133,8 @@ export default defineComponent({
           </div>
           <div v-for="(value, key) in user" :key="key">
             <p v-if="!excludedKeys.includes(key)">
-              <strong>{{ key.charAt(0).toUpperCase() + key.slice(1) }}</strong>:
-              <span v-if="key === 'lastlogin' && value">{{ new Date(value as Date).toLocaleString()
-                }}</span>
+              <strong>{{ keyDisplayNames[key as string] || key.charAt(0).toUpperCase() + key.slice(1) }}</strong>:
+              <span v-if="key === 'lastlogin' && value">{{ new Date(value as Date).toLocaleString() }}</span>
               <span v-else>{{ value }}</span>
             </p>
           </div>
@@ -150,7 +149,7 @@ export default defineComponent({
           <h2 class="mb-0">Profile Details</h2>
           <div class="d-flex justify-content-end">
             <button v-if="!isEditing" class="btn btn-outline-primary me-2" @click="startEditing">
-              <font-awesome-icon :icon="['fas', 'pencil']" /> Edit
+              <font-awesome-icon :icon="['fas', 'pencil']" />  Edit
             </button>
           </div>
         </div>
@@ -160,13 +159,13 @@ export default defineComponent({
             <!-- Weight and Height -->
             <div class="row">
               <div class="col-12 col-md-6 mb-3">
-                <label for="weight" class="form-label">Weight <span v-if="isEditing">(lbs)</span></label>
+                <label for="weight" class="form-label"><strong>Weight</strong> <span v-if="isEditing">(lbs)</span></label>
                 <div v-if="!isEditing">{{ userStats.weight }} lbs</div>
                 <input v-else type="number" placeholder="Enter weight in pounds" class="form-control" id="weight"
                   v-model.number="editUserStats.weight" />
               </div>
               <div class="col-12 col-md-6 mb-3">
-                <label for="height" class="form-label">Height <span v-if="isEditing">(inches)</span></label>
+                <label for="height" class="form-label"><strong>Height</strong> <span v-if="isEditing">(inches)</span></label>
                 <div v-if="!isEditing">{{ userStats.height }} inches</div>
                 <input v-else type="number" placeholder="Enter height in inches" class="form-control" id="height"
                   v-model.number="editUserStats.height" />
@@ -176,31 +175,23 @@ export default defineComponent({
             <!-- Calorie Goal and Date of Birth -->
             <div class="row">
               <div class="col-12 col-md-6 mb-3">
-                <div v-if="!isEditing">
-                  Calorie Goal: {{ userStats.caloriegoal }}
-                </div>
-                <div v-else>
-                  <label for="calorieGoal" class="form-label">Calorie Goal</label>
-                  <input type="number" placeholder="Enter calorie goal" class="form-control" id="calorieGoal"
-                    v-model.number="editUserStats.caloriegoal" />
-                </div>
-                <div class="form-text">
-                  Recommended calorie goal:
-                  {{ userStats.recommendedcaloriegoal }}
-                </div>
+                <label for="calorieGoal" class="form-label"><strong>Calorie Goal</strong></label>
+                <div v-if="!isEditing">{{ userStats.caloriegoal }}</div>
+                <input v-else type="number" placeholder="Enter calorie goal" class="form-control"
+                  id="calorieGoal" v-model.number="editUserStats.caloriegoal">
+                <div class="form-text">Recommended calorie goal: {{ userStats.recommendedcaloriegoal }}</div>
               </div>
               <div class="col-12 col-md-6 mb-3">
-                <label for="dob" class="form-label">Date of Birth</label>
+                <label for="dob" class="form-label"><strong>Date of Birth</strong></label>
                 <div v-if="!isEditing">{{ formattedDateOfBirth }}</div>
                 <input v-else type="date" placeholder="Enter date of birth" class="form-control" id="dob"
                   v-model="formattedDateOfBirth" />
               </div>
             </div>
-
             <!-- Goal and Activity Level -->
             <div class="row">
               <div class="col-12 col-md-6 mb-3">
-                <label for="goal" class="form-label">Goal</label>
+                <label for="goal" class="form-label"><strong>Goal</strong></label>
                 <div v-if="!isEditing">
                   <span v-if="userStats.goal == 1">Lose Weight</span>
                   <span v-else-if="userStats.goal == 2">Maintain Weight</span>
@@ -213,7 +204,7 @@ export default defineComponent({
                 </select>
               </div>
               <div class="col-12 col-md-6 mb-3">
-                <label for="activitylevel" class="form-label">Activity Level</label>
+                <label for="activitylevel" class="form-label"><strong>Activity Level</strong></label>
                 <div v-if="!isEditing">
                   <!-- Display activity level based on userStats.activitylevel -->
                   <span v-if="userStats.activitylevel == 1">Sedentary</span>
@@ -235,7 +226,7 @@ export default defineComponent({
             <!-- Sex and Percentages -->
             <div class="row">
               <div class="col-12 col-md-6 mb-3">
-                <label for="sex" class="form-label">Sex</label>
+                <label for="sex" class="form-label"><strong>Sex</strong></label>
                 <div v-if="!isEditing">
                   {{ userStats.sex === 1 ? 'Male' : 'Female' }}
                 </div>
@@ -244,13 +235,13 @@ export default defineComponent({
                   <option value="2">Female</option>
                 </select>
               </div>
-              <user-stats-percentages :is-editing="isEditing" :user-stats="userStats"
-                :edit-user-stats="editUserStats" />
+              <user-stats-percentages :is-editing="isEditing" :user-stats="userStats" :edit-user-stats="editUserStats"
+                @reset-warning="handleValidityUpdate(false)" @update-validity="handleValidityUpdate" />
             </div>
 
             <!-- Buttons -->
             <div class="d-flex justify-content-end">
-              <button v-if="isEditing" type="submit" class="btn btn-primary">
+              <button v-if="isEditing" type="submit" class="btn btn-primary" :disabled="!isFormValid">
                 Save Changes
               </button>
               <button v-if="isEditing" type="button" class="btn btn-secondary ms-2" @click="cancelEditing">
