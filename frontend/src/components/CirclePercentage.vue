@@ -22,5 +22,4 @@ const props = defineProps<{
     size: number;
     title?: string;
 }>();
-
 </script>
