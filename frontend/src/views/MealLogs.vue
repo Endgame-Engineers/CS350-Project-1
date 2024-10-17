@@ -9,7 +9,7 @@
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
     <div class="card mb-2">
-      <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
         <div class="input-group">
           <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
             <font-awesome-icon :icon="['fas', 'arrow-left']" />
@@ -25,15 +25,18 @@
             @click="selectedMealType = 'Breakfast'">
             <font-awesome-icon icon="coffee" class="me-2" /> Breakfast
           </button>
-          <button type="button" class="btn" :class="selectedMealType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
+          <button type="button" class="btn"
+            :class="selectedMealType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Lunch'">
             <font-awesome-icon icon="hamburger" class="me-2" /> Lunch
           </button>
-          <button type="button" class="btn" :class="selectedMealType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
+          <button type="button" class="btn"
+            :class="selectedMealType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Dinner'">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
-          <button type="button" class="btn" :class="selectedMealType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
+          <button type="button" class="btn"
+            :class="selectedMealType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Snack'">
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>
@@ -46,18 +49,20 @@
         </div>
       </div>
 
-      <div class="card-body d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap">
-        <!-- Days Stats -->
-        <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
-          title="Water" />
-        <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
-          title="Calories" />
-        <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
-          title="Protein" />
-        <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
-          title="Carbs" />
-        <circle-percentage :progress="(((computeTotals('all').day.fat) / 70) * (100)).toFixed(0)" size="8"
-          title="Fat" />
+      <div class="card-body">
+        <div class="d-grid todays-stats">
+          <!-- Days Stats -->
+          <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
+            title="Water" />
+          <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
+            title="Calories" />
+            <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
+            title="Carbs" />
+          <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
+            title="Proteins" />
+          <circle-percentage :progress="(((computeTotals('all').day.fat) / 70) * (100)).toFixed(0)" size="8"
+            title="Fats" />
+        </div>
       </div>
     </div>
 

@@ -115,6 +115,7 @@ export default defineComponent({
     </div>
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
+      <circle-percentage :progress="Math.round((totals.water / 128) * 100)" size=8 title="Water" />
       <circle-percentage :progress="Math.round(totals.calories / (userStats.caloriegoal ? userStats.caloriegoal -
         totals.calories : 0) * 100)" size=8 title="Calories" />
       <circle-percentage :progress="Math.round((totals.carbs / (totals.carbs + totals.proteins + totals.fats)) * 100)"
@@ -124,7 +125,6 @@ export default defineComponent({
         title="Proteins" />
       <circle-percentage :progress="Math.round((totals.fats / (totals.carbs + totals.proteins + totals.fats)) * 100)"
         size=8 title="Fats" />
-      <circle-percentage :progress="Math.round((totals.water / 128) * 100)" size=8 title="Water" />
     </div>
     <template v-if="mealLogs.length > 0">
       <h2 class="text-center">Recently Consumed Food Items</h2>
