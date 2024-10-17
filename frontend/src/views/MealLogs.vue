@@ -8,25 +8,12 @@
 <template>
   <!-- Water Consumption Tracker -->
   <div>
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="mb-0">
-          <font-awesome-icon icon="tint" class="me-2" /> Water Consumption
-        </h3>
-      </div>
-      <div class="card-body">
-        <div class="input-group mb-3">
-          <input type="number" class="form-control" v-model="water" placeholder="Enter amount in Oz" />
-        </div>
-        <ul class="list-group">
-          <!-- <li v-for="log in waterLogs" :key="log.id" class="list-group-item">
-              {{ log.amount }} ml - {{ log.dateadded }}
-            </li> -->
-        </ul>
-      </div>
-    </div>
+    <circle-percentage :progress="((computeTotals('water').water) / 128)*(100)" size=8 title="Water" />
+    <div class="input-group mt-3">
+      <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
+      <button class="btn btn-primary" @click="addWaterLog">Add</button>
+    </div>  
   </div>
-
 
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
@@ -201,6 +188,7 @@ import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
 
+
 export default defineComponent({
   name: 'MealLogs',
   methods: {
@@ -210,14 +198,17 @@ export default defineComponent({
         protein: 0,
         carbs: 0,
         fat: 0,
+        water: 0,
       };
 
       this.mealLogs.forEach((item) => {
+        if (item.mealtype.toLowerCase() === 'water'){
+          totals.water += item.servingconsumed;
+        }
+        else
         if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
-          totals.calories +=
-            item.foodItem.calories_per_serv * item.servingconsumed;
-          totals.protein +=
-            item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
           totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
           totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
         }
@@ -228,11 +219,22 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
-    const water = ref<number>(0);
     const startDate = ref(new Date());
     const endDate = ref(new Date());
     const selectedMealType = ref<MealType>('Breakfast');
     const itemToDelete = ref<ExtendedMealLog | null>(null);
+    const water = ref<number | null>(null);
+
+    const addWaterLog = async () => {
+      const mealLogStore = useMealLogStore();
+      mealLogStore.setMealLog({
+        barcode: '',
+        mealtype: 'Water',
+        servingconsumed: water.value ?? 0,
+      });
+      await addMealLog(mealLogStore.getMealLog());
+      water.value = null;
+    };
 
     const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
@@ -373,6 +375,7 @@ export default defineComponent({
       adjustDates,
       itemToDelete,
       water,
+      addWaterLog,
     };
   },
 });
