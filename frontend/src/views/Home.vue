@@ -10,17 +10,26 @@ export default defineComponent({
   setup() {
     const userStore = useUserStore();
     const user = userStore.user;
-    const totalCaloriesConsumed = ref(0);
-    const totalCarbs = ref(0);
-    const totalProteins = ref(0);
-    const totalFats = ref(0);
+    const totals = ref({
+      calories: 0,
+      carbs: 0,
+      proteins: 0,
+      fats: 0,
+      water: 0,
+    });
 
     const fetchMealLogs = async () => {
       const mealLogs = await getMealLogs(new Date(), new Date()) as ExtendedMealLog[];
-      totalCaloriesConsumed.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.calories_per_serv ?? 0) * log.servingconsumed, 0));
-      totalCarbs.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.carb_per_serv ?? 0) * log.servingconsumed, 0));
-      totalProteins.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.protein_per_serv ?? 0) * log.servingconsumed, 0));
-      totalFats.value = Math.round(mealLogs.reduce((total, log) => total + (log.foodItem?.fat_per_serv ?? 0) * log.servingconsumed, 0));
+      mealLogs.forEach((log) => {
+        if(log.foodItem && log.mealtype.toLowerCase() !== 'water') {
+          totals.value.calories += log.foodItem.calories_per_serv * log.servingconsumed;
+          totals.value.carbs += log.foodItem.carb_per_serv * log.servingconsumed;
+          totals.value.proteins += log.foodItem.protein_per_serv * log.servingconsumed;
+          totals.value.fats += log.foodItem.fat_per_serv * log.servingconsumed;
+        } else if(log.mealtype.toLowerCase() === 'water') {
+          totals.value.water += log.servingconsumed;
+        }
+      });
     };
 
     fetchMealLogs();
@@ -70,10 +79,7 @@ export default defineComponent({
       userStats,
       chartData,
       chartOptions,
-      totalCaloriesConsumed,
-      totalCarbs,
-      totalProteins,
-      totalFats,
+      totals,
     };
   },
 });
@@ -81,28 +87,32 @@ export default defineComponent({
 <template>
   <div class="container">
     <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
-    <div class="d-grid todays-stats">
-      <circle-percentage :progress="Math.round(totalCaloriesConsumed / userStats.caloriegoal * 100)" size="8"
-        title="Calories" />
-      <circle-percentage :progress="Math.round((totalCarbs / (totalCarbs + totalProteins + totalFats)) * 100)" size="8"
-        title="Carbs" />
-      <circle-percentage :progress="Math.round((totalProteins / (totalCarbs + totalProteins + totalFats)) * 100)"
-        size="8" title="Proteins" />
-
-      <circle-percentage :progress="Math.round((totalFats / (totalCarbs + totalProteins + totalFats)) * 100)" size="8"
-        title="Fats" />
+    <div class="d-flex justify-content-center">
+      <div v-if="userStats.caloriegoal !== null && totals.calories > userStats.caloriegoal" class="alert alert-danger" role="alert">
+        You have consumed <i>{{ totals.calories }}</i> calories today, which is more than your daily goal of
+        <i>{{ userStats.caloriegoal }}</i> calories.
+      </div>
+      <div v-else-if="userStats.caloriegoal !== null && totals.calories === userStats.caloriegoal" class="alert alert-success" role="alert">
+        You have consumed <i>{{ totals.calories }}</i> calories today, which is exactly your daily goal of
+        <i>{{ userStats.caloriegoal }}</i> calories.
+      </div>
+      <div v-else class="alert alert-info" role="alert">
+        You have consumed <i>{{ totals.calories }}</i> calories today and have <i>{{ userStats.caloriegoal ? userStats.caloriegoal -
+          totals.calories : 0  }}</i> calories left to consume.
+      </div>
     </div>
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
-      <circle-percentage :progress="Math.round(totalCaloriesConsumed / (userStats.caloriegoal ? userStats.caloriegoal -
-          totalCaloriesConsumed : 0) * 100)" size=8
+      <circle-percentage :progress="Math.round(totals.calories / (userStats.caloriegoal ? userStats.caloriegoal -
+          totals.calories : 0) * 100)" size=8
         title="Calories" />
-      <circle-percentage :progress="Math.round((totalCarbs / (totalCarbs + totalProteins + totalFats)) * 100)" size=8
+      <circle-percentage :progress="Math.round((totals.carbs / (totals.carbs + totals.proteins + totals.fats)) * 100)" size=8
         title="Carbs" />
-      <circle-percentage :progress="Math.round((totalProteins / (totalCarbs + totalProteins + totalFats)) * 100)"
+      <circle-percentage :progress="Math.round((totals.proteins /(totals.carbs + totals.proteins + totals.fats)) * 100)"
         size="8" title="Proteins" />
-      <circle-percentage :progress="Math.round((totalFats / (totalCarbs + totalProteins + totalFats)) * 100)" size=8
+      <circle-percentage :progress="Math.round((totals.fats / (totals.carbs + totals.proteins + totals.fats)) * 100)" size=8
         title="Fats" />
+      <circle-percentage :progress="Math.round((totals.water / 128) * 100)" size=8 title="Water" />
     </div>
   </div>
 </template>
