@@ -19,17 +19,19 @@
         </button>
       </div>
     </div>
-
+  </div>
+  <div class="container w-100 pt-4">
     <!-- Chart -->
     <div class="row">
-      <div class="col cal-chart">
-        <h2 class="pb-1 pt-1">Calories Consumed vs Calorie Goal</h2>
-        <Bar v-if="mealLogs.length > 0" :data="chartData" :options="chartOptions" />
-        <div v-else class="alert alert-warning" role="alert">
-          No meal logs found for the selected date range.
+      <div class="col">
+        <div class="cal-chart">
+          <h2 class="pb-1">Calories Consumed vs Calorie Goal</h2>
+          <Bar v-if="mealLogs.length > 0" :data="chartData" :options="chartOptions" />
+          <div v-else class="alert alert-warning" role="alert">
+            No meal logs found for the selected date range.
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -147,7 +149,7 @@ export default defineComponent({
             dailyCalories[date] = 0;
           }
           if (log.foodItem && log.foodItem.calories_per_serv) {
-            dailyCalories[date] += log.servingconsumed * log.foodItem.calories_per_serv;
+            dailyCalories[date] += Math.round(log.servingconsumed * log.foodItem.calories_per_serv);
           }
         }
       });
