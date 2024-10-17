@@ -140,15 +140,6 @@ $circle-text-size: 0.3rem;
   margin-top: 2rem;
 }
 
-@media (max-width: 768px) {
-  .todays-stats> :last-child {
-    grid-column: 1 / -1;
-    /* Span across all columns */
-    justify-self: center;
-    /* Center the item horizontally */
-  }
-}
-
 .cal-chart {
   display: flex;
   flex-direction: column;
