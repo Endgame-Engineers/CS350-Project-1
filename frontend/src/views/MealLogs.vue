@@ -42,6 +42,24 @@
           </button>
         </div>
         <div class="input-group">
+          <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <font-awesome-icon :icon="['fas', 'ellipsis-v']" />
+          </button>
+          <ul class="dropdown-menu">
+            <template v-if="filteredWaterLogs.length === 0">
+              <li class="dropdown-item text-muted">No water logs available</li>
+            </template>
+            <template v-else v-for="item in filteredWaterLogs"
+              :key="item.servingconsumed + (item.dateadded ? item.dateadded.toISOString() : '')">
+              <li>
+                <button class="dropdown-item" id="removeWaterItem" @click="removeItem(item)">
+                  <font-awesome-icon :icon="['fas', 'trash']" class="me-2" />
+                  {{ item.servingconsumed }} oz
+                </button>
+              </li>
+            </template>
+          </ul>
           <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
           <button class="btn btn-primary" @click="addWaterLog" @keydown.enter="addWaterLog">
             <font-awesome-icon :icon="['fas', 'plus']" />
@@ -56,7 +74,7 @@
             title="Water" />
           <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
             title="Calories" />
-            <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
             title="Carbs" />
           <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
             title="Proteins" />
@@ -138,7 +156,7 @@
                 </div>
                 <div class="card-footer text-muted d-grid grid-template-columns-1-2 align-items-center">
                   <div class="text-start">
-                    <button class="btn btn-outline-primary mb-2" @click="removeItem(item)">
+                    <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
                   </div>
@@ -161,22 +179,29 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">
-                      Confirm Deletion
-                    </h5>
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
                     <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
-                      aria-label="Close"></button>
+                      aria-label="Close">
+                    </button>
                   </div>
-                  <div v-if="itemToDelete?.foodItem" class="modal-body">
-                    <p>Are you sure you want to remove "{{ itemToDelete?.foodItem.foodname }}" from your meal log?</p>
-                    <img :src="itemToDelete?.foodItem.image" alt="{{ itemToDelete?.foodItem.foodname }}"
-                      style="height: 200px; object-fit: cover;" />
+                  <div class="modal-body">
+                    <template v-if="itemToDelete?.foodItem">
+                      <p>Are you sure you want to remove "{{ itemToDelete.foodItem.foodname }}" from your meal log?</p>
+                      <img :src="itemToDelete.foodItem.image" :alt="itemToDelete.foodItem.foodname"
+                        style="height: 200px; object-fit: cover;" />
+                    </template>
+                    <template v-else>
+                      <p>Are you sure you want to remove this water log from your meal log?</p>
+                    </template>
                   </div>
+
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                      @click="cancelDelete">Cancel</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                      @click="confirmDelete()">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">
+                      Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">
+                      Confirm
+                    </button>
                   </div>
                 </div>
               </div>
@@ -329,6 +354,12 @@ export default defineComponent({
       );
     });
 
+    const filteredWaterLogs = computed(() => {
+      return sortedMealLogs.value.filter(
+        (item) => item.mealtype.toLowerCase() === 'water'
+      );
+    });
+
     watch([currentDate], ([newcurrentDate]) => {
       if (newcurrentDate) {
         updateMealLogs(newcurrentDate);
@@ -344,9 +375,7 @@ export default defineComponent({
     const confirmDelete = async () => {
       if (itemToDelete.value) {
         await deleteMealLog(itemToDelete.value.id);
-        mealLogs.value = mealLogs.value.filter(
-          (log) => log.id !== itemToDelete.value!.id
-        );
+        updateMealLogs(currentDate.value);
         itemToDelete.value = null;
       }
     };
@@ -372,6 +401,7 @@ export default defineComponent({
 
       water.value = null;
       updateMealLogs(currentDate.value);
+
     };
 
     return {
@@ -385,12 +415,14 @@ export default defineComponent({
       filteredMealLogs,
       selectedMealType,
       removeItem,
-      confirmDelete,
-      cancelDelete,
       adjustDates,
       itemToDelete,
       water,
       addWaterLog,
+      filteredWaterLogs,
+      deleteMealLog,
+      cancelDelete,
+      confirmDelete,
     };
   },
 });
