@@ -6,62 +6,58 @@
     add water to the meal type switcher
     -->
 <template>
-  <!-- Water Consumption Tracker -->
-  <div class="row">
-    <div class="col-md-6">
-      <circle-percentage :progress="((computeTotals('water').water) / 128) * (100)" size="8" title="Water" />
-    </div>
-    <div class="col-md-6">
-      <div class="input-group mt-3">
-        <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
-        <button class="btn btn-primary" @click="addWaterLog" @keydown.enter="addWaterLog">
-          <font-awesome-icon :icon="['fas', 'plus']" />
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
-    <div class="row mb-4">
-      <div class="col-12 text-center">
-        <div class="btn-group flex-wrap" role="group" aria-label="Meal Type Switcher">
+    <div class="card mb-2">
+      <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div class="input-group">
+          <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+          </button>
+          <input type="date" class="form-control" id="selectedDate" v-model="formattedCurrentDate" />
+          <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
+            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+          </button>
+        </div>
+        <div class="d-flex gap-2 justify-content-center flex-wrap flex-md-nowrap">
           <button type="button" class="btn"
             :class="selectedMealType === 'Breakfast' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Breakfast'">
             <font-awesome-icon icon="coffee" class="me-2" /> Breakfast
           </button>
-          <button type="button" class="btn"
-            :class="selectedMealType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
+          <button type="button" class="btn" :class="selectedMealType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Lunch'">
             <font-awesome-icon icon="hamburger" class="me-2" /> Lunch
           </button>
-        </div>
-        <div class="btn-group flex-wrap" role="group" aria-label="Meal Type Switcher">
-          <button type="button" class="btn"
-            :class="selectedMealType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
+          <button type="button" class="btn" :class="selectedMealType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Dinner'">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
-          <button type="button" class="btn"
-            :class="selectedMealType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
+          <button type="button" class="btn" :class="selectedMealType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Snack'">
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>
         </div>
+        <div class="input-group">
+          <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
+          <button class="btn btn-primary" @click="addWaterLog" @keydown.enter="addWaterLog">
+            <font-awesome-icon :icon="['fas', 'plus']" />
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- Date Range Selection -->
-    <div class="row mb-4">
-      <div class="input-group">
-        <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" />
-        </button>
-        <input type="date" class="form-control" id="selectedDate" v-model="formattedCurrentDate" />
-        <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
-          <font-awesome-icon :icon="['fas', 'arrow-right']" />
-        </button>
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <!-- Days Stats -->
+        <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
+          title="Water" />
+        <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
+          title="Calories" />
+        <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
+          title="Protein" />
+        <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
+          title="Carbs" />
+        <circle-percentage :progress="(((computeTotals('all').day.fat) / 70) * (100)).toFixed(0)" size="8"
+          title="Fat" />
       </div>
     </div>
 
@@ -205,13 +201,27 @@ export default defineComponent({
         protein: 0,
         carbs: 0,
         fat: 0,
-        water: 0,
+        day: {
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          water: 0,
+        }
       };
 
       this.mealLogs.forEach((item) => {
         if (item.mealtype.toLowerCase() === 'water') {
-          totals.water += item.servingconsumed;
+          totals.day.water += item.servingconsumed;
         }
+
+        if (item.foodItem && item.mealtype.toLowerCase() !== 'water') {
+          totals.day.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.day.protein += item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.day.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+          totals.day.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+        }
+
         if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
           totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
           totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
