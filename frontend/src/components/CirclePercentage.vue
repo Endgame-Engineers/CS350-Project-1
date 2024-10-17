@@ -6,7 +6,7 @@
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
             <!-- Progress circle -->
-            <path class="circle" :stroke-dasharray="props.progress + ', 100'" d="M18 2.0845
+            <path v-if="props.progress > 0" class="circle" :stroke-dasharray="props.progress + ', 100'" d="M18 2.0845
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
             <text x="18" y="18" class="percentage">{{ props.progress }}%</text>
