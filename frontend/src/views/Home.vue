@@ -126,27 +126,29 @@ export default defineComponent({
         size=8 title="Fats" />
       <circle-percentage :progress="Math.round((totals.water / 128) * 100)" size=8 title="Water" />
     </div>
-    <h2 class="text-center">Recently Consumed Food Items</h2>
-    <div id="mealCarousel" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner">
-        <div v-for="(log, index) in mealLogs" :key="log.id" :class="['carousel-item', { active: index === 0 }]">
-          <img :src="log.foodItem?.image" class="d-block w-100" alt="Food Image"
-            style="height: 300px; object-fit: cover;">
-          <div class="carousel-caption d-none d-md-block text-white">
-            <h5>{{ log.foodItem?.foodname }}</h5>
-            <p>{{ log.mealtype }}</p>
-            <p>Comsumed at: {{ new Date(log.dateadded ?? 0).toLocaleString() }}</p>
+    <template v-if="mealLogs.length > 0">
+      <h2 class="text-center">Recently Consumed Food Items</h2>
+      <div id="mealCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <div v-for="(log, index) in mealLogs" :key="log.id" :class="['carousel-item', { active: index === 0 }]">
+            <img :src="log.foodItem?.image" class="d-block w-100" alt="Food Image"
+              style="height: 300px; object-fit: cover;">
+            <div class="carousel-caption d-none d-md-block text-white">
+              <h5>{{ log.foodItem?.foodname }}</h5>
+              <p>{{ log.mealtype }}</p>
+              <p>Comsumed at: {{ new Date(log.dateadded ?? 0).toLocaleString() }}</p>
+            </div>
           </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#mealCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mealCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#mealCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#mealCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
-    </div>
+    </template>
   </div>
 </template>
