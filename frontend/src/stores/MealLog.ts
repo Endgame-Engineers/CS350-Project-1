@@ -8,6 +8,7 @@ export const useMealLogStore = defineStore('mealLog', {
       barcode: '',
       servingconsumed: 0,
     } as MealLog,
+    selectedMealType: 'Breakfast' as MealType,
   }),
 
   actions: {
@@ -26,6 +27,14 @@ export const useMealLogStore = defineStore('mealLog', {
         barcode: '',
         servingconsumed: 0,
       } as MealLog;
+    },
+
+    setSelectedMealType(mealType: MealType) {
+      this.selectedMealType = mealType;
+    },
+
+    getSelectedMealType() {
+      return this.selectedMealType;
     },
   },
 });
