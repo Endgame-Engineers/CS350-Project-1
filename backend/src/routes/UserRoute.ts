@@ -169,7 +169,7 @@ class UserRoute {
             try {
                 if (req.body.mealtype.toLowerCase() == 'water') {
                     logger.info('Meal type is water');
-                    const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, barcode: 'Water', dateadded: new Date() });
+                    const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, barcode: 'Water', dateadded: req.body.dateadded || new Date() });
                     logger.info('Meal log created');
                     res.status(201).json(mealLog);
                     return;
@@ -182,7 +182,7 @@ class UserRoute {
                         logger.info(product);
                         if (FoodItems.isFoodItem(product)) {
                             logger.info('Food item is valid');
-                            const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: new Date() });
+                            const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() });
                             logger.info('Meal log created');
                             res.status(201).json(mealLog);
                         } else {

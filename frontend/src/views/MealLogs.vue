@@ -7,19 +7,25 @@
     -->
 <template>
   <!-- Water Consumption Tracker -->
-  <div>
-    <circle-percentage :progress="((computeTotals('water').water) / 128)*(100)" size=8 title="Water" />
-    <div class="input-group mt-3">
-      <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
-      <button class="btn btn-primary" @click="addWaterLog">Add</button>
-    </div>  
+  <div class="row">
+    <div class="col-md-6">
+      <circle-percentage :progress="((computeTotals('water').water) / 128) * (100)" size="8" title="Water" />
+    </div>
+    <div class="col-md-6">
+      <div class="input-group mt-3">
+        <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
+        <button class="btn btn-primary" @click="addWaterLog" @keydown.enter="addWaterLog">
+          <font-awesome-icon :icon="['fas', 'plus']" />
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
     <div class="row mb-4">
       <div class="col-12 text-center">
-        <div class="btn-group" role="group" aria-label="Meal Type Switcher">
+        <div class="btn-group flex-wrap" role="group" aria-label="Meal Type Switcher">
           <button type="button" class="btn"
             :class="selectedMealType === 'Breakfast' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Breakfast'">
@@ -30,6 +36,8 @@
             @click="selectedMealType = 'Lunch'">
             <font-awesome-icon icon="hamburger" class="me-2" /> Lunch
           </button>
+        </div>
+        <div class="btn-group flex-wrap" role="group" aria-label="Meal Type Switcher">
           <button type="button" class="btn"
             :class="selectedMealType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Dinner'">
@@ -50,7 +58,7 @@
         <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
-        <input type="date" class="form-control" id="selectedDate" v-model="formattedStartDate" />
+        <input type="date" class="form-control" id="selectedDate" v-model="formattedCurrentDate" />
         <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
@@ -188,7 +196,6 @@ import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
 
-
 export default defineComponent({
   name: 'MealLogs',
   methods: {
@@ -202,7 +209,7 @@ export default defineComponent({
       };
 
       this.mealLogs.forEach((item) => {
-        if (item.mealtype.toLowerCase() === 'water'){
+        if (item.mealtype.toLowerCase() === 'water') {
           totals.water += item.servingconsumed;
         }
         if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
@@ -218,22 +225,10 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
-    const startDate = ref(new Date());
+    const currentDate = ref(new Date());
     const selectedMealType = ref<MealType>('Breakfast');
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
-
-    const addWaterLog = async () => {
-      const waterLog = {
-        dateadded: startDate.value,
-        barcode: 'water',
-        mealtype: 'Water',
-        servingconsumed: water.value ?? 0,
-      } as ExtendedMealLog;
-      await addMealLog(waterLog);
-      water.value = null;
-      updateMealLogs(startDate.value);
-    };
 
     const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
@@ -248,7 +243,7 @@ export default defineComponent({
     };
 
     const updateMealLogs = async (start: Date) => {
-      const response = (await getMealLogs(start,start)) as ExtendedMealLog[];
+      const response = (await getMealLogs(start, start)) as ExtendedMealLog[];
       mealLogs.value = response.map((item) => ({
         ...item,
         dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
@@ -257,9 +252,13 @@ export default defineComponent({
 
     const adjustDates = (days: number) => {
       logger.info('Adjusting dates by', days, 'days');
-      const newStartDate = new Date(startDate.value);
-      newStartDate.setDate(newStartDate.getDate() + days);
-      startDate.value = newStartDate;
+      logger.info('Current date:', currentDate.value);
+
+      const newcurrentDate = new Date(currentDate.value);
+      newcurrentDate.setDate(newcurrentDate.getDate() + days);
+      currentDate.value = newcurrentDate;
+
+      logger.info('New date:', currentDate.value);
     };
 
     onMounted(async () => {
@@ -278,25 +277,25 @@ export default defineComponent({
       }
 
       logger.info('Fetching meal logs');
-      await updateMealLogs(startDate.value);
+      await updateMealLogs(currentDate.value);
     });
 
     const prettyDate = (date: Date) => {
       return new Date(date).toLocaleString();
     };
 
-    const formattedStartDate = computed({
+    const formattedCurrentDate = computed({
       get() {
-        if (!startDate.value) {
+        if (!currentDate.value) {
           return '';
         }
-        const date = new Date(startDate.value);
+        const date = new Date(currentDate.value);
         return date.toISOString().split('T')[0];
       },
       set(value: string) {
-        startDate.value = new Date(value);
+        currentDate.value = new Date(value);
       },
-    });    
+    });
 
     const sortedMealLogs = computed(() => {
       return mealLogs.value
@@ -314,9 +313,9 @@ export default defineComponent({
       );
     });
 
-    watch([startDate], ([newStartDate]) => {
-      if (newStartDate) {
-        updateMealLogs(newStartDate);
+    watch([currentDate], ([newcurrentDate]) => {
+      if (newcurrentDate) {
+        updateMealLogs(newcurrentDate);
       }
     });
 
@@ -340,13 +339,32 @@ export default defineComponent({
       itemToDelete.value = null;
     };
 
+    const addWaterLog = async () => {
+      if (!water.value) {
+        logger.warn('No water value provided');
+        return;
+      }
+
+      await addMealLog(
+        {
+          barcode: 'water',
+          mealtype: 'Water',
+          servingconsumed: water.value ?? 0,
+          dateadded: currentDate.value,
+        }
+      );
+
+      water.value = null;
+      updateMealLogs(currentDate.value);
+    };
+
     return {
       mealLogs,
       routeToSearch,
       prettyDate,
       updateMealLogs,
-      startDate,
-      formattedStartDate,
+      currentDate,
+      formattedCurrentDate,
       sortedMealLogs,
       filteredMealLogs,
       selectedMealType,
