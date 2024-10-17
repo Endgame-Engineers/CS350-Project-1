@@ -241,13 +241,13 @@ export default defineComponent({
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const currentDate = ref(new Date());
-    const selectedMealType = ref<MealType>('Breakfast');
+    const mealLogStore = useMealLogStore();
+    const selectedMealType = ref<MealType>(mealLogStore.getSelectedMealType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
 
     const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
-      const mealLogStore = useMealLogStore();
       mealLogStore.setMealLog({
         barcode: '',
         mealtype: mealType,
@@ -323,6 +323,7 @@ export default defineComponent({
     });
 
     const filteredMealLogs = computed(() => {
+      mealLogStore.setSelectedMealType(selectedMealType.value);
       return sortedMealLogs.value.filter(
         (item) => item.mealtype === selectedMealType.value
       );
