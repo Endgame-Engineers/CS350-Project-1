@@ -167,6 +167,14 @@ class UserRoute {
             }
 
             try {
+                if (req.body.mealtype.toLowerCase() == 'water') {
+                    logger.info('Meal type is water');
+                    const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, barcode: 'Water', dateadded: new Date() });
+                    logger.info('Meal log created');
+                    res.status(201).json(mealLog);
+                    return;
+                }
+
                 logger.info('Checking if food item exists');
                 OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
                     .then(async (product) => {
