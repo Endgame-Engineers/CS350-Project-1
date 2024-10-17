@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <div class="card-body d-flex justify-content-between align-items-center">
+      <div class="card-body d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap">
         <!-- Days Stats -->
         <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
           title="Water" />
