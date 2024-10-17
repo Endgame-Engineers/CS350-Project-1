@@ -50,7 +50,7 @@
         <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
           <font-awesome-icon :icon="['fas', 'arrow-left']" />
         </button>
-        <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
+        <input type="date" class="form-control" id="selectedDate" v-model="formattedStartDate" />
         <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
         </button>
@@ -205,7 +205,6 @@ export default defineComponent({
         if (item.mealtype.toLowerCase() === 'water'){
           totals.water += item.servingconsumed;
         }
-        else
         if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
           totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
           totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
@@ -220,20 +219,20 @@ export default defineComponent({
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const startDate = ref(new Date());
-    const endDate = ref(new Date());
     const selectedMealType = ref<MealType>('Breakfast');
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
 
     const addWaterLog = async () => {
-      const mealLogStore = useMealLogStore();
-      mealLogStore.setMealLog({
-        barcode: '',
+      const waterLog = {
+        dateadded: startDate.value,
+        barcode: 'water',
         mealtype: 'Water',
         servingconsumed: water.value ?? 0,
-      });
-      await addMealLog(mealLogStore.getMealLog());
+      } as ExtendedMealLog;
+      await addMealLog(waterLog);
       water.value = null;
+      updateMealLogs(startDate.value);
     };
 
     const routeToSearch = (mealType: MealType) => {
@@ -248,8 +247,8 @@ export default defineComponent({
       router.push({ path: '/search' });
     };
 
-    const updateMealLogs = async (start: Date, end: Date) => {
-      const response = (await getMealLogs(start, end)) as ExtendedMealLog[];
+    const updateMealLogs = async (start: Date) => {
+      const response = (await getMealLogs(start,start)) as ExtendedMealLog[];
       mealLogs.value = response.map((item) => ({
         ...item,
         dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
@@ -259,11 +258,8 @@ export default defineComponent({
     const adjustDates = (days: number) => {
       logger.info('Adjusting dates by', days, 'days');
       const newStartDate = new Date(startDate.value);
-      const newEndDate = new Date(endDate.value);
       newStartDate.setDate(newStartDate.getDate() + days);
-      newEndDate.setDate(newEndDate.getDate() + days);
       startDate.value = newStartDate;
-      endDate.value = newEndDate;
     };
 
     onMounted(async () => {
@@ -282,7 +278,7 @@ export default defineComponent({
       }
 
       logger.info('Fetching meal logs');
-      await updateMealLogs(startDate.value, endDate.value);
+      await updateMealLogs(startDate.value);
     });
 
     const prettyDate = (date: Date) => {
@@ -300,20 +296,7 @@ export default defineComponent({
       set(value: string) {
         startDate.value = new Date(value);
       },
-    });
-
-    const formattedEndDate = computed({
-      get() {
-        if (!endDate.value) {
-          return '';
-        }
-        const date = new Date(endDate.value);
-        return date.toISOString().split('T')[0];
-      },
-      set(value: string) {
-        endDate.value = new Date(value);
-      },
-    });
+    });    
 
     const sortedMealLogs = computed(() => {
       return mealLogs.value
@@ -331,9 +314,9 @@ export default defineComponent({
       );
     });
 
-    watch([startDate, endDate], ([newStartDate, newEndDate]) => {
-      if (newStartDate && newEndDate) {
-        updateMealLogs(newStartDate, newEndDate);
+    watch([startDate], ([newStartDate]) => {
+      if (newStartDate) {
+        updateMealLogs(newStartDate);
       }
     });
 
@@ -363,9 +346,7 @@ export default defineComponent({
       prettyDate,
       updateMealLogs,
       startDate,
-      endDate,
       formattedStartDate,
-      formattedEndDate,
       sortedMealLogs,
       filteredMealLogs,
       selectedMealType,
