@@ -19,7 +19,7 @@ function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
 class MealLogs {
     private client: any;
 
-   constructor() {
+    constructor() {
         this.client = ConnectToDB.getClient();
     }
 
@@ -30,8 +30,13 @@ class MealLogs {
 
         if (start && end) {
             logger.info('Using date range');
-            query += ' AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) + INTERVAL \'1 day\' ORDER BY dateadded';
-            params.push(start, end);
+            if (start.getTime() === end.getTime()) {
+                query += ' AND DATE(dateadded) = DATE($2) ORDER BY dateadded';
+                params.push(start);
+            } else {
+                query += ' AND DATE(dateadded) BETWEEN DATE($2) AND DATE($3) ORDER BY dateadded';
+                params.push(start, end);
+            }
         }
 
         logger.info('Querying database');
@@ -43,7 +48,7 @@ class MealLogs {
 
     async addMealLog(mealLog: MealLog): Promise<void> {
 
-        if(!isValidMealLog(mealLog)) {
+        if (!isValidMealLog(mealLog)) {
             throw new Error('Invalid meal log');
         }
 
@@ -59,7 +64,7 @@ class MealLogs {
         logger.info('Deleting meal log from database');
         try {
             await (await this.client).query(
-                'DELETE FROM "MealLogs" WHERE userid = $1 AND id = $2', 
+                'DELETE FROM "MealLogs" WHERE userid = $1 AND id = $2',
                 [userid, id]
             );
             logger.info('Meal log deleted from database');

@@ -6,33 +6,20 @@
     add water to the meal type switcher
     -->
 <template>
-  <!-- Water Consumption Tracker -->
-  <div>
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h3 class="mb-0">
-          <font-awesome-icon icon="tint" class="me-2" /> Water Consumption
-        </h3>
-      </div>
-      <div class="card-body">
-        <div class="input-group mb-3">
-          <input type="number" class="form-control" v-model="water" placeholder="Enter amount in Oz" />
-        </div>
-        <ul class="list-group">
-          <!-- <li v-for="log in waterLogs" :key="log.id" class="list-group-item">
-              {{ log.amount }} ml - {{ log.dateadded }}
-            </li> -->
-        </ul>
-      </div>
-    </div>
-  </div>
-
-
   <div class="container-fluid">
     <!-- Meal Type Switcher -->
-    <div class="row mb-4">
-      <div class="col-12 text-center">
-        <div class="btn-group" role="group" aria-label="Meal Type Switcher">
+    <div class="card mb-2">
+      <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+        <div class="input-group">
+          <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+          </button>
+          <input type="date" class="form-control" id="selectedDate" v-model="formattedCurrentDate" />
+          <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
+            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+          </button>
+        </div>
+        <div class="d-flex gap-2 justify-content-center flex-wrap flex-md-nowrap">
           <button type="button" class="btn"
             :class="selectedMealType === 'Breakfast' ? 'btn-primary' : 'btn-outline-primary'"
             @click="selectedMealType = 'Breakfast'">
@@ -54,19 +41,46 @@
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>
         </div>
+        <div class="input-group">
+          <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <font-awesome-icon :icon="['fas', 'ellipsis-v']" />
+          </button>
+          <ul class="dropdown-menu">
+            <template v-if="filteredWaterLogs.length === 0">
+              <li class="dropdown-item text-muted">No water logs available</li>
+            </template>
+            <template v-else v-for="item in filteredWaterLogs"
+              :key="item.servingconsumed + (item.dateadded ? item.dateadded.toISOString() : '')">
+              <li>
+                <button class="dropdown-item" id="removeWaterItem" @click="removeItem(item)">
+                  <font-awesome-icon :icon="['fas', 'trash']" class="me-2" />
+                  {{ item.servingconsumed }} oz
+                </button>
+              </li>
+            </template>
+          </ul>
+          <input type="meallogs" class="form-control" placeholder="Water Consumed (oz)" v-model="water" />
+          <button class="btn btn-primary" @click="addWaterLog" @keydown.enter="addWaterLog">
+            <font-awesome-icon :icon="['fas', 'plus']" />
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- Date Range Selection -->
-    <div class="row mb-4">
-      <div class="input-group">
-        <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" />
-        </button>
-        <input type="date" class="form-control" id="selectedDate" v-model="formattedEndDate" />
-        <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
-          <font-awesome-icon :icon="['fas', 'arrow-right']" />
-        </button>
+      <div class="card-body">
+        <div class="d-grid todays-stats">
+          <!-- Days Stats -->
+          <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
+            title="Water" />
+          <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
+            title="Calories" />
+          <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
+            title="Carbs" />
+          <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
+            title="Proteins" />
+          <circle-percentage :progress="(((computeTotals('all').day.fat) / 70) * (100)).toFixed(0)" size="8"
+            title="Fats" />
+        </div>
       </div>
     </div>
 
@@ -142,7 +156,7 @@
                 </div>
                 <div class="card-footer text-muted d-grid grid-template-columns-1-2 align-items-center">
                   <div class="text-start">
-                    <button class="btn btn-outline-primary mb-2" @click="removeItem(item)">
+                    <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
                   </div>
@@ -165,22 +179,29 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">
-                      Confirm Deletion
-                    </h5>
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
                     <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
-                      aria-label="Close"></button>
+                      aria-label="Close">
+                    </button>
                   </div>
-                  <div v-if="itemToDelete?.foodItem" class="modal-body">
-                    <p>Are you sure you want to remove "{{ itemToDelete?.foodItem.foodname }}" from your meal log?</p>
-                    <img :src="itemToDelete?.foodItem.image" alt="{{ itemToDelete?.foodItem.foodname }}"
-                      style="height: 200px; object-fit: cover;" />
+                  <div class="modal-body">
+                    <template v-if="itemToDelete?.foodItem">
+                      <p>Are you sure you want to remove "{{ itemToDelete.foodItem.foodname }}" from your meal log?</p>
+                      <img :src="itemToDelete.foodItem.image" :alt="itemToDelete.foodItem.foodname"
+                        style="height: 200px; object-fit: cover;" />
+                    </template>
+                    <template v-else>
+                      <p>Are you sure you want to remove this water log from your meal log?</p>
+                    </template>
                   </div>
+
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                      @click="cancelDelete">Cancel</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                      @click="confirmDelete()">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">
+                      Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">
+                      Confirm
+                    </button>
                   </div>
                 </div>
               </div>
@@ -210,14 +231,30 @@ export default defineComponent({
         protein: 0,
         carbs: 0,
         fat: 0,
+        day: {
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          water: 0,
+        }
       };
 
       this.mealLogs.forEach((item) => {
+        if (item.mealtype.toLowerCase() === 'water') {
+          totals.day.water += item.servingconsumed;
+        }
+
+        if (item.foodItem && item.mealtype.toLowerCase() !== 'water') {
+          totals.day.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.day.protein += item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.day.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+          totals.day.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+        }
+
         if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
-          totals.calories +=
-            item.foodItem.calories_per_serv * item.servingconsumed;
-          totals.protein +=
-            item.foodItem.protein_per_serv * item.servingconsumed;
+          totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+          totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
           totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
           totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
         }
@@ -228,15 +265,14 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
-    const water = ref<number>(0);
-    const startDate = ref(new Date());
-    const endDate = ref(new Date());
-    const selectedMealType = ref<MealType>('Breakfast');
+    const currentDate = ref(new Date());
+    const mealLogStore = useMealLogStore();
+    const selectedMealType = ref<MealType>(mealLogStore.getSelectedMealType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
+    const water = ref<number | null>(null);
 
     const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
-      const mealLogStore = useMealLogStore();
       mealLogStore.setMealLog({
         barcode: '',
         mealtype: mealType,
@@ -246,8 +282,8 @@ export default defineComponent({
       router.push({ path: '/search' });
     };
 
-    const updateMealLogs = async (start: Date, end: Date) => {
-      const response = (await getMealLogs(start, end)) as ExtendedMealLog[];
+    const updateMealLogs = async (start: Date) => {
+      const response = (await getMealLogs(start, start)) as ExtendedMealLog[];
       mealLogs.value = response.map((item) => ({
         ...item,
         dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
@@ -256,12 +292,13 @@ export default defineComponent({
 
     const adjustDates = (days: number) => {
       logger.info('Adjusting dates by', days, 'days');
-      const newStartDate = new Date(startDate.value);
-      const newEndDate = new Date(endDate.value);
-      newStartDate.setDate(newStartDate.getDate() + days);
-      newEndDate.setDate(newEndDate.getDate() + days);
-      startDate.value = newStartDate;
-      endDate.value = newEndDate;
+      logger.info('Current date:', currentDate.value);
+
+      const newcurrentDate = new Date(currentDate.value);
+      newcurrentDate.setDate(newcurrentDate.getDate() + days);
+      currentDate.value = newcurrentDate;
+
+      logger.info('New date:', currentDate.value);
     };
 
     onMounted(async () => {
@@ -280,36 +317,23 @@ export default defineComponent({
       }
 
       logger.info('Fetching meal logs');
-      await updateMealLogs(startDate.value, endDate.value);
+      await updateMealLogs(currentDate.value);
     });
 
     const prettyDate = (date: Date) => {
       return new Date(date).toLocaleString();
     };
 
-    const formattedStartDate = computed({
+    const formattedCurrentDate = computed({
       get() {
-        if (!startDate.value) {
+        if (!currentDate.value) {
           return '';
         }
-        const date = new Date(startDate.value);
+        const date = new Date(currentDate.value);
         return date.toISOString().split('T')[0];
       },
       set(value: string) {
-        startDate.value = new Date(value);
-      },
-    });
-
-    const formattedEndDate = computed({
-      get() {
-        if (!endDate.value) {
-          return '';
-        }
-        const date = new Date(endDate.value);
-        return date.toISOString().split('T')[0];
-      },
-      set(value: string) {
-        endDate.value = new Date(value);
+        currentDate.value = new Date(value);
       },
     });
 
@@ -324,14 +348,21 @@ export default defineComponent({
     });
 
     const filteredMealLogs = computed(() => {
+      mealLogStore.setSelectedMealType(selectedMealType.value);
       return sortedMealLogs.value.filter(
         (item) => item.mealtype === selectedMealType.value
       );
     });
 
-    watch([startDate, endDate], ([newStartDate, newEndDate]) => {
-      if (newStartDate && newEndDate) {
-        updateMealLogs(newStartDate, newEndDate);
+    const filteredWaterLogs = computed(() => {
+      return sortedMealLogs.value.filter(
+        (item) => item.mealtype.toLowerCase() === 'water'
+      );
+    });
+
+    watch([currentDate], ([newcurrentDate]) => {
+      if (newcurrentDate) {
+        updateMealLogs(newcurrentDate);
       }
     });
 
@@ -344,9 +375,7 @@ export default defineComponent({
     const confirmDelete = async () => {
       if (itemToDelete.value) {
         await deleteMealLog(itemToDelete.value.id);
-        mealLogs.value = mealLogs.value.filter(
-          (log) => log.id !== itemToDelete.value!.id
-        );
+        updateMealLogs(currentDate.value);
         itemToDelete.value = null;
       }
     };
@@ -355,24 +384,45 @@ export default defineComponent({
       itemToDelete.value = null;
     };
 
+    const addWaterLog = async () => {
+      if (!water.value) {
+        logger.warn('No water value provided');
+        return;
+      }
+
+      await addMealLog(
+        {
+          barcode: 'water',
+          mealtype: 'Water',
+          servingconsumed: water.value ?? 0,
+          dateadded: currentDate.value,
+        }
+      );
+
+      water.value = null;
+      updateMealLogs(currentDate.value);
+
+    };
+
     return {
       mealLogs,
       routeToSearch,
       prettyDate,
       updateMealLogs,
-      startDate,
-      endDate,
-      formattedStartDate,
-      formattedEndDate,
+      currentDate,
+      formattedCurrentDate,
       sortedMealLogs,
       filteredMealLogs,
       selectedMealType,
       removeItem,
-      confirmDelete,
-      cancelDelete,
       adjustDates,
       itemToDelete,
       water,
+      addWaterLog,
+      filteredWaterLogs,
+      deleteMealLog,
+      cancelDelete,
+      confirmDelete,
     };
   },
 });

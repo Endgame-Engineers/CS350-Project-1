@@ -17,6 +17,12 @@ $box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
   /* Full viewport height */
   overflow: hidden;
   /* Hide any overflow */
+  width: 100vw;
+  /* Full viewport width */
+  height: 100vh;
+  /* Full viewport height */
+  overflow: hidden;
+  /* Hide any overflow */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -118,25 +124,12 @@ $circle-text-size: 0.3rem;
   fill: $primary;
 }
 
-.circle-bg {
-  fill: none;
-  stroke: $secondary;
-  stroke-width: 3.8;
-}
-
 .circle {
   fill: none;
   stroke-width: 2.8;
   stroke: $primary;
   stroke-linecap: round;
   transition: stroke-dasharray 0.3s;
-}
-
-.percentage {
-  font-size: $circle-text-size;
-  text-anchor: middle;
-  align-baseline: middle;
-  fill: $primary;
 }
 
 .todays-stats {
@@ -158,4 +151,16 @@ $circle-text-size: 0.3rem;
 .food-image {
   height: 200px;
   object-fit: cover;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: $secondary;
+  stroke-width: 3.8;
+}
+
+.percentage {
+  font-size: 0.4rem;
+  text-anchor: middle;
+  fill: $primary;
 }
