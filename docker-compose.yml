@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .
+    container_name: carbio-web
+    ports:
+      - "3000:3000"
+    command: ["node", "/app/backend/dist/index.js"]
