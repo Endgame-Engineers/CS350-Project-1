@@ -26,7 +26,7 @@ services:
       - POSTGRES_PASSWORD=carbio
       - POSTGRES_DB=thedatabase
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U carbio"]
+      test: ["CMD-SHELL", "pg_isready -U thedatabase"]
       interval: 10s
       timeout: 5s
       retries: 5
