@@ -14,15 +14,15 @@ export const foodItemSchema = `
 `;
 
 export const mealLogSchema = `
-    CREATE SEQUENCE IF NOT EXISTS "UserNutritionLog_id_seq";
-    CREATE TABLE IF NOT EXISTS "MealLogs (
-        "id" int4 NOT NULL DEFAULT nextval('"UserNutritionLog_id_seq"'::regclass),
-        "mealtype" varchar,
-        "dateadded" varchar,
-        "barcode" varchar,
-        "userid" int8,
-        "servingconsumed" float8,
-        PRIMARY KEY ("id")
+    CREATE SEQUENCE IF NOT EXISTS UserNutritionLog_id_seq;
+    CREATE TABLE IF NOT EXISTS MealLogs (
+        id INT NOT NULL DEFAULT nextval('UserNutritionLog_id_seq'::regclass),
+        mealtype VARCHAR,
+        dateadded VARCHAR,
+        barcode VARCHAR,
+        userid BIGINT,
+        servingconsumed FLOAT8,
+        PRIMARY KEY (id)
     );
 `;
 
