@@ -1,5 +1,6 @@
 import { Client } from 'pg';
 import { config } from 'dotenv';
+import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema } from '../models/tableSchema';
 
 config();
 
@@ -32,6 +33,17 @@ class ConnectToDB {
                     if (err) {
                         console.error('Failed to list tables:', err);
                     } else {
+                        if (res.rows.length === 0) {
+                            console.log('No tables found');
+                            try {
+                                this.createTable(userSchema);
+                                this.createTable(userStatsSchema);
+                                this.createTable(mealLogSchema);
+                                this.createTable(foodItemSchema);
+                            } catch (error) {
+                                console.error('Failed to create tables:', error);
+                            }
+                        }
                         console.log('Found tables:');
                         res.rows.forEach((row) => {
                             console.log(row.table_name);
@@ -42,6 +54,16 @@ class ConnectToDB {
         });
     }
 
+    createTable(schema: string): void {
+        this.client.query(schema, (err, res) => {
+            if (err) {
+                console.error('Failed to create table:', err);
+            } else {
+                console.log('Table created successfully');
+            }
+        });
+    }
+    
     /**
      * Get the database client
      * @returns Client

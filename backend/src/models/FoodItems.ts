@@ -1,3 +1,4 @@
+import e from 'express';
 import ConnectToDB from '../utils/ConnectToDB';
 import { logger } from '../utils/Logging';
 import { ErrorMessage } from './ErrorMessage';
