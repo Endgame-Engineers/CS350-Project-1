@@ -14,6 +14,8 @@ type ProfileStats = {
   carbpercentage: number;
 };
 
+type PercentageKeys = keyof ProfileStats;
+
 const currentStats = computed<ProfileStats>(() => {
   return props.isEditing ? props.editUserStats : props.userStats;
 });
