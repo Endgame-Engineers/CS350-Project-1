@@ -15,7 +15,7 @@ export const foodItemSchema = `
 
 export const mealLogSchema = `
     CREATE SEQUENCE IF NOT EXISTS UserNutritionLog_id_seq;
-    CREATE TABLE IF NOT EXISTS MealLogs (
+    CREATE TABLE IF NOT EXISTS "MealLogs" (
         id INT NOT NULL DEFAULT nextval('UserNutritionLog_id_seq'::regclass),
         mealtype VARCHAR,
         dateadded VARCHAR,
