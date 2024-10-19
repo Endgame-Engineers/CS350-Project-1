@@ -2,6 +2,23 @@ services:
   web:
     build: .
     container_name: carbio-web
+    environment:
+      - DB_USERNAME=carbio
+      - DB_PASSWORD=carbio
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=thedatabase
+      - GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
+      - GOOGLE_CLIENT_SECRET=<YOUR_GOOGLE_CLIENT_SECRET>
+      - SESSION_SECRET=<YOUR_SESSION_SECRET>
     ports:
       - "3000:3000"
     command: ["node", "/app/backend/dist/index.js"]
+  postgres:
+    image: "postgres:16"
+    container_name: carbio-postgres
+    environment:
+      - POSTGRES_USER=carbio
+      - POSTGRES_PASSWORD=carbio
+      - POSTGRES_DB=thedatabase
+    
