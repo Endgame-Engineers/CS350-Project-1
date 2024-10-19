@@ -13,6 +13,12 @@ export default defineComponent({
         const userStore = useUserStore();
         const user = userStore.user;
         const step = ref(1);
+        const isFormValid = ref(true);
+
+        const handleValidityUpdate = (isValid: boolean) => {
+        isFormValid.value = isValid;
+        };
+
 
         const nextStep = (event: Event) => {
             event.preventDefault();
@@ -83,7 +89,9 @@ export default defineComponent({
             prevStep,
             saveUserStats,
             formattedDateOfBirth,
-            getRecommendedCalorieGoal
+            getRecommendedCalorieGoal,
+            handleValidityUpdate,
+            isFormValid
         }
     }
 });
@@ -222,12 +230,13 @@ export default defineComponent({
 
                 <div v-if="step === 9" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Macronutrient Distribution</h1>
-                    <user-stats-percentages />
+                    <user-stats-percentages :is-editing="true" :user-stats="userStats" :edit-user-stats="userStats"
+                @reset-warning="handleValidityUpdate(false)" @update-validity="handleValidityUpdate" />
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-outline-primary" @click="prevStep">
                             <font-awesome-icon :icon="['fas', 'arrow-left']" />
                         </button>
-                        <button class="btn btn-primary" type="button" @click="saveUserStats">
+                        <button class="btn btn-primary" type="button" @click="saveUserStats" :disabled="!isFormValid">
                             Save and Continue
                         </button>
                     </div>
