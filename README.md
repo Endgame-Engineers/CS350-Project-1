@@ -1,6 +1,6 @@
 # Carbio - Nutrition Tracker
 ## Prereqs
-- Must have docker
+- Must have Docker (https://docs.docker.com/get-started/get-docker/)
 - Google Console API ClientID and ClientSecret (https://developers.google.com/workspace/guides/create-project)
 - Add callback to Google API: `http://localhost:3000/api/auth/google/callback`
 ## How to Run
