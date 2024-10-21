@@ -44,3 +44,8 @@ Profit????
 
 ## Profile Page
 ![Profile Page](images/Screenshot8.png)
+
+# List of features that we plan to implement
+- Allow the user to create their own food items and add them to their meals
+- Read Health Data and Activity Data from Google Fit API
+- Implement the tracking of micronutrients
