@@ -27,3 +27,20 @@ Start docker using docker compose:
 Connect to `http://localhost:3000/`
 
 Profit????
+
+# Screenshots on how the project works
+## Home Page
+![Home Page](images/Screenshot1.png)
+
+## History Page
+![History Page](images/Screenshot2.png)
+![History Page](images/Screenshot3.png)
+
+## Add Meal Page
+![Add Meal Page](images/Screenshot4.png)
+![Add Meal Page](images/Screenshot5.png)
+![Add Meal Page](images/Screenshot6.png)
+![Add Meal Page](images/Screenshot7.png)
+
+## Profile Page
+![Profile Page](images/Screenshot8.png)
