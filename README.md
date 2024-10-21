@@ -45,7 +45,7 @@ Profit????
 ## Profile Page
 ![Profile Page](images/Screenshot8.png)
 
-# List of features that we plan to implement
+# List of features that we plan to implement for the rest of the semester
 - Allow the user to create their own food items and add them to their meals
 - Read Health Data and Activity Data from Google Fit API
 - Implement the tracking of micronutrients
