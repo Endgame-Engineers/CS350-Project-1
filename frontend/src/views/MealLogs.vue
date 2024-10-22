@@ -66,13 +66,12 @@
           </button>
         </div>
       </div>
-
       <div class="card-body">
         <div class="d-grid todays-stats">
           <!-- Days Stats -->
           <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
             title="Water" />
-          <circle-percentage :progress="(((computeTotals('all').day.calories) / (stats.caloriegoal ?? 2000)) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.calories) / (stats.caloriegoal ?? 0)) * (100)).toFixed(0)" size="8"
             title="Calories" />
           <circle-percentage :progress="(((computeTotals('all').day.carbs) / stats.carbgrams) * (100)).toFixed(0)" size="8"
             title="Carbs" />
@@ -80,6 +79,9 @@
             title="Proteins" />
           <circle-percentage :progress="(((computeTotals('all').day.fat) / stats.fatgrams) * (100)).toFixed(0)" size="8"
             title="Fats" />
+            <p>
+              {{ (((computeTotals('all').day.protein) / stats.proteingrams) * (100)).toFixed(0) }}
+            </p>
         </div>
       </div>
     </div>
@@ -271,7 +273,22 @@ export default defineComponent({
     const selectedMealType = ref<MealType>(mealLogStore.getSelectedMealType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
-    const stats = ref<UserStat>({} as UserStat);
+    const stats = ref<UserStat>({
+      caloriegoal: 0,
+      proteingrams: 0,
+      carbgrams: 0,
+      fatgrams: 0,
+      height: 0,
+      weight: 0,
+      goal: 0,
+      activitylevel: 0,
+      sex: 0,
+      proteinpercentage: 0,
+      fatpercentage: 0,
+      carbpercentage: 0,
+      dateofbirth: new Date(),
+      updatedon: new Date(),
+    });
 
     const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
@@ -407,10 +424,13 @@ export default defineComponent({
     };
 
     const statistics = async () => {
-      const staty = (await getUserStat()) as UserStat;
-      if (staty) {
-        stats.value = staty;
-      }
+      getUserStat().then((response) => {
+        if ('caloriegoal' in response) {
+          stats.value = response as UserStat;
+        } else {
+          logger.error('Failed to fetch user stats:', response);
+        }
+      });
     };
 
     statistics();
