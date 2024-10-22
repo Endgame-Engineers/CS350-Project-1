@@ -145,4 +145,17 @@ export class CalculateUserStats {
                 return this.stats.tdee;
         }
     }
+
+    public calculateProteinGoal(): number {
+        return this.stats.caloriegoal * (this.stats.proteinpercentage / 100) / 4;
+    }
+
+    public calculateFatGoal(): number {
+        return this.stats.caloriegoal * (this.stats.fatpercentage / 100) / 9;
+    }
+
+    public calculateCarbGoal(): number {
+        return this.stats.caloriegoal * (this.stats.carbpercentage / 100) / 4;
+    }
+
 }

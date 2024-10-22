@@ -42,6 +42,9 @@ class UserRoute {
                             bmr: stats.calculateBMR(),
                             tdee: stats.calculateTDEE(),
                             recommendedcaloriegoal: Math.round(stats.calculateCalorieGoal()),
+                            fatgrams: stats.calculateFatGoal(),
+                            carbgrams: stats.calculateCarbGoal(),
+                            proteingrams: stats.calculateProteinGoal()
                         };
                     }))
                     .then((calculatedStats) => {

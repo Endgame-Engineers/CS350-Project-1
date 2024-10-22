@@ -72,13 +72,13 @@
           <!-- Days Stats -->
           <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
             title="Water" />
-          <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.calories) / (stats.caloriegoal ?? 2000)) * (100)).toFixed(0)" size="8"
             title="Calories" />
-          <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.carbs) / stats.carbgrams) * (100)).toFixed(0)" size="8"
             title="Carbs" />
-          <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.protein) / stats.proteingrams) * (100)).toFixed(0)" size="8"
             title="Proteins" />
-          <circle-percentage :progress="(((computeTotals('all').day.fat) / 70) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.fat) / stats.fatgrams) * (100)).toFixed(0)" size="8"
             title="Fats" />
         </div>
       </div>
@@ -215,12 +215,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import { ExtendedMealLog, MealType } from '@/models/Models';
+import { ExtendedMealLog, MealType, UserStat } from '@/models/Models';
 import router from '@/router';
 import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
+import { getUserStat } from '@/services/UserStats';
 
 export default defineComponent({
   name: 'MealLogs',
@@ -263,13 +264,14 @@ export default defineComponent({
       return totals;
     },
   },
-  setup() {
+   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const currentDate = ref(new Date());
     const mealLogStore = useMealLogStore();
     const selectedMealType = ref<MealType>(mealLogStore.getSelectedMealType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
+    const stats = ref<UserStat>({} as UserStat);
 
     const routeToSearch = (mealType: MealType) => {
       logger.info('Adding Meal Type to meal log store');
@@ -404,6 +406,15 @@ export default defineComponent({
 
     };
 
+    const statistics = async () => {
+      const staty = (await getUserStat()) as UserStat;
+      if (staty) {
+        stats.value = staty;
+      }
+    };
+
+    statistics();
+
     return {
       mealLogs,
       routeToSearch,
@@ -423,6 +434,7 @@ export default defineComponent({
       deleteMealLog,
       cancelDelete,
       confirmDelete,
+      stats,
     };
   },
 });

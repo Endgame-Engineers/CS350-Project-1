@@ -24,10 +24,6 @@ export default defineComponent({
       mealLogs.value = logs;
       mealLogs.value = mealLogs.value.sort((a, b) => new Date(b.dateadded ?? 0).getTime() - new Date(a.dateadded ?? 0).getTime());
 
-      const threeHoursAgo = new Date();
-      threeHoursAgo.setHours(threeHoursAgo.getHours() - 3);
-      mealLogs.value = mealLogs.value.filter((log) => log.mealtype.toLowerCase() !== 'water' && new Date(log.dateadded ?? 0) >= threeHoursAgo);
-
       logs.forEach((log) => {
         if (log.foodItem && log.mealtype.toLowerCase() !== 'water') {
           totals.value.calories += Math.round(log.foodItem.calories_per_serv * log.servingconsumed);
