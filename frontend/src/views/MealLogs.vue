@@ -71,7 +71,7 @@
           <!-- Days Stats -->
           <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
             title="Water" />
-          <circle-percentage :progress="(((computeTotals('all').day.calories) / (stats.caloriegoal ?? 0)) * (100)).toFixed(0)" size="8"
+          <circle-percentage :progress="(((computeTotals('all').day.calories) / (stats.caloriegoal ?? stats.recommendedcaloriegoal ?? 1)) * (100)).toFixed(0)" size="8"
             title="Calories" />
           <circle-percentage :progress="(((computeTotals('all').day.carbs) / stats.carbgrams) * (100)).toFixed(0)" size="8"
             title="Carbs" />
@@ -220,7 +220,7 @@ import { useMealLogStore } from '@/stores/MealLog';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
-import { getUserStat } from '@/services/UserStats';
+import { getUserStat, ProfileStats } from '@/services/UserStats';
 
 export default defineComponent({
   name: 'MealLogs',
@@ -270,7 +270,7 @@ export default defineComponent({
     const selectedMealType = ref<MealType>(mealLogStore.getSelectedMealType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
-    const stats = ref<UserStat>({
+    const stats = ref<ProfileStats>({
       caloriegoal: 0,
       proteingrams: 0,
       carbgrams: 0,
