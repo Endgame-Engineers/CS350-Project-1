@@ -79,9 +79,6 @@
             title="Proteins" />
           <circle-percentage :progress="(((computeTotals('all').day.fat) / stats.fatgrams) * (100)).toFixed(0)" size="8"
             title="Fats" />
-            <p>
-              {{ (((computeTotals('all').day.protein) / stats.proteingrams) * (100)).toFixed(0) }}
-            </p>
         </div>
       </div>
     </div>
