@@ -1,4 +1,5 @@
 # Carbio - Nutrition Tracker
+[![Open in Coder](https://coder.galifrey.dev/open-in-coder.svg)](https://coder.galifrey.dev/templates/coder/DockerRepoClone/workspace?mode=manual&param.Git+repo+http+URL=https%3A%2F%2Fgithub.com%2FEndgame-Engineers%2FCS350-Project-1)
 ## Prereqs
 - Must have Docker (https://docs.docker.com/get-started/get-docker/)
 - Google Console API ClientID and ClientSecret (https://developers.google.com/workspace/guides/create-project)
@@ -49,6 +50,3 @@ Profit????
 - Allow the user to create their own food items and add them to their meals
 - Read Health Data and Activity Data from Google Fit API
 - Implement the tracking of micronutrients
-
-# Edit with coder
-[![Open in Coder](https://coder.galifrey.dev/open-in-coder.svg)](https://coder.galifrey.dev/templates/coder/DockerRepoClone/workspace?mode=auto&param.Git+repo+http+URL=https://github.com/Endgame-Engineers/CS350-Project-1)
