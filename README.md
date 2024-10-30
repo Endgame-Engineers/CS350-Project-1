@@ -49,3 +49,6 @@ Profit????
 - Allow the user to create their own food items and add them to their meals
 - Read Health Data and Activity Data from Google Fit API
 - Implement the tracking of micronutrients
+
+# Edit with coder
+[![Open in Coder](https://coder.galifrey.dev/open-in-coder.svg)](https://coder.galifrey.dev/templates/coder/DockerRepoClone/workspace?mode=auto&param.Git+repo+http+URL=https://github.com/Endgame-Engineers/CS350-Project-1)
