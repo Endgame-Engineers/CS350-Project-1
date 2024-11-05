@@ -19,7 +19,7 @@ class AuthGoogle {
                         'email',
                         'https://www.googleapis.com/auth/fitness.activity.read',
                         'https://www.googleapis.com/auth/fitness.body.read'
-                    ]
+                    ],
                 },
                 async (req, accessToken, refreshToken, profile, done) => {
                     try {
