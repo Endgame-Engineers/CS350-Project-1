@@ -8,7 +8,6 @@ import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
 import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { logger } from '../utils/Logging';
-import HealthGoogle from '../utils/HealthGoogle';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
@@ -235,29 +234,6 @@ class UserRoute {
                         logger.error(error);
                         res.status(500).json({ error: 'An error occurred' });
                     });
-            } else {
-                logger.error('User not authenticated');
-                res.status(400).json({ error: 'User not authenticated' });
-            }
-        });
-
-        this.router.get('/user/health', isAuthenticated, (req, res) => {
-            logger.info('/user/health GET');
-            const { start, end } = req.query;
-            const startDate = start ? new Date(start as string) : undefined;
-            const endDate = end ? new Date(end as string) : undefined;
-            const user = req.user as User;
-
-            if (user.id) {
-                logger.info('User authenticated');
-                const healthGoogle = new HealthGoogle(user);
-
-                healthGoogle.connectToGoogle()
-                    .then(() => {
-                        logger.info('Connected to Google Fit API');
-                        // return healthGoogle.getHealthData();
-                        healthGoogle.checkTokenScopes();
-                    })
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
