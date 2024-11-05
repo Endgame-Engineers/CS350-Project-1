@@ -81,6 +81,7 @@ class AuthGoogle {
         googleStrategy.authorizationParams = (options) => {
             return {
                 access_type: 'offline',
+                prompt: 'consent',
             };
         };
 

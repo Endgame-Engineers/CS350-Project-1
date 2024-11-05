@@ -8,6 +8,7 @@ import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
 import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { logger } from '../utils/Logging';
+import HealthGoogle from '../utils/HealthGoogle';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
@@ -25,7 +26,7 @@ class UserRoute {
         this.router.get('/user', isAuthenticated, (req, res) => {
             logger.info('/user GET');
             logger.info('User authenticated');
-            const { accesstoken, refreshtoken, ...userWithoutTokens } = req.user;
+            const { accesstoken, refreshtoken, ...userWithoutTokens } = req.user as User;
             res.json(userWithoutTokens);
         });
 
@@ -249,21 +250,14 @@ class UserRoute {
 
             if (user.id) {
                 logger.info('User authenticated');
-                if (startDate && endDate) {
-                    logger.info('Using date range');
-                    HealthLogs.getHealthLogs(user.id, startDate, endDate)
-                        .then((healthLogs) => {
-                            logger.info('Health logs retrieved');
-                            res.json(healthLogs);
-                        });
-                } else {
-                    logger.info('Using all health logs');
-                    HealthLogs.getHealthLogs(user.id)
-                        .then((healthLogs) => {
-                            logger.info('Health logs retrieved');
-                            res.json(healthLogs);
-                        });
-                }
+                const healthGoogle = new HealthGoogle(user);
+
+                healthGoogle.connectToGoogle()
+                    .then(() => {
+                        logger.info('Connected to Google Fit API');
+                        // return healthGoogle.getHealthData();
+                        healthGoogle.checkTokenScopes();
+                    })
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
