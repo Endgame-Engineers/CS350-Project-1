@@ -13,6 +13,12 @@ class AuthGoogle {
                     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
                     callbackURL: '/api/auth/google/callback',
                     passReqToCallback: true,
+                    scope: [
+                        'profile',
+                        'email',
+                        'https://www.googleapis.com/auth/fitness.activity.read',
+                        'https://www.googleapis.com/auth/fitness.body.read'
+                    ]
                 },
                 async (req, accessToken, refreshToken, profile, done) => {
                     try {

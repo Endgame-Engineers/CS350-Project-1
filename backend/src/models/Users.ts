@@ -12,6 +12,8 @@ export interface User {
     providerid: string;
     profilepic: string;
     profilecreated: boolean;
+    accesstoken?: string;
+    refreshtoken?: string;
 }
 
 class Users {

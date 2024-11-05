@@ -1,6 +1,7 @@
 import { Client } from 'pg';
 import { config } from 'dotenv';
-import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema } from '../models/tableSchema';
+import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema, healthLogSchema } from '../models/tableSchema';
+import { logger } from './Logging';
 
 config();
 
@@ -29,27 +30,79 @@ class ConnectToDB {
             } else {
                 console.log('Successfully connected to the database');
                 // list all found tables
+                const tablesToCreate = [
+                    { name: 'Users', schema: userSchema },
+                    { name: 'UserStats', schema: userStatsSchema },
+                    { name: 'MealLogs', schema: mealLogSchema },
+                    { name: 'FoodItems', schema: foodItemSchema },
+                    { name: 'HealthLogs', schema: healthLogSchema }
+                ];
+
                 this.client.query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' ORDER BY table_name;', (err, res) => {
                     if (err) {
                         console.error('Failed to list tables:', err);
                     } else {
-                        if (res.rows.length === 0) {
-                            console.log('No tables found');
-                            try {
-                                this.createTable(userSchema);
-                                this.createTable(userStatsSchema);
-                                this.createTable(mealLogSchema);
-                                this.createTable(foodItemSchema);
-                            } catch (error) {
-                                console.error('Failed to create tables:', error);
+                        const existingTables = res.rows.map(row => row.table_name);
+
+                        tablesToCreate.forEach(table => {
+                            if (!existingTables.includes(table.name)) {
+                                try {
+                                    this.createTable(table.schema);
+                                } catch (error) {
+                                    console.error(`Failed to create table ${table.name}:`, error);
+                                }
                             }
-                        }
+                        });
+
                         console.log('Found tables:');
                         res.rows.forEach((row) => {
                             console.log(row.table_name);
                         });
                     }
                 });
+            // Check and add missing columns
+            tablesToCreate.forEach(table => {
+                this.client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = '${table.name}'`, (err, res) => {
+                    if (err) {
+                        console.error(`Failed to list columns for table ${table.name}:`, err);
+                    } else {
+                        const existingColumns = res.rows.map(row => row.column_name);
+
+                        const schemaMatch = tablesToCreate.find(t => t.name === table.name)?.schema.match(/"([^"]+)"/g);
+                        const schemaColumns = schemaMatch ? schemaMatch.map((match: string) => match.replace(/"/g, '')) : [];
+
+                        const columnsToIgnore = tablesToCreate.map(table => `${table.name}_id_seq`).concat(tablesToCreate.map(table => table.name));
+
+                        schemaColumns.forEach(column => {
+                            if (!existingColumns.includes(column) && !columnsToIgnore.includes(column)) {
+                                console.error(`Column ${column} is missing from table ${table.name}`);
+
+                                const columnMatch = table.schema.match(new RegExp(`"${column}"[^,]+`));
+                                const columnDefinition = columnMatch ? columnMatch[0] : '';
+                                const columnQuery = `ALTER TABLE "${table.name}" ADD COLUMN ${columnDefinition}`;
+
+                                this.client.query(columnQuery, (err, res) => {
+                                    if (err) {
+                                        console.error(`Failed to add column ${column} to table ${table.name}:`, err);
+                                    } else {
+                                        console.log(`Added column ${column} to table ${table.name}`);
+                                    }
+                                });
+                            }
+                        });
+
+                        //handle if table has extra columns that are not in the schema
+                        existingColumns.forEach(column => {
+                            if (!schemaColumns.includes(column) && !columnsToIgnore.includes(column)) {
+                                logger.info(`Column ${column} is not in the schema for table ${table.name}`);
+
+                                const columnQuery = `ALTER TABLE "${table.name}" DROP COLUMN ${column}`;
+                                logger.info(`Dropping column ${column} from table ${table.name}`);
+                            }
+                        });
+                    }
+                });
+            });
             }
         });
     }

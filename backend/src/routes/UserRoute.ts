@@ -2,6 +2,7 @@ import e, { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
+import HealthLogs, { HealthLog } from '../models/HealthLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
@@ -232,6 +233,36 @@ class UserRoute {
                         logger.error(error);
                         res.status(500).json({ error: 'An error occurred' });
                     });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.get('/user/health', isAuthenticated, (req, res) => {
+            logger.info('/user/health GET');
+            const { start, end } = req.query;
+            const startDate = start ? new Date(start as string) : undefined;
+            const endDate = end ? new Date(end as string) : undefined;
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+                if (startDate && endDate) {
+                    logger.info('Using date range');
+                    HealthLogs.getHealthLogs(user.id, startDate, endDate)
+                        .then((healthLogs) => {
+                            logger.info('Health logs retrieved');
+                            res.json(healthLogs);
+                        });
+                } else {
+                    logger.info('Using all health logs');
+                    HealthLogs.getHealthLogs(user.id)
+                        .then((healthLogs) => {
+                            logger.info('Health logs retrieved');
+                            res.json(healthLogs);
+                        });
+                }
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
