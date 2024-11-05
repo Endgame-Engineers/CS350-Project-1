@@ -53,6 +53,13 @@ class Users {
         await (await this.client).query('UPDATE "Users" SET profilecreated = $1 WHERE uuid = $2', [true, uuid]);
     }
 
+    async updateTokens(user: { id?: number; accesstoken: string; refreshtoken: string }): Promise<void> {
+        await (await this.client).query(
+            'UPDATE "Users" SET accesstoken = $1, refreshtoken = $2 WHERE id = $3',
+            [user.accesstoken, user.refreshtoken, user.id]
+        );
+    }
+
     async updateUser(user: User): Promise<void> {
         await (await this.client).query(
             'UPDATE "Users" SET email = $1, firstname = $2, lastname = $3, uuid = $4, lastlogin = $5 WHERE username = $6',

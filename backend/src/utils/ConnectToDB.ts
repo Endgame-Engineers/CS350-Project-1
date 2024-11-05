@@ -89,15 +89,18 @@ class ConnectToDB {
                                     }
                                 });
                             }
-                        });
 
-                        //handle if table has extra columns that are not in the schema
-                        existingColumns.forEach(column => {
-                            if (!schemaColumns.includes(column) && !columnsToIgnore.includes(column)) {
-                                logger.info(`Column ${column} is not in the schema for table ${table.name}`);
+                            if(existingColumns.includes(column) && columnsToIgnore.includes(column)) {
+                                console.error(`Column ${column} is not in the schema for table ${table.name}`);
 
                                 const columnQuery = `ALTER TABLE "${table.name}" DROP COLUMN ${column}`;
-                                logger.info(`Dropping column ${column} from table ${table.name}`);
+                                this.client.query(columnQuery, (err, res) => {
+                                    if (err) {
+                                        console.error(`Failed to drop column ${column} from table ${table.name}:`, err);
+                                    } else {
+                                        console.log(`Dropped column ${column} from table ${table.name}`);
+                                    }
+                                });
                             }
                         });
                     }

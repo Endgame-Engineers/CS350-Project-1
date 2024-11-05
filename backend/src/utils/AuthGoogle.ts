@@ -3,6 +3,7 @@ import e, { NextFunction, Response, Request } from 'express';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import Users, { User } from '../models/Users';
 import UserStats from '../models/UserStats';
+import { logger } from './Logging';
 
 class AuthGoogle {
     constructor() {
@@ -22,12 +23,18 @@ class AuthGoogle {
                 },
                 async (req, accessToken, refreshToken, profile, done) => {
                     try {
+                        logger.info('Handling Google OAuth callback');
                         if (profile) {
                             try {
                                 const user = await Users.getUser(profile.id);
                                 if (user !== null) {
                                     console.log('User found in database');
                                     await Users.updateUserLastLogin(user.uuid);
+                                    await Users.updateTokens({
+                                        id: user.id,
+                                        accesstoken: accessToken,
+                                        refreshtoken: refreshToken
+                                    });
                                     user.profilepic = profile.photos ? profile.photos[0].value : '';
                                     if (user.id !== undefined) {
                                         user.profilecreated = await UserStats.getUserStats(user.id).then((userStats) => {
@@ -50,7 +57,9 @@ class AuthGoogle {
                                         providername: "Google",
                                         providerid: profile.id,
                                         profilepic: profile.photos ? profile.photos[0].value : '',
-                                        profilecreated: false
+                                        profilecreated: false,
+                                        accesstoken: accessToken,
+                                        refreshtoken: refreshToken
                                     };
                                     const createdUser = await Users.addUser(newUser);
                                     req.user = createdUser;
