@@ -24,7 +24,7 @@ class AuthRoutes {
         this.router.get('/auth/google/callback', (req: Request, res: Response) => {
             passport.authenticate('google', { failureRedirect: '/' })(req, res, async () => {
                 if (req.user) {
-                    res.redirect('/');
+                    res.redirect('/api/auth/google/success');
                 } else {
                     res.redirect('/api/auth/google');
                 }
@@ -42,7 +42,7 @@ class AuthRoutes {
                         return res.status(500).json({ message: 'Failed to destroy session' });
                     }
                     res.clearCookie('connect.sid');
-                    res.redirect('/');
+                    res.json({ message: 'Logged out' });
                 });
             });
         });

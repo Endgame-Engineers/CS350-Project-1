@@ -17,8 +17,6 @@ class AuthGoogle {
                 scope: [
                     'profile',
                     'email',
-                    'https://www.googleapis.com/auth/fitness.activity.read',
-                    'https://www.googleapis.com/auth/fitness.body.read'
                 ]
             },
             async (req, accessToken, refreshToken, profile, done) => {
@@ -105,5 +103,5 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/login');
+    res.json({ isAuthenticated: false });
 }

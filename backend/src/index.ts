@@ -5,7 +5,6 @@ import http from 'http';
 import { config } from 'dotenv';
 import { getRoutes } from './routes/index';
 import AuthGoogle from './utils/AuthGoogle';
-import path from 'path';
 
 config();
 
@@ -21,10 +20,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 new AuthGoogle();
-
-const vueJSStatic = path.join(__dirname, 'public');
-
-app.use(express.static(vueJSStatic));
 app.use(express.json());
 
 const routes = getRoutes();
@@ -32,8 +27,12 @@ routes.forEach((route) => {
     app.use('/api', route);
 });
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(vueJSStatic, 'index.html'));
+app.get('/', (req, res) => {
+    if (req.user) {
+        res.status(200).json({ message: 'Authenticated' });
+    } else {
+        res.status(401).json({ message: 'Not authenticated' });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
