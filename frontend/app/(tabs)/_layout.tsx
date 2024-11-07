@@ -18,7 +18,7 @@ const isAuthenticated = useIsAuthenticated();
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
-  if (true) {
+  if (!isAuthenticated) {
     return (
       <ThemedView>
         <Login />
