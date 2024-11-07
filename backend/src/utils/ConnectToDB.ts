@@ -4,7 +4,6 @@ import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema, healthLogSc
 import { logger } from './Logging';
 
 config();
-
 /**
  * Class to connect to the database
  */
@@ -61,6 +60,7 @@ class ConnectToDB {
                     }
                 });
             // Check and add missing columns
+            
             tablesToCreate.forEach(table => {
                 this.client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = '${table.name}'`, (err, res) => {
                     if (err) {
