@@ -278,6 +278,7 @@ export default defineComponent({
         mealtype: mealType,
         servingconsumed: 0,
       });
+      mealLogStore.currentDateMealLog = currentDate.value;
       logger.info('Routing to search page with meal type:', mealType);
       router.push({ path: '/search' });
     };

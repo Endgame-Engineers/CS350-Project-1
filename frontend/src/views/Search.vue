@@ -127,7 +127,7 @@ export default {
         logger.info('Adding food item:', selectedFoodItem.value);
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
-        mealLog.dateadded = new Date();
+        mealLog.dateadded = useMealLogStore().currentDateMealLog;
         if(servingConsumed.value){
           mealLog.servingconsumed = servingConsumed.value;
         }
