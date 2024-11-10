@@ -1,6 +1,7 @@
 # Carbio - Nutrition Tracker
+[![Open in Coder](https://coder.galifrey.dev/open-in-coder.svg)](https://coder.galifrey.dev/templates/coder/DockerRepoClone/workspace?mode=manual&param.Git+repo+http+URL=https%3A%2F%2Fgithub.com%2FEndgame-Engineers%2FCS350-Project-1)
 ## Prereqs
-- Must have docker
+- Must have Docker (https://docs.docker.com/get-started/get-docker/)
 - Google Console API ClientID and ClientSecret (https://developers.google.com/workspace/guides/create-project)
 - Add callback to Google API: `http://localhost:3000/api/auth/google/callback`
 ## How to Run

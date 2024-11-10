@@ -9,6 +9,7 @@ export const useMealLogStore = defineStore('mealLog', {
       servingconsumed: 0,
     } as MealLog,
     selectedMealType: 'Breakfast' as MealType,
+    currentDateMealLog : new Date(),
   }),
 
   actions: {

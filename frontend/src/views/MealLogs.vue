@@ -265,7 +265,6 @@ export default defineComponent({
   },
    setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
-    const currentDate = ref(new Date());
     const mealLogStore = useMealLogStore();
     const selectedMealType = ref<MealType>(mealLogStore.getSelectedMealType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
@@ -308,13 +307,13 @@ export default defineComponent({
 
     const adjustDates = (days: number) => {
       logger.info('Adjusting dates by', days, 'days');
-      logger.info('Current date:', currentDate.value);
+      logger.info('Current date:', );
 
-      const newcurrentDate = new Date(currentDate.value);
+      const newcurrentDate = new Date(mealLogStore.currentDateMealLog);
       newcurrentDate.setDate(newcurrentDate.getDate() + days);
-      currentDate.value = newcurrentDate;
+      mealLogStore.currentDateMealLog = newcurrentDate;
 
-      logger.info('New date:', currentDate.value);
+      logger.info('New date:', mealLogStore.currentDateMealLog);
     };
 
     onMounted(async () => {
@@ -333,7 +332,7 @@ export default defineComponent({
       }
 
       logger.info('Fetching meal logs');
-      await updateMealLogs(currentDate.value);
+      await updateMealLogs(mealLogStore.currentDateMealLog);
     });
 
     const prettyDate = (date: Date) => {
@@ -342,14 +341,14 @@ export default defineComponent({
 
     const formattedCurrentDate = computed({
       get() {
-        if (!currentDate.value) {
+        if (!mealLogStore.currentDateMealLog) {
           return '';
         }
-        const date = new Date(currentDate.value);
+        const date = new Date(mealLogStore.currentDateMealLog);
         return date.toISOString().split('T')[0];
       },
       set(value: string) {
-        currentDate.value = new Date(value);
+        mealLogStore.currentDateMealLog = new Date(value);
       },
     });
 
@@ -376,9 +375,10 @@ export default defineComponent({
       );
     });
 
-    watch([currentDate], ([newcurrentDate]) => {
-      if (newcurrentDate) {
-        updateMealLogs(newcurrentDate);
+    watch(() => mealLogStore.currentDateMealLog,
+    (newDate) => {
+      if (newDate) {
+        updateMealLogs(newDate);
       }
     });
 
@@ -391,7 +391,7 @@ export default defineComponent({
     const confirmDelete = async () => {
       if (itemToDelete.value) {
         await deleteMealLog(itemToDelete.value.id);
-        updateMealLogs(currentDate.value);
+        updateMealLogs(mealLogStore.currentDateMealLog);
         itemToDelete.value = null;
       }
     };
@@ -411,12 +411,12 @@ export default defineComponent({
           barcode: 'water',
           mealtype: 'Water',
           servingconsumed: water.value ?? 0,
-          dateadded: currentDate.value,
+          dateadded: mealLogStore.currentDateMealLog,
         }
       );
 
       water.value = null;
-      updateMealLogs(currentDate.value);
+      updateMealLogs(mealLogStore.currentDateMealLog);
 
     };
 
@@ -437,7 +437,6 @@ export default defineComponent({
       routeToSearch,
       prettyDate,
       updateMealLogs,
-      currentDate,
       formattedCurrentDate,
       sortedMealLogs,
       filteredMealLogs,
