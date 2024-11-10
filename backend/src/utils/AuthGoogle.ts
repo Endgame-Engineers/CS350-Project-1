@@ -17,8 +17,6 @@ class AuthGoogle {
                 scope: [
                     'profile',
                     'email',
-                    'https://www.googleapis.com/auth/fitness.activity.read',
-                    'https://www.googleapis.com/auth/fitness.body.read'
                 ]
             },
             async (req, accessToken, refreshToken, profile, done) => {
@@ -30,11 +28,6 @@ class AuthGoogle {
                             if (user !== null) {
                                 console.log('User found in database');
                                 await Users.updateUserLastLogin(user.uuid);
-                                await Users.updateTokens({
-                                    id: user.id,
-                                    accesstoken: accessToken,
-                                    refreshtoken: refreshToken
-                                });
                                 user.profilepic = profile.photos ? profile.photos[0].value : '';
                                 if (user.id !== undefined) {
                                     user.profilecreated = await UserStats.getUserStats(user.id).then((userStats) => {
@@ -58,8 +51,6 @@ class AuthGoogle {
                                     providerid: profile.id,
                                     profilepic: profile.photos ? profile.photos[0].value : '',
                                     profilecreated: false,
-                                    accesstoken: accessToken,
-                                    refreshtoken: refreshToken
                                 };
                                 const createdUser = await Users.addUser(newUser);
                                 req.user = createdUser;

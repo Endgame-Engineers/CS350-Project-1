@@ -12,8 +12,6 @@ export interface User {
     providerid: string;
     profilepic: string;
     profilecreated: boolean;
-    accesstoken?: string;
-    refreshtoken?: string;
 }
 
 class Users {
@@ -51,13 +49,6 @@ class Users {
 
     async updateProfileCreated(uuid: string): Promise<void> {
         await (await this.client).query('UPDATE "Users" SET profilecreated = $1 WHERE uuid = $2', [true, uuid]);
-    }
-
-    async updateTokens(user: { id?: number; accesstoken: string; refreshtoken: string }): Promise<void> {
-        await (await this.client).query(
-            'UPDATE "Users" SET accesstoken = $1, refreshtoken = $2 WHERE id = $3',
-            [user.accesstoken, user.refreshtoken, user.id]
-        );
     }
 
     async updateUser(user: User): Promise<void> {

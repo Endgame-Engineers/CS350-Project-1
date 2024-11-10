@@ -25,8 +25,8 @@ class UserRoute {
         this.router.get('/user', isAuthenticated, (req, res) => {
             logger.info('/user GET');
             logger.info('User authenticated');
-            const { accesstoken, refreshtoken, ...userWithoutTokens } = req.user as User;
-            res.json(userWithoutTokens);
+            const user = req.user as User;
+            res.json(user);
         });
 
         this.router.get('/user/stats', isAuthenticated, (req, res) => {
