@@ -38,23 +38,6 @@ const adjustPercentages = (changedStat: PercentageKeys, newValue: number) => {
   showWarning.value = total !== 100;
   // Emit the validity state
   emit('update-validity', isValid.value);
-  let excess = total - 100;
-
-  if (excess > 0) {
-    const otherStats = (['proteinpercentage', 'fatpercentage', 'carbpercentage'] as PercentageKeys[]).filter(
-      (stat) => stat !== changedStat
-    );
-
-    for (const stat of otherStats) {
-      if (currentStats.value[stat] > excess) {
-        currentStats.value[stat] -= excess;
-        break;
-      } else {
-        excess -= currentStats.value[stat];
-        currentStats.value[stat] = 0;
-      }
-    }
-  }
 };
 
 // Watchers for changes in percentages
@@ -93,7 +76,7 @@ watch(
         </span>
         <span v-if="isEditing">100%</span>
       </div>
-      <input v-if="isEditing" type="range" step="5" min="1" max="100" class="form-control" id="proteinPercentage"
+      <input v-if="isEditing" type="range" step="5" min="0" max="100" class="form-control" id="proteinPercentage"
         v-model.number="currentStats.proteinpercentage" />
     </div>
 
@@ -108,7 +91,7 @@ watch(
         </span>
         <span v-if="isEditing">100%</span>
       </div>
-      <input v-if="isEditing" type="range" step="5" min="1" max="100" class="form-control" id="fatPercentage"
+      <input v-if="isEditing" type="range" step="5" min="0" max="100" class="form-control" id="fatPercentage"
         v-model.number="currentStats.fatpercentage" />
     </div>
 
@@ -123,7 +106,7 @@ watch(
         </span>
         <span v-if="isEditing">100%</span>
       </div>
-      <input v-if="isEditing" type="range" step="5" min="1" max="100" class="form-control" id="carbPercentage"
+      <input v-if="isEditing" type="range" step="5" min="0" max="100" class="form-control" id="carbPercentage"
         v-model.number="currentStats.carbpercentage" />
     </div>
   </div>
