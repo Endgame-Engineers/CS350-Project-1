@@ -25,6 +25,7 @@ class UserRoute {
         this.router.get('/user', isAuthenticated, (req, res) => {
             logger.info('/user GET');
             logger.info('User authenticated');
+            
             const user = req.user as User;
             res.json(user);
         });
