@@ -26,12 +26,12 @@ export default defineComponent({
 
       logs.forEach((log) => {
         if (log.foodItem && log.mealtype.toLowerCase() !== 'water') {
-          totals.value.calories += Math.round(log.foodItem.calories_per_serv * log.servingconsumed);
-          totals.value.carbs += Math.round(log.foodItem.carb_per_serv * log.servingconsumed);
-          totals.value.proteins += Math.round(log.foodItem.protein_per_serv * log.servingconsumed);
-          totals.value.fats += Math.round(log.foodItem.fat_per_serv * log.servingconsumed);
+          totals.value.calories += log.foodItem.calories_per_serv * log.servingconsumed;
+          totals.value.carbs += log.foodItem.carb_per_serv * log.servingconsumed;
+          totals.value.proteins += log.foodItem.protein_per_serv * log.servingconsumed;
+          totals.value.fats += log.foodItem.fat_per_serv * log.servingconsumed;
         } else if (log.mealtype.toLowerCase() === 'water') {
-          totals.value.water += Math.round(log.servingconsumed);
+          totals.value.water += log.servingconsumed;
         }
       });
     };
@@ -111,15 +111,14 @@ export default defineComponent({
     </div>
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
-      <circle-percentage :progress="Math.round((totals.water / 128) * 100)" size=8 title="Water" />
-      <circle-percentage :progress="Math.round(totals.calories / (userStats.caloriegoal ? userStats.caloriegoal -
-        totals.calories : 0) * 100)" size=8 title="Calories" />
-      <circle-percentage :progress="Math.round((totals.carbs / (totals.carbs + totals.proteins + totals.fats)) * 100)"
+      <circle-percentage :progress="((totals.water / 128) * 100).toFixed(0)" size=8 title="Water" />
+      <circle-percentage :progress="(totals.calories / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)" size=8 title="Calories" />
+      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)"
         size=8 title="Carbs" />
       <circle-percentage
-        :progress="Math.round((totals.proteins / (totals.carbs + totals.proteins + totals.fats)) * 100)" size="8"
+        :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size="8"
         title="Proteins" />
-      <circle-percentage :progress="Math.round((totals.fats / (totals.carbs + totals.proteins + totals.fats)) * 100)"
+      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)"
         size=8 title="Fats" />
     </div>
     <template v-if="mealLogs.length > 0">
