@@ -22,34 +22,31 @@
         <div class="d-flex gap-2 justify-content-center flex-wrap flex-md-nowrap">
           <button type="button" class="btn"
             :class="selectedLogType === 'Breakfast' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedLogType = 'Breakfast'">
+            @click="filterLogs('Breakfast')">
             <font-awesome-icon icon="coffee" class="me-2" /> Breakfast
           </button>
-          <button type="button" class="btn"
-            :class="selectedLogType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedLogType = 'Lunch'">
+          <button type="button" class="btn" :class="selectedLogType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
+            @click="filterLogs('Lunch')">
             <font-awesome-icon icon="hamburger" class="me-2" /> Lunch
           </button>
           <button type="button" class="btn"
-            :class="selectedLogType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedLogType = 'Dinner'">
+            :class="selectedLogType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'" @click="filterLogs('Dinner')">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
-          <button type="button" class="btn"
-            :class="selectedLogType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedLogType = 'Snack'">
+          <button type="button" class="btn" :class="selectedLogType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
+            @click="filterLogs('Snack')">
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>
           <button type="button" class="btn"
             :class="selectedLogType === 'Activity' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="selectedLogType = 'Activity'">
+            @click="filterLogs('Activity')">
             <font-awesome-icon icon="line-chart" class="me-2" /> Activity
           </button>
         </div>
         <div class="input-group">
           <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
             aria-expanded="false">
-            <font-awesome-icon :icon="['fas', 'ellipsis-v']" />
+            <font-awesome-icon :icon="['fas', 'droplet']" />
           </button>
           <ul class="dropdown-menu">
             <template v-if="filteredWaterLogs.length === 0">
@@ -108,7 +105,8 @@
               " class="me-2" />
             {{ selectedLogType }}
           </h3>
-          <button @click="routeToSearch(selectedLogType)" class="btn btn-primary" v-if="selectedLogType !== 'Activity'">
+          <button @click="routeToSearch(selectedLogType, currentDate)" class="btn btn-primary"
+            v-if="selectedLogType !== 'Activity'">
             <font-awesome-icon :icon="['fas', 'plus']" /> Add Meal
           </button>
           <button @click="logActivity()" class="btn btn-primary" v-else>
@@ -117,8 +115,8 @@
         </div>
 
         <!-- Totals -->
-        <div class="card-body" v-if="selectedLogType !== 'Activity'">
-          <div class="row text-center mb-3">
+        <div class="card-body">
+          <div class="row text-center mb-3" v-if="selectedLogType !== 'Activity'">
             <div class="col-6 col-md-3">
               <h5>Total Calories</h5>
               <p>{{ computeTotals(selectedLogType).calories.toFixed(1) }} kcal</p>
@@ -137,10 +135,9 @@
             </div>
           </div>
 
-          <!-- Meal Logs -->
-          <div class="row">
-            <div v-for="item in filteredMealLogs" :key="item.barcode + item.dateadded"
-              class="col-12 col-md-6 col-lg-4 mb-4">
+          <!-- Logs -->
+          <div v-for="item in filteredLogs" :key="item.dateadded" class="col-12 col-md-6 col-lg-4 mb-4">
+            <template v-if="item.mealtype">
               <div v-if="item.foodItem" class="card h-100">
                 <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
                   style="height: 200px; object-fit: cover;" />
@@ -175,45 +172,50 @@
                     <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
                   </div>
                 </div>
-
               </div>
-            </div>
+            </template>
+            <template v-else>
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.activity }}</h5>
+                </div>
+              </div>
+            </template>
+          </div>
+          <!-- No Meals Message -->
+          <div v-if="filteredLogs.length === 0" class="col-12">
+            <p>No logs for {{ selectedLogType }} during this period.</p>
+          </div>
 
-            <!-- No Meals Message -->
-            <div v-if="filteredMealLogs.length === 0" class="col-12 text-center my-3">
-              <p>No meals logged for {{ selectedLogType }} during this period.</p>
-            </div>
+          <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+            aria-hidden="true" ref="confirmDeleteModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                  <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
+                    aria-label="Close">
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <template v-if="itemToDelete?.foodItem">
+                    <p>Are you sure you want to remove "{{ itemToDelete.foodItem.foodname }}" from your meal log?
+                    </p>
+                    <img :src="itemToDelete.foodItem.image" :alt="itemToDelete.foodItem.foodname"
+                      style="height: 200px; object-fit: cover;" />
+                  </template>
+                  <template v-else>
+                    <p>Are you sure you want to remove this water log from your meal log?</p>
+                  </template>
+                </div>
 
-            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
-              aria-hidden="true" ref="confirmDeleteModal">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
-                    <button type="button" class="btn-close" @click="cancelDelete" data-bs-dismiss="modal"
-                      aria-label="Close">
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <template v-if="itemToDelete?.foodItem">
-                      <p>Are you sure you want to remove "{{ itemToDelete.foodItem.foodname }}" from your meal log?
-                      </p>
-                      <img :src="itemToDelete.foodItem.image" :alt="itemToDelete.foodItem.foodname"
-                        style="height: 200px; object-fit: cover;" />
-                    </template>
-                    <template v-else>
-                      <p>Are you sure you want to remove this water log from your meal log?</p>
-                    </template>
-                  </div>
-
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">
-                      Cancel
-                    </button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">
-                      Confirm
-                    </button>
-                  </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">
+                    Cancel
+                  </button>
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">
+                    Confirm
+                  </button>
                 </div>
               </div>
             </div>
@@ -226,12 +228,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, watch } from 'vue';
-import { ExtendedMealLog, MealType } from '@/models/Models';
+import { ExtendedMealLog, MealType, ActivityLog } from '@/models/Models';
 import router from '@/router';
 import { useLogStore } from '@/stores/Log';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
+import { getActivityLogs } from '@/services/ActivityLogs';
 
 export default defineComponent({
   name: 'UserLogs',
@@ -251,7 +254,7 @@ export default defineComponent({
         }
       };
 
-      this.mealLogs.forEach((item) => {
+      this.mealLogs.forEach((item: ExtendedMealLog) => {
         if (item.mealtype.toLowerCase() === 'water') {
           totals.day.water += item.servingconsumed;
         }
@@ -276,18 +279,20 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
+    const activityLogs = ref<ActivityLog[]>([]);
     const currentDate = ref(new Date());
-    const mealLogStore = useLogStore();
-    const selectedLogType = ref<string>(mealLogStore.getSelectedLogType());
+    const userLogStore = useLogStore();
+    const selectedLogType = ref<string>(userLogStore.getSelectedLogType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
-
-    const routeToSearch = (logType: string) => {
+    const filteredLogs = ref<ExtendedMealLog[] | ActivityLog[]>([]);
+    const routeToSearch = (logType: string, start: Date) => {
       logger.info('Adding Meal Type to meal log store');
-      mealLogStore.setMealLog({
+      userLogStore.setMealLog({
         barcode: '',
         mealtype: logType as MealType,
         servingconsumed: 0,
+        dateadded: start,
       });
       logger.info('Routing to search page with meal type:', logType);
       router.push({ path: '/search' });
@@ -295,10 +300,15 @@ export default defineComponent({
 
     const updateMealLogs = async (start: Date) => {
       const response = (await getMealLogs(start, start)) as ExtendedMealLog[];
-      mealLogs.value = response.map((item) => ({
+      mealLogs.value = response.map((item: ExtendedMealLog) => ({
         ...item,
         dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
       }));
+    };
+
+    const updateActivityLogs = async (start: Date) => {
+      const response = (await getActivityLogs(start, start)) as ActivityLog[];
+      activityLogs.value = response;
     };
 
     const adjustDates = (days: number) => {
@@ -313,8 +323,8 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      const mealLogStore = useLogStore();
-      const existingMealLog = mealLogStore.getMealLog();
+      const userLogStore = useLogStore();
+      const existingMealLog = userLogStore.getMealLog();
       if (
         existingMealLog.barcode !== '' &&
         existingMealLog.dateadded !== undefined &&
@@ -324,11 +334,14 @@ export default defineComponent({
         await addMealLog(existingMealLog);
         logger.info('Added existing meal log to meal logs');
         logger.info('Clearing existing meal log');
-        mealLogStore.clearMealLog();
+        userLogStore.clearMealLog();
       }
 
       logger.info('Fetching meal logs');
       await updateMealLogs(currentDate.value);
+
+      logger.info('Fetching activity logs');
+      await updateActivityLogs(currentDate.value);
     });
 
     const prettyDate = (date: Date) => {
@@ -352,28 +365,34 @@ export default defineComponent({
       return mealLogs.value
         .slice()
         .sort(
-          (a, b) =>
+          (a: ExtendedMealLog, b: ExtendedMealLog) =>
             new Date(b.dateadded ?? 0).getTime() -
             new Date(a.dateadded ?? 0).getTime()
         );
     });
 
-    const filteredMealLogs = computed(() => {
-      mealLogStore.setSelectedLogType(selectedLogType.value);
+    const filteredWaterLogs = computed(() => {
       return sortedMealLogs.value.filter(
-        (item) => item.mealtype === selectedLogType.value
+        (item: ExtendedMealLog) => item.mealtype.toLowerCase() === 'water'
       );
     });
 
-    const filteredWaterLogs = computed(() => {
-      return sortedMealLogs.value.filter(
-        (item) => item.mealtype.toLowerCase() === 'water'
-      );
-    });
+    const filterLogs = (logType: string) => {
+      logger.info('Filtering logs by:', selectedLogType.value);
+      selectedLogType.value = logType;
+      if (selectedLogType.value === 'Activity') {
+        filteredLogs.value = activityLogs.value;
+      } else {
+        filteredLogs.value = sortedMealLogs.value.filter(
+          (item: ExtendedMealLog) => item.mealtype === selectedLogType.value
+        );
+      }
+    };
 
     watch([currentDate], ([newcurrentDate]) => {
       if (newcurrentDate) {
         updateMealLogs(newcurrentDate);
+        updateActivityLogs(newcurrentDate);
       }
     });
 
@@ -427,7 +446,7 @@ export default defineComponent({
       currentDate,
       formattedCurrentDate,
       sortedMealLogs,
-      filteredMealLogs,
+      filteredLogs,
       selectedLogType,
       removeItem,
       adjustDates,
@@ -439,6 +458,7 @@ export default defineComponent({
       cancelDelete,
       confirmDelete,
       logActivity,
+      filterLogs,
     };
   },
 });

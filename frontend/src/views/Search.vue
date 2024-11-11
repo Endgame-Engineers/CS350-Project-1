@@ -127,7 +127,7 @@ export default {
         logger.info('Adding food item:', selectedFoodItem.value);
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
-        mealLog.dateadded = new Date();
+        mealLog.dateadded = useLogStore().getMealLog().dateadded;
         if(servingConsumed.value){
           mealLog.servingconsumed = servingConsumed.value;
         }
@@ -135,7 +135,7 @@ export default {
         useLogStore().setMealLog(mealLog);
 
         logger.info('Navigating to meal logs page');
-        router.push({ path: '/meallogs' });
+        router.push({ path: '/logs' });
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
         if (modal) {

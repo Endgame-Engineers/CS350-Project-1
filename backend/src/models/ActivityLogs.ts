@@ -4,9 +4,8 @@ import { logger } from "../utils/Logging";
 export interface ActivityLog {
     dateadded: Date;
     userid: number;
-    caloruiesburned: number;
-    steps: number;
-    heartrate: number;
+    activityid: number;
+    durationminutes: number;
 }
 
 class ActivityLogs {
@@ -43,8 +42,8 @@ class ActivityLogs {
     async addActivityLog(ActivityLog: ActivityLog): Promise<void> {
         logger.info('Adding health log to database');
         await (await this.client).query(
-            'INSERT INTO "ActivityLogs" (dateadded, userid, caloriesburned, steps, heartrate) VALUES ($1, $2, $3, $4, $5)',
-            [ActivityLog.dateadded, ActivityLog.userid, ActivityLog.caloruiesburned, ActivityLog.steps, ActivityLog.heartrate]
+            'INSERT INTO "ActivityLogs" (dateadded, userid, activityid, durationminutes) VALUES ($1, $2, $3, $4)',
+            [ActivityLog.dateadded, ActivityLog.userid, ActivityLog.activityid, ActivityLog.durationminutes]
         );
         logger.info('Health log added to database');
     }
