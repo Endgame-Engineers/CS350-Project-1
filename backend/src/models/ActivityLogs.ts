@@ -1,7 +1,7 @@
 import ConnectToDB from "../utils/ConnectToDB";
 import { logger } from "../utils/Logging";
 
-export interface HealthLog {
+export interface ActivityLog {
     dateadded: Date;
     userid: number;
     caloruiesburned: number;
@@ -9,7 +9,7 @@ export interface HealthLog {
     heartrate: number;
 }
 
-class HealthLogs {
+class ActivityLogs {
     private client: any;
 
     constructor() {
@@ -17,9 +17,9 @@ class HealthLogs {
     }
 
 
-    async getHealthLogs(userid: number, start?: Date, end?: Date): Promise<any> {
+    async getActivityLogs(userid: number, start?: Date, end?: Date): Promise<any> {
         logger.info('Fetching health logs from database');
-        let query = 'SELECT * FROM "HealthLogs" WHERE userid = $1';
+        let query = 'SELECT * FROM "ActivityLogs" WHERE userid = $1';
         const params: any[] = [userid];
 
         if (start && end) {
@@ -40,23 +40,30 @@ class HealthLogs {
         return result.rows;
     }
 
-    async addHealthLog(healthLog: HealthLog): Promise<void> {
+    async addActivityLog(ActivityLog: ActivityLog): Promise<void> {
         logger.info('Adding health log to database');
         await (await this.client).query(
-            'INSERT INTO "HealthLogs" (dateadded, userid, caloriesburned, steps, heartrate) VALUES ($1, $2, $3, $4, $5)',
-            [healthLog.dateadded, healthLog.userid, healthLog.caloruiesburned, healthLog.steps, healthLog.heartrate]
+            'INSERT INTO "ActivityLogs" (dateadded, userid, caloriesburned, steps, heartrate) VALUES ($1, $2, $3, $4, $5)',
+            [ActivityLog.dateadded, ActivityLog.userid, ActivityLog.caloruiesburned, ActivityLog.steps, ActivityLog.heartrate]
         );
         logger.info('Health log added to database');
     }
 
-    async deleteHealthLog(userid: number, dateadded: Date): Promise<void> {
+    async deleteActivityLog(userid: number, dateadded: Date): Promise<void> {
         logger.info('Deleting health log from database');
         await (await this.client).query(
-            'DELETE FROM "HealthLogs" WHERE userid = $1 AND dateadded = $2',
+            'DELETE FROM "ActivityLogs" WHERE userid = $1 AND dateadded = $2',
             [userid, dateadded]
         );
         logger.info('Health log deleted from database');
     }
+
+    async getActivities(): Promise<any> {
+        logger.info('Fetching activities from database');
+        const result = await (await this.client).query('SELECT * FROM "Activities"');
+        logger.info('Returning activities');
+        return result.rows;
+    }
 }
 
-export default new HealthLogs();
+export default new ActivityLogs();

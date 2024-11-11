@@ -2,7 +2,7 @@ import e, { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
-import HealthLogs, { HealthLog } from '../models/ActivityLogs';
+import ActivityLogs, { ActivityLog } from '../models/ActivityLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
@@ -230,6 +230,51 @@ class UserRoute {
                     .then((mealLog) => {
                         logger.info('Meal log deleted');
                         res.json(mealLog);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.get('/user/activity', isAuthenticated, (req, res) => {
+            logger.info('/user/activity GET');
+            const { start, end } = req.query;
+            const startDate = start ? new Date(start as string) : undefined;
+            const endDate = end ? new Date(end as string) : undefined;
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+                ActivityLogs.getActivityLogs(user.id, startDate, endDate)
+                    .then((activityLogs) => {
+                        logger.info('Activity logs retrieved');
+                        res.json(activityLogs);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.get('/user/activities', isAuthenticated, (req, res) => {
+            logger.info('/user/activities GET');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+                ActivityLogs.getActivities()
+                    .then((activities) => {
+                        logger.info('Activities retrieved');
+                        res.json(activities);
                     })
                     .catch((error) => {
                         logger.error(error);

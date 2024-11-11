@@ -78,3 +78,14 @@ export const activityLogSchema = `
         PRIMARY KEY ("id")
     );
 `;
+
+export const activitiesSchema = `
+    CREATE SEQUENCE IF NOT EXISTS "Activities_id_seq";
+    CREATE TABLE IF NOT EXISTS "Activities" (
+        "id" int4 NOT NULL DEFAULT nextval('"Activities_id_seq"'::regclass),
+        "activity" varchar,
+        "intensity" varchar,
+        "MET" float8,
+        PRIMARY KEY ("id"),
+    );
+`;
