@@ -69,7 +69,7 @@ watch(
     <div class="col-12 col-md-4 mb-3">
       <label for="proteinPercentage" class="form-label"><strong>Protein Percentage</strong></label>
       <div class="d-flex justify-content-between">
-        <span v-if="isEditing">1%</span>
+        <span v-if="isEditing">0%</span>
         <span v-if="isEditing">{{ currentStats.proteinpercentage }}%</span>
         <span v-if="!isEditing" class="display-6 text-center">
           {{ currentStats.proteinpercentage }}%
@@ -84,7 +84,7 @@ watch(
     <div class="col-12 col-md-4 mb-3">
       <label for="fatPercentage" class="form-label"><strong>Fat Percentage</strong></label>
       <div class="d-flex justify-content-between">
-        <span v-if="isEditing">1%</span>
+        <span v-if="isEditing">0%</span>
         <span v-if="isEditing">{{ currentStats.fatpercentage }}%</span>
         <span v-if="!isEditing" class="display-6 text-center">
           {{ currentStats.fatpercentage }}%
@@ -99,7 +99,7 @@ watch(
     <div class="col-12 col-md-4 mb-3">
       <label for="carbPercentage" class="form-label"><strong>Carb Percentage</strong></label>
       <div class="d-flex justify-content-between">
-        <span v-if="isEditing">1%</span>
+        <span v-if="isEditing">0%</span>
         <span v-if="isEditing">{{ currentStats.carbpercentage }}%</span>
         <span v-if="!isEditing" class="display-6 text-center">
           {{ currentStats.carbpercentage }}%
