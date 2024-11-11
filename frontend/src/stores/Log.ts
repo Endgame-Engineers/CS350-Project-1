@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
 import { MealLog, MealType } from '../models/Models';
 
-export const useMealLogStore = defineStore('mealLog', {
+export const useLogStore = defineStore('mealLog', {
   state: () => ({
     mealLog: {
       mealtype: 'Breakfast' as MealType, // Default to a valid MealType
       barcode: '',
       servingconsumed: 0,
     } as MealLog,
-    selectedMealType: 'Breakfast' as MealType,
+    selectedType: 'Breakfast' as string, // Default to a valid MealType
   }),
 
   actions: {
@@ -29,12 +29,12 @@ export const useMealLogStore = defineStore('mealLog', {
       } as MealLog;
     },
 
-    setSelectedMealType(mealType: MealType) {
-      this.selectedMealType = mealType;
+    setSelectedLogType(selectedType: string) {
+      this.selectedType = selectedType;
     },
 
-    getSelectedMealType() {
-      return this.selectedMealType;
+    getSelectedLogType() {
+      return this.selectedType;
     },
   },
 });

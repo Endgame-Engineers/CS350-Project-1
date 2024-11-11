@@ -43,8 +43,8 @@
             <router-link to="/history" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'chart-line']" />
             </router-link>
-            <router-link to="/meallogs" class="btn btn-outline-primary me-2" type="button">
-              <font-awesome-icon :icon="['fas', 'utensils']" />
+            <router-link to="/logs" class="btn btn-outline-primary me-2" type="button">
+              <font-awesome-icon :icon="['fas', 'book']" />
             </router-link>
             <router-link to="/profile" class="btn btn-outline-primary me-2" type="button">
               <font-awesome-icon :icon="['fas', 'user']" />
