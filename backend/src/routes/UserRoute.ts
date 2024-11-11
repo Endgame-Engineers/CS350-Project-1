@@ -2,7 +2,7 @@ import e, { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
-import ActivityLogs, { ActivityLog } from '../models/ActivityLogs';
+import ActivityLogs, { ActivityLog, Activity } from '../models/ActivityLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
@@ -11,6 +11,10 @@ import { logger } from '../utils/Logging';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
+}
+
+interface ExtendedActivityLog extends ActivityLog {
+    activity: Activity;
 }
 
 class UserRoute {
@@ -253,7 +257,17 @@ class UserRoute {
                 ActivityLogs.getActivityLogs(user.id, startDate, endDate)
                     .then((activityLogs) => {
                         logger.info('Activity logs retrieved');
-                        res.json(activityLogs);
+                        const activityLogPromises = activityLogs.map(async (activityLog: ExtendedActivityLog) => {
+                            logger.info('Retrieving activity');
+                            const activity = await ActivityLogs.getActivity(activityLog.activityid);
+                            if (activity) {
+                                logger.info('Activity retrieved');
+                                logger.info('Mapping activity logs');
+                                logger.info(activity);
+                                activityLog.activity = activity;
+                            }
+                            res.json(activityLogs);
+                        });
                     })
                     .catch((error) => {
                         logger.error(error);

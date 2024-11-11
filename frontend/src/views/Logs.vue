@@ -177,7 +177,12 @@
             <template v-else>
               <div class="card h-100">
                 <div class="card-body">
-                  <h5 class="card-title">{{ item.activity }}</h5>
+                  <h5 class="card-title">{{ item.activity.activity }}</h5>
+                  <ul class="list-group">
+                    <li class="list-group">
+                      Duration: {{ item.durationminutes }} minutes
+                    </li>
+                  </ul>          
                 </div>
               </div>
             </template>

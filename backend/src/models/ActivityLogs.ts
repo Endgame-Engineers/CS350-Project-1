@@ -8,6 +8,12 @@ export interface ActivityLog {
     durationminutes: number;
 }
 
+export interface Activity {
+    activity: string;
+    MET: number;
+    description: string;
+}
+
 class ActivityLogs {
     private client: any;
 
@@ -62,6 +68,13 @@ class ActivityLogs {
         const result = await (await this.client).query('SELECT * FROM "Activities"');
         logger.info('Returning activities');
         return result.rows;
+    }
+
+    async getActivity(activityid: number): Promise<any> {
+        logger.info('Fetching activity from database');
+        const result = await (await this.client).query('SELECT * FROM "Activities" WHERE id = $1', [activityid]);
+        logger.info('Returning activity');
+        return result.rows[0];
     }
 }
 
