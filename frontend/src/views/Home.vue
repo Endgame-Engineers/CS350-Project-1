@@ -112,27 +112,26 @@ export default defineComponent({
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
       <circle-percentage :progress="((totals.water / 128) * 100).toFixed(0)" size=8 title="Water" />
-      <circle-percentage :progress="(totals.calories / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)" size=8 title="Calories" />
-      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)"
-        size=8 title="Carbs" />
       <circle-percentage
-        :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size="8"
+        :progress="(totals.calories / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)"
+        size=8 title="Calories" />
+      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)" size=8 title="Carbs" />
+      <circle-percentage :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size="8"
         title="Proteins" />
-      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)"
-        size=8 title="Fats" />
+      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)" size=8 title="Fats" />
     </div>
     <template v-if="mealLogs.length > 0">
-      <h2 class="text-center">Recently Consumed Food Items</h2>
+      <h2 v-if="mealLogs.filter(log => log.mealtype.toLowerCase() !== 'water').length > 0" class="text-center">Recently Consumed Food Items</h2>
       <div id="mealCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-          <div v-for="(log, index) in mealLogs" :key="log.id" :class="['carousel-item', { active: index === 0 }]">
-            <img :src="log.foodItem?.image" class="d-block w-100" alt="Food Image"
-              style="height: 300px; object-fit: cover;">
-            <div class="carousel-caption d-none d-md-block text-white">
-              <h5>{{ log.foodItem?.foodname }}</h5>
-              <p>{{ log.mealtype }}</p>
-              <p>Comsumed at: {{ new Date(log.dateadded ?? 0).toLocaleString() }}</p>
-            </div>
+          <div v-for="(log, index) in mealLogs.filter(log => log.mealtype.toLowerCase() !== 'water')" :key="log.id" :class="['carousel-item', { active: index === 0 }]">
+              <img :src="log.foodItem?.image" class="d-block w-100" alt="Food Image"
+                style="height: 300px; object-fit: cover;">
+              <div class="carousel-caption d-none d-md-block text-white">
+                <h5>{{ log.foodItem?.foodname }}</h5>
+                <p>{{ log.mealtype }}</p>
+                <p>Comsumed at: {{ new Date(log.dateadded ?? 0).toLocaleString() }}</p>
+              </div>
           </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#mealCarousel" data-bs-slide="prev">
