@@ -265,25 +265,28 @@ class UserRoute {
             }
         });
 
-        this.router.get('/user/activities', isAuthenticated, (req, res) => {
+        //TODO: add isAuthenticated, back.
+        this.router.get('/user/activities', (req, res) => {
             logger.info('/user/activities GET');
-            const user = req.user as User;
 
-            if (user.id) {
-                logger.info('User authenticated');
-                ActivityLogs.getActivities()
-                    .then((activities) => {
-                        logger.info('Activities retrieved');
-                        res.json(activities);
-                    })
-                    .catch((error) => {
-                        logger.error(error);
-                        res.status(500).json({ error: 'An error occurred' });
-                    });
-            } else {
-                logger.error('User not authenticated');
-                res.status(400).json({ error: 'User not authenticated' });
-            }
+            //TODO: add back to if statement.
+            ActivityLogs.getActivities()
+            .then((activities) => {
+                logger.info('Activities retrieved');
+                res.json(activities);
+            })
+            .catch((error) => {
+                logger.error(error);
+                res.status(500).json({ error: 'An error occurred' });
+            });
+
+            // const user = req.user as User;
+            // if (user.id) {
+            //     logger.info('User authenticated');
+            // } else {
+            //     logger.error('User not authenticated');
+            //     res.status(400).json({ error: 'User not authenticated' });
+            // }
         });
     }
 }

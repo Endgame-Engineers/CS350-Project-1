@@ -73,7 +73,7 @@ export const activityLogSchema = `
         "id" int4 NOT NULL DEFAULT nextval('"ActivityLogs_id_seq"'::regclass),
         "dateadded" timestamptz,
         "userid" int8,
-        "activityname" varchar,
+        "activityid" int8,
         "durationminutes" int4,
         PRIMARY KEY ("id")
     );
@@ -84,7 +84,7 @@ export const activitiesSchema = `
     CREATE TABLE IF NOT EXISTS "Activities" (
         "id" int4 NOT NULL DEFAULT nextval('"Activities_id_seq"'::regclass),
         "activity" varchar,
-        "intensity" varchar,
+        "description" varchar,
         "MET" float8,
         PRIMARY KEY ("id"),
     );
