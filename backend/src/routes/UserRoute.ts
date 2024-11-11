@@ -247,7 +247,7 @@ class UserRoute {
             }
         });
 
-        this.router.get('/user/activity', isAuthenticated, (req, res) => {
+        this.router.get('/user/activity', isAuthenticated, async (req, res) => {
             logger.info('/user/activity GET');
             const { start, end } = req.query;
             const startDate = start ? new Date(start as string) : undefined;
@@ -257,25 +257,28 @@ class UserRoute {
             if (user.id) {
                 logger.info('User authenticated');
                 ActivityLogs.getActivityLogs(user.id, startDate, endDate)
-                    .then((activityLogs) => {
+                    .then((activityLogs: ExtendedActivityLog[]) => {
                         logger.info('Activity logs retrieved');
                         const activityLogPromises = activityLogs.map(async (activityLog: ExtendedActivityLog) => {
                             logger.info('Retrieving activity');
                             const activity = await ActivityLogs.getActivity(activityLog.activityid);
                             if (activity) {
                                 logger.info('Activity retrieved');
-                                logger.info('Mapping activity logs');
-                                logger.info(activity);
-                                activityLog.activity = activity;
 
                                 const mostRecentUserStat = await UserStats.getUserStat(user.id as number);
                                 const calculatedActivity = new CalculateActivityLogs(activityLog, activity, mostRecentUserStat);
-                                logger.info('Calculating calories burned');
-                                activityLog.caloriesburned = calculatedActivity.calculateCaloriesBurned();
-
+                                const caloriesBurned = calculatedActivity.calculateCaloriesBurned();
+                                logger.info('Mapping activity logs');
+                                activityLog.activity = activity;
+                                activityLog.caloriesburned = caloriesBurned;
                             }
-                            res.json(activityLogs);
+                            return activityLog;
                         });
+                        return Promise.all(activityLogPromises);
+                    })
+                    .then((mappedActivityLogs) => {
+                        logger.info('Returning activity logs');
+                        res.json(mappedActivityLogs);
                     })
                     .catch((error) => {
                         logger.error(error);
@@ -285,6 +288,41 @@ class UserRoute {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
             }
+        });
+
+        this.router.post('/user/activity', isAuthenticated, (req, res) => {
+            logger.info('/user/activity POST');
+            const user = req.user as User;
+
+            if (!user.id) {
+                logger.error('User not authenticated');
+                return res.status(400).json({ error: 'User not authenticated' });
+            }
+
+            if (!req.body.activityid || !req.body.durationminutes) {
+                logger.error('All fields are required');
+                return res.status(400).json({ error: 'All fields are required' });
+            }
+
+            if(req.body.durationminutes < 0) {
+                logger.error('Duration must be greater than 0');
+                return res.status(400).json({ error: 'Duration must be greater than 0' });
+            }
+
+            if(!ActivityLogs.doesActivityExist(req.body.activityid)) {
+                logger.error('Activity does not exist');
+                return res.status(400).json({ error: 'Activity does not exist' });
+            }
+
+            ActivityLogs.addActivityLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() })
+                .then((activityLog) => {
+                    logger.info('Activity log created');
+                    res.status(201).json(activityLog);
+                })
+                .catch((error) => {
+                    logger.error(error);
+                    res.status(500).json({ error: 'An error occurred' });
+                });
         });
         
         this.router.get('/user/activities', isAuthenticated, (req, res) => {

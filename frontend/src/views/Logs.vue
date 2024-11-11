@@ -22,24 +22,25 @@
         <div class="d-flex gap-2 justify-content-center flex-wrap flex-md-nowrap">
           <button type="button" class="btn"
             :class="selectedLogType === 'Breakfast' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="filterLogs('Breakfast')">
+            @click="selectedLogType = 'Breakfast'">
             <font-awesome-icon icon="coffee" class="me-2" /> Breakfast
           </button>
           <button type="button" class="btn" :class="selectedLogType === 'Lunch' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="filterLogs('Lunch')">
+            @click="selectedLogType = 'Lunch'">
             <font-awesome-icon icon="hamburger" class="me-2" /> Lunch
           </button>
           <button type="button" class="btn"
-            :class="selectedLogType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'" @click="filterLogs('Dinner')">
+            :class="selectedLogType === 'Dinner' ? 'btn-primary' : 'btn-outline-primary'"
+            @click="selectedLogType = 'Dinner'">
             <font-awesome-icon icon="drumstick-bite" class="me-2" /> Dinner
           </button>
           <button type="button" class="btn" :class="selectedLogType === 'Snack' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="filterLogs('Snack')">
+            @click="selectedLogType = 'Snack'">
             <font-awesome-icon icon="cookie-bite" class="me-2" /> Snacks
           </button>
           <button type="button" class="btn"
             :class="selectedLogType === 'Activity' ? 'btn-primary' : 'btn-outline-primary'"
-            @click="filterLogs('Activity')">
+            @click="selectedLogType = 'Activity'">
             <font-awesome-icon icon="line-chart" class="me-2" /> Activity
           </button>
         </div>
@@ -116,27 +117,41 @@
 
         <!-- Totals -->
         <div class="card-body">
-          <div class="row text-center mb-3" v-if="selectedLogType !== 'Activity'">
-            <div class="col-6 col-md-3">
-              <h5>Total Calories</h5>
-              <p>{{ computeTotals(selectedLogType).calories.toFixed(1) }} kcal</p>
+          <template v-if="selectedLogType !== 'Activity'">
+            <div class="row text-center mb-3">
+              <div class="col-6 col-md-3">
+                <h5>Total Calories</h5>
+                <p>{{ computeTotals(selectedLogType).calories.toFixed(1) }} kcal</p>
+              </div>
+              <div class="col-6 col-md-3">
+                <h5>Total Protein</h5>
+                <p>{{ computeTotals(selectedLogType).protein.toFixed(1) }} g</p>
+              </div>
+              <div class="col-6 col-md-3">
+                <h5>Total Carbs</h5>
+                <p>{{ computeTotals(selectedLogType).carbs.toFixed(1) }} g</p>
+              </div>
+              <div class="col-6 col-md-3">
+                <h5>Total Fat</h5>
+                <p>{{ computeTotals(selectedLogType).fat.toFixed(1) }} g</p>
+              </div>
             </div>
-            <div class="col-6 col-md-3">
-              <h5>Total Protein</h5>
-              <p>{{ computeTotals(selectedLogType).protein.toFixed(1) }} g</p>
+          </template>
+          <template v-else>
+            <div class="row text-center mb-3">
+              <div class="col-6 col-md-3">
+                <h5>Total Duration</h5>
+                <p>{{ computeTotals('Activity').durationminutes.toFixed(1) }} minutes</p>
+              </div>
+              <div class="col-6 col-md-3">
+                <h5>Total Calories Burned</h5>
+                <p>{{ computeTotals('Activity').caloriesburned.toFixed(1) }} kcal</p>
+              </div>
             </div>
-            <div class="col-6 col-md-3">
-              <h5>Total Carbs</h5>
-              <p>{{ computeTotals(selectedLogType).carbs.toFixed(1) }} g</p>
-            </div>
-            <div class="col-6 col-md-3">
-              <h5>Total Fat</h5>
-              <p>{{ computeTotals(selectedLogType).fat.toFixed(1) }} g</p>
-            </div>
-          </div>
+          </template>
 
           <!-- Logs -->
-          <div v-for="item in filteredLogs" :key="item.dateadded" class="col-12 col-md-6 col-lg-4 mb-4">
+          <div v-for="item in filteredLogs" :key="item.id" class="col-12 col-md-6 col-lg-4 mb-3">
             <template v-if="item.mealtype">
               <div v-if="item.foodItem" class="card h-100">
                 <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
@@ -182,7 +197,7 @@
                     <li class="list-group">
                       Duration: {{ item.durationminutes }} minutes
                     </li>
-                  </ul>          
+                  </ul>
                 </div>
               </div>
             </template>
@@ -256,30 +271,45 @@ export default defineComponent({
           carbs: 0,
           fat: 0,
           water: 0,
-        }
+        },
+        caloriesburned: 0,
+        durationminutes: 0.0,
       };
 
-      this.mealLogs.forEach((item: ExtendedMealLog) => {
-        if (item.mealtype.toLowerCase() === 'water') {
-          totals.day.water += item.servingconsumed;
-        }
+      if (mealType !== 'Activity') {
+        logger.info('Computing totals for meal logs');
 
-        if (item.foodItem && item.mealtype.toLowerCase() !== 'water') {
-          totals.day.calories += item.foodItem.calories_per_serv * item.servingconsumed;
-          totals.day.protein += item.foodItem.protein_per_serv * item.servingconsumed;
-          totals.day.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
-          totals.day.fat += item.foodItem.fat_per_serv * item.servingconsumed;
-        }
+        this.mealLogs.forEach((item: ExtendedMealLog) => {
+          if (item.mealtype.toLowerCase() === 'water') {
+            totals.day.water += item.servingconsumed;
+          }
 
-        if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
-          totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
-          totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
-          totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
-          totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
-        }
-      });
+          if (item.foodItem && item.mealtype.toLowerCase() !== 'water') {
+            totals.day.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+            totals.day.protein += item.foodItem.protein_per_serv * item.servingconsumed;
+            totals.day.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+            totals.day.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+          }
 
-      return totals;
+          if (item.foodItem && item.mealtype.toLowerCase() === mealType.toLowerCase()) {
+            totals.calories += item.foodItem.calories_per_serv * item.servingconsumed;
+            totals.protein += item.foodItem.protein_per_serv * item.servingconsumed;
+            totals.carbs += item.foodItem.carb_per_serv * item.servingconsumed;
+            totals.fat += item.foodItem.fat_per_serv * item.servingconsumed;
+          }
+        });
+
+        return totals;
+      } else {
+        logger.info('Computing totals for activity logs');
+
+        this.activityLogs.forEach((item) => {
+          totals.caloriesburned += item.caloriesburned;
+          totals.durationminutes += item.durationminutes;
+        });
+
+        return totals;
+      }
     },
   },
   setup() {
@@ -290,7 +320,6 @@ export default defineComponent({
     const selectedLogType = ref<string>(userLogStore.getSelectedLogType());
     const itemToDelete = ref<ExtendedMealLog | null>(null);
     const water = ref<number | null>(null);
-    const filteredLogs = ref<ExtendedMealLog[] | ActivityLog[]>([]);
     const routeToSearch = (logType: string, start: Date) => {
       logger.info('Adding Meal Type to meal log store');
       userLogStore.setMealLog({
@@ -303,16 +332,15 @@ export default defineComponent({
       router.push({ path: '/search' });
     };
 
-    const updateMealLogs = async (start: Date) => {
-      const response = (await getMealLogs(start, start)) as ExtendedMealLog[];
+    const updateLogs = async (start: Date) => {
+      logger.info('Updating logs for date:', start);
+      let response = (await getMealLogs(start, start)) as ExtendedMealLog[];
       mealLogs.value = response.map((item: ExtendedMealLog) => ({
         ...item,
         dateadded: item.dateadded ? new Date(item.dateadded) : undefined,
       }));
-    };
 
-    const updateActivityLogs = async (start: Date) => {
-      const response = (await getActivityLogs(start, start)) as ActivityLog[];
+      response = (await getActivityLogs(start, start)) as ActivityLog[];
       activityLogs.value = response;
     };
 
@@ -336,17 +364,15 @@ export default defineComponent({
         existingMealLog.servingconsumed !== 0
       ) {
         logger.info('Adding existing meal log to meal logs:', existingMealLog);
+
         await addMealLog(existingMealLog);
         logger.info('Added existing meal log to meal logs');
         logger.info('Clearing existing meal log');
+
         userLogStore.clearMealLog();
       }
 
-      logger.info('Fetching meal logs');
-      await updateMealLogs(currentDate.value);
-
-      logger.info('Fetching activity logs');
-      await updateActivityLogs(currentDate.value);
+      await updateLogs(currentDate.value);
     });
 
     const prettyDate = (date: Date) => {
@@ -366,38 +392,26 @@ export default defineComponent({
       },
     });
 
-    const sortedMealLogs = computed(() => {
-      return mealLogs.value
-        .slice()
-        .sort(
-          (a: ExtendedMealLog, b: ExtendedMealLog) =>
-            new Date(b.dateadded ?? 0).getTime() -
-            new Date(a.dateadded ?? 0).getTime()
-        );
-    });
-
     const filteredWaterLogs = computed(() => {
-      return sortedMealLogs.value.filter(
+      return mealLogs.value.filter(
         (item: ExtendedMealLog) => item.mealtype.toLowerCase() === 'water'
       );
     });
 
-    const filterLogs = (logType: string) => {
-      logger.info('Filtering logs by:', selectedLogType.value);
-      selectedLogType.value = logType;
+    const filteredLogs = computed(() => {
+      userLogStore.setSelectedLogType(selectedLogType.value);
+      logger.info('Filtering logs by selected log type:', selectedLogType.value);
       if (selectedLogType.value === 'Activity') {
-        filteredLogs.value = activityLogs.value;
-      } else {
-        filteredLogs.value = sortedMealLogs.value.filter(
-          (item: ExtendedMealLog) => item.mealtype === selectedLogType.value
-        );
+        return activityLogs.value
       }
-    };
+      return mealLogs.value.filter(
+        (item: ExtendedMealLog) => item.mealtype.toLowerCase() === selectedLogType.value.toLowerCase()
+      );
+    });
 
     watch([currentDate], ([newcurrentDate]) => {
       if (newcurrentDate) {
-        updateMealLogs(newcurrentDate);
-        updateActivityLogs(newcurrentDate);
+        updateLogs(newcurrentDate);
       }
     });
 
@@ -410,7 +424,7 @@ export default defineComponent({
     const confirmDelete = async () => {
       if (itemToDelete.value) {
         await deleteMealLog(itemToDelete.value.id);
-        updateMealLogs(currentDate.value);
+        updateLogs(currentDate.value);
         itemToDelete.value = null;
       }
     };
@@ -435,7 +449,7 @@ export default defineComponent({
       );
 
       water.value = null;
-      updateMealLogs(currentDate.value);
+      updateLogs(currentDate.value);
 
     };
 
@@ -445,12 +459,12 @@ export default defineComponent({
 
     return {
       mealLogs,
+      activityLogs,
       routeToSearch,
       prettyDate,
-      updateMealLogs,
+      updateLogs,
       currentDate,
       formattedCurrentDate,
-      sortedMealLogs,
       filteredLogs,
       selectedLogType,
       removeItem,
@@ -463,7 +477,6 @@ export default defineComponent({
       cancelDelete,
       confirmDelete,
       logActivity,
-      filterLogs,
     };
   },
 });

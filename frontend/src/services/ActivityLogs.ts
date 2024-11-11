@@ -17,7 +17,12 @@ export async function getActivityLogs(start?: Date, end?: Date): Promise<Activit
             }
         });
         logger.info('Meal logs retrieved');
-        return response.data;
+        return response.data
+            .sort(
+                (a: ActivityLog, b: ActivityLog) =>
+                    new Date(b.dateadded ?? 0).getTime() -
+                    new Date(a.dateadded ?? 0).getTime()
+            );
     } catch (error) {
         logger.error('Error getting meal logs', error);
         throw new Error("Could not get meal logs.");

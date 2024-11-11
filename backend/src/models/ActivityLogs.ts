@@ -76,6 +76,13 @@ class ActivityLogs {
         logger.info('Returning activity');
         return result.rows[0];
     }
+
+    async doesActivityExist(activityid: number): Promise<boolean> {
+        logger.info('Checking if activity exists in database');
+        const result = await (await this.client).query('SELECT * FROM "Activities" WHERE id = $1', [activityid]);
+        logger.info('Returning if activity exists');
+        return result.rowCount > 0;
+    }
 }
 
 export default new ActivityLogs();
