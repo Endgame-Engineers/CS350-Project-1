@@ -145,4 +145,8 @@ export class CalculateUserStats {
                 return this.stats.tdee;
         }
     }
+
+    public getWeightKgs(): number {
+        return this.stats.weightkgs;
+    }
 }

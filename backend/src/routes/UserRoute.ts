@@ -8,6 +8,7 @@ import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';
 import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { logger } from '../utils/Logging';
+import { CalculateActivityLogs } from '../utils/CalculateActivityStats';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
@@ -15,6 +16,7 @@ interface ExtendedMealLog extends MealLog {
 
 interface ExtendedActivityLog extends ActivityLog {
     activity: Activity;
+    caloriesburned: number;
 }
 
 class UserRoute {
@@ -265,6 +267,12 @@ class UserRoute {
                                 logger.info('Mapping activity logs');
                                 logger.info(activity);
                                 activityLog.activity = activity;
+
+                                const mostRecentUserStat = await UserStats.getUserStat(user.id as number);
+                                const calculatedActivity = new CalculateActivityLogs(activityLog, activity, mostRecentUserStat);
+                                logger.info('Calculating calories burned');
+                                activityLog.caloriesburned = calculatedActivity.calculateCaloriesBurned();
+
                             }
                             res.json(activityLogs);
                         });
