@@ -75,14 +75,18 @@
           <!-- Days Stats -->
           <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
             title="Water" />
-          <circle-percentage :progress="(((computeTotals('all').day.calories) / 2000) * (100)).toFixed(0)" size="8"
-            title="Calories" />
-          <circle-percentage :progress="(((computeTotals('all').day.carbs) / 300) * (100)).toFixed(0)" size="8"
-            title="Carbs" />
-          <circle-percentage :progress="(((computeTotals('all').day.protein) / 50) * (100)).toFixed(0)" size="8"
-            title="Proteins" />
-          <circle-percentage :progress="(((computeTotals('all').day.fat) / 70) * (100)).toFixed(0)" size="8"
-            title="Fats" />
+          <circle-percentage
+            :progress="(((computeTotals('all').day.calories - computeTotals('all').caloriesburned)) / (userStatValue?.caloriegoal ?? 1) * 100).toFixed(0)"
+            size="8" title="Calories" />
+          <circle-percentage
+            :progress="(((computeTotals('all').day.carbs) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
+            ∏size="8" title="Carbs" />
+          <circle-percentage
+            :progress="(((computeTotals('all').day.protein) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
+            size="8" title="Proteins" />
+          <circle-percentage
+            :progress="(((computeTotals('all').day.fat) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
+            size="8" title="Fats" />
         </div>
       </div>
     </div>
@@ -240,6 +244,21 @@
               </div>
             </div>
           </div>
+
+
+          <div class="modal fade" id="addActivityLog" tabindex="-1" aria-labelledby="addActivityLogLabel"
+            aria-hidden="true" ref="addActivityLog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addActivityLogLabel">Add Activity Log</h5>
+                  <dropdown v-model="selectedActivity" :options="activityOptions" />
+
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -252,6 +271,7 @@ import { ExtendedMealLog, MealType, ActivityLog } from '@/models/Models';
 import router from '@/router';
 import { useLogStore } from '@/stores/Log';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
+import { getUserStat } from '@/services/UserStats';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
 import { getActivityLogs } from '@/services/ActivityLogs';
@@ -299,6 +319,11 @@ export default defineComponent({
           }
         });
 
+        if (mealType === 'all') {
+          totals.caloriesburned = this.computeTotals('Activity').caloriesburned;
+          totals.durationminutes = this.computeTotals('Activity').durationminutes;
+        }
+
         return totals;
       } else {
         logger.info('Computing totals for activity logs');
@@ -314,6 +339,7 @@ export default defineComponent({
   },
   setup() {
     const mealLogs = ref<ExtendedMealLog[]>([]);
+    const userStatValue = ref<UserStat | null>(null);
     const activityLogs = ref<ActivityLog[]>([]);
     const currentDate = ref(new Date());
     const userLogStore = useLogStore();
@@ -342,6 +368,11 @@ export default defineComponent({
 
       response = (await getActivityLogs(start, start)) as ActivityLog[];
       activityLogs.value = response;
+    };
+
+    const updateUserStat = async () => {
+      logger.info('Fetching user stats');
+      userStatValue.value = await getUserStat() as UserStat;
     };
 
     const adjustDates = (days: number) => {
@@ -373,6 +404,9 @@ export default defineComponent({
       }
 
       await updateLogs(currentDate.value);
+
+      logger.info('Fetching user stats');
+      await updateUserStat();
     });
 
     const prettyDate = (date: Date) => {
@@ -477,6 +511,7 @@ export default defineComponent({
       cancelDelete,
       confirmDelete,
       logActivity,
+      userStatValue,
     };
   },
 });

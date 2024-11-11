@@ -136,8 +136,7 @@ export default defineComponent({
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
       <circle-percentage :progress="Math.round((totals.water / 128) * 100)" size=8 title="Water" />
-      <circle-percentage :progress="Math.round((totals.calories - totals.caloriesburned) / (userStats.caloriegoal ? userStats.caloriegoal -
-        totals.calories : 0) * 100)" size=8 title="Calories" />
+      <circle-percentage :progress="Math.round((totals.calories - totals.caloriesburned) / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)" size=8 title="Calories" />
       <circle-percentage :progress="Math.round((totals.carbs / (totals.carbs + totals.proteins + totals.fats)) * 100)"
         size=8 title="Carbs" />
       <circle-percentage
