@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { config } from 'dotenv';
-import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema, healthLogSchema } from '../models/tableSchema';
+import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema, activityLogSchema } from '../models/tableSchema';
 import { logger } from './Logging';
 
 config();
@@ -15,7 +15,7 @@ class ConnectToDB {
      * Connect to the database
      */
     constructor() {
-        console.log('Connecting to the database');
+        logger.info('Connecting to the database');
         this.client = new Client({
             user: process.env.DB_USERNAME,
             host: process.env.DB_HOST,
@@ -25,21 +25,21 @@ class ConnectToDB {
         });
         this.client.connect((err) => {
             if (err) {
-                console.error('Failed to connect to the database:', err);
+                logger.error('Failed to connect to the database:', err);
             } else {
-                console.log('Successfully connected to the database');
+                logger.info('Connected to the database');
                 // list all found tables
                 const tablesToCreate = [
                     { name: 'Users', schema: userSchema },
                     { name: 'UserStats', schema: userStatsSchema },
                     { name: 'MealLogs', schema: mealLogSchema },
                     { name: 'FoodItems', schema: foodItemSchema },
-                    { name: 'HealthLogs', schema: healthLogSchema }
+                    { name: 'ActivityLogs', schema: activityLogSchema },
                 ];
 
                 this.client.query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' ORDER BY table_name;', (err, res) => {
                     if (err) {
-                        console.error('Failed to list tables:', err);
+                        logger.error('Failed to list tables:', err);
                     } else {
                         const existingTables = res.rows.map(row => row.table_name);
 
@@ -47,15 +47,16 @@ class ConnectToDB {
                             if (!existingTables.includes(table.name)) {
                                 try {
                                     this.createTable(table.schema);
+                                    logger.info(`Created table ${table.name}`);
                                 } catch (error) {
-                                    console.error(`Failed to create table ${table.name}:`, error);
+                                    logger.error(`Failed to create table ${table.name}:`, error);
                                 }
                             }
                         });
 
-                        console.log('Found tables:');
+                        logger.info('Tables found in the database:');
                         res.rows.forEach((row) => {
-                            console.log(row.table_name);
+                            logger.info(row.table_name);
                         });
                     }
                 });
@@ -64,7 +65,7 @@ class ConnectToDB {
             tablesToCreate.forEach(table => {
                 this.client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = '${table.name}'`, (err, res) => {
                     if (err) {
-                        console.error(`Failed to list columns for table ${table.name}:`, err);
+                        logger.error(`Failed to list columns for table ${table.name}:`, err);
                     } else {
                         const existingColumns = res.rows.map(row => row.column_name);
 
@@ -75,7 +76,7 @@ class ConnectToDB {
 
                         schemaColumns.forEach(column => {
                             if (!existingColumns.includes(column) && !columnsToIgnore.includes(column)) {
-                                console.error(`Column ${column} is missing from table ${table.name}`);
+                                logger.error(`Column ${column} is missing from table ${table.name}`);
 
                                 const columnMatch = table.schema.match(new RegExp(`"${column}"[^,]+`));
                                 const columnDefinition = columnMatch ? columnMatch[0] : '';
@@ -83,22 +84,22 @@ class ConnectToDB {
 
                                 this.client.query(columnQuery, (err, res) => {
                                     if (err) {
-                                        console.error(`Failed to add column ${column} to table ${table.name}:`, err);
+                                        logger.error(`Failed to add column ${column} to table ${table.name}:`, err);
                                     } else {
-                                        console.log(`Added column ${column} to table ${table.name}`);
+                                        logger.info(`Added column ${column} to table ${table.name}`);
                                     }
                                 });
                             }
 
                             if(existingColumns.includes(column) && columnsToIgnore.includes(column)) {
-                                console.error(`Column ${column} is not in the schema for table ${table.name}`);
+                                logger.error(`Column ${column} is not needed in table ${table.name}`);
 
                                 const columnQuery = `ALTER TABLE "${table.name}" DROP COLUMN ${column}`;
                                 this.client.query(columnQuery, (err, res) => {
                                     if (err) {
-                                        console.error(`Failed to drop column ${column} from table ${table.name}:`, err);
+                                        logger.error(`Failed to drop column ${column} from table ${table.name}:`, err);
                                     } else {
-                                        console.log(`Dropped column ${column} from table ${table.name}`);
+                                        logger.info(`Dropped column ${column} from table ${table.name}`);
                                     }
                                 });
                             }
@@ -113,9 +114,9 @@ class ConnectToDB {
     createTable(schema: string): void {
         this.client.query(schema, (err, res) => {
             if (err) {
-                console.error('Failed to create table:', err);
+                logger.error('Failed to create table:', err);
             } else {
-                console.log('Table created successfully');
+                logger.info('Table created');
             }
         });
     }
@@ -134,7 +135,7 @@ class ConnectToDB {
      */
     async disconnect(): Promise<void> {
         await this.client.end();
-        console.log('Disconnected from the database');
+        logger.info('Disconnected from the database');
     }
 }
 

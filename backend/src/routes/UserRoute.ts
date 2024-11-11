@@ -2,7 +2,7 @@ import e, { Router } from 'express';
 import { User } from '../models/Users';
 import MealLogs, { MealLog } from '../models/MealLogs';
 import UserStats, { UserStat } from '../models/UserStats';
-import HealthLogs, { HealthLog } from '../models/HealthLogs';
+import HealthLogs, { HealthLog } from '../models/ActivityLogs';
 import { isAuthenticated } from '../utils/AuthGoogle';
 import { CalculateUserStats } from '../utils/CalculateUserStats';
 import FoodItems, { FoodItem } from '../models/FoodItems';

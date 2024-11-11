@@ -67,15 +67,14 @@ export const userStatsSchema = `
     );
 `;
 
-export const healthLogSchema = `
-    CREATE SEQUENCE IF NOT EXISTS "HealthLogs_id_seq";
-    CREATE TABLE IF NOT EXISTS "HealthLogs" (
-        "id" int4 NOT NULL DEFAULT nextval('"HealthLogs_id_seq"'::regclass),
+export const activityLogSchema = `
+    CREATE SEQUENCE IF NOT EXISTS "ActivityLogs_id_seq";
+    CREATE TABLE IF NOT EXISTS "ActivityLogs" (
+        "id" int4 NOT NULL DEFAULT nextval('"ActivityLogs_id_seq"'::regclass),
         "dateadded" timestamptz,
         "userid" int8,
-        "caloriesburned" float8,
-        "steps" int4,
-        "heartrate" int4,
+        "activityname" varchar,
+        "durationminutes" int4,
         PRIMARY KEY ("id")
     );
 `;
