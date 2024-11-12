@@ -8,6 +8,8 @@ import {
 } from '@/services/UserStats';
 import UserStatsPercentages from '@/components/UserStatsPercentages.vue';
 
+
+//TODO: add setting to toggle subtracting exercise calories from daily goal
 export default defineComponent({
   name: 'ProfilePage',
   components: {
