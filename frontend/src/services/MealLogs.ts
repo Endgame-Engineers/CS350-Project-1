@@ -17,7 +17,12 @@ export async function getMealLogs(start?: Date, end?: Date): Promise<MealLog[]> 
             }
         });
         logger.info('Meal logs retrieved');
-        return response.data;
+        return response.data
+            .sort(
+                (a: MealLog, b: MealLog) =>
+                    new Date(b.dateadded ?? 0).getTime() -
+                    new Date(a.dateadded ?? 0).getTime()
+            );
     } catch (error) {
         logger.error('Error getting meal logs', error);
         throw new Error("Could not get meal logs.");

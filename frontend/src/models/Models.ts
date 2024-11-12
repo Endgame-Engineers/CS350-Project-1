@@ -64,3 +64,10 @@ export interface ExtendedMealLog extends MealLog {
   id: number;
   foodItem?: FoodItem;
 }
+
+export interface ActivityLog {
+  dateadded: Date;
+  userid: number;
+  activityid: number;
+  durationminutes: number;
+}

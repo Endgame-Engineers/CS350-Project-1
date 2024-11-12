@@ -38,6 +38,8 @@ export const userSchema = `
         "lastlogin" timestamptz,
         "providername" varchar,
         "providerid" varchar,
+        "accesstoken" varchar,
+        "refreshtoken" varchar,
         PRIMARY KEY ("id")
     );
 `;
@@ -62,5 +64,28 @@ export const userStatsSchema = `
         "activitylevel" int2,
         "goal" int2,
         PRIMARY KEY ("id")
+    );
+`;
+
+export const activityLogSchema = `
+    CREATE SEQUENCE IF NOT EXISTS "ActivityLogs_id_seq";
+    CREATE TABLE IF NOT EXISTS "ActivityLogs" (
+        "id" int4 NOT NULL DEFAULT nextval('"ActivityLogs_id_seq"'::regclass),
+        "dateadded" timestamptz,
+        "userid" int8,
+        "activityid" int8,
+        "durationminutes" int4,
+        PRIMARY KEY ("id")
+    );
+`;
+
+export const activitiesSchema = `
+    CREATE SEQUENCE IF NOT EXISTS "Activities_id_seq";
+    CREATE TABLE IF NOT EXISTS "Activities" (
+        "id" int4 NOT NULL DEFAULT nextval('"Activities_id_seq"'::regclass),
+        "activity" varchar,
+        "description" varchar,
+        "MET" float8,
+        PRIMARY KEY ("id"),
     );
 `;

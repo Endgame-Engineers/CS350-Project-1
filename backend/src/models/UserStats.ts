@@ -31,6 +31,12 @@ class UserStats {
         return result.rows;
     }
 
+    async getUserStat(id: number): Promise<UserStat> {
+        const query = 'SELECT * FROM "UserStats" WHERE userid = $1 ORDER BY updatedon DESC LIMIT 1';
+        const result = await (await this.client).query(query, [id]);
+        return result.rows[0];
+    }
+
     async addUserStats(userStats: UserStat, userid: number): Promise<boolean> {
         if (userStats !== undefined && userStats !== null) {
             // Check if macronutrient percentages add up to 100%

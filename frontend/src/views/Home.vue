@@ -2,8 +2,9 @@
 import { defineComponent, ref } from 'vue';
 import { useUserStore } from '@/stores/User';
 import { getUserStat, userStats } from '@/services/UserStats';
+import { getActivityLogs } from '@/services/ActivityLogs';
 import { getMealLogs } from '@/services/MealLogs';
-import { ExtendedMealLog, UserStat } from '@/models/Models';
+import { ExtendedMealLog, UserStat, ActivityLog } from '@/types';
 
 export default defineComponent({
   name: 'HomePage',
@@ -17,6 +18,7 @@ export default defineComponent({
       proteins: 0,
       fats: 0,
       water: 0,
+      caloriesburned: 0,
     });
 
     const fetchMealLogs = async () => {
@@ -51,6 +53,21 @@ export default defineComponent({
     };
 
     fetchUserStats();
+
+
+    const fetchActivityLogs = async () => {
+      try {
+        const logs = await getActivityLogs(new Date(), new Date()) as ActivityLog[];
+
+        logs.forEach((log) => {
+          totals.value.caloriesburned += log.caloriesburned;
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchActivityLogs();
 
     const chartData = ref<{
       labels: string[];
@@ -92,7 +109,7 @@ export default defineComponent({
 <template>
   <div class="container">
     <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex flex-column justify-content-center align-items-center">
       <div v-if="userStats.caloriegoal !== null && totals.calories > userStats.caloriegoal" class="alert alert-danger"
         role="alert">
         You have consumed <i>{{ totals.calories }}</i> calories today, which is more than your daily goal of
@@ -107,6 +124,9 @@ export default defineComponent({
         You have consumed <i>{{ totals.calories }}</i> calories today and have <i>{{ userStats.caloriegoal ?
           userStats.caloriegoal -
           totals.calories : 0 }}</i> calories left to consume.
+      </div>
+      <div v-if="totals.caloriesburned > 0" class="alert alert-info" role="alert">
+        You have burned <i>{{ totals.caloriesburned.toFixed(0) }}</i> calories today.
       </div>
     </div>
     <h2 class="text-center">Today's Progress</h2>

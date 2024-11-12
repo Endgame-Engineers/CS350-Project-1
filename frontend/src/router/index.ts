@@ -8,7 +8,7 @@ import Profile from '@/views/Profile.vue';
 import welcomescreen from '@/views/WelcomeScreen.vue';
 import { createPinia } from 'pinia';
 import { useUserStore } from '@/stores/User';
-import MealLogs from '../views/MealLogs.vue';
+import UserLogs from '@/views/Logs.vue';
 
 const pinia = createPinia();
 const userStore = useUserStore(pinia);
@@ -31,9 +31,9 @@ const routes = [
     component: history,
   },
   {
-    path: '/meallogs',
-    name: 'MealLogs',
-    component: MealLogs,
+    path: '/logs',
+    name: 'UserLogs',
+    component: UserLogs
   },
   {
     path: '/barscanner',

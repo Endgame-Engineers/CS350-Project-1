@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { FoodItem, SearchResult, MealLog, MealType } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
-import { useMealLogStore } from '@/stores/MealLog';
+import { useLogStore } from '@/stores/Log';
 import router from '@/router';
 import * as bootstrap from 'bootstrap';
 import { logger } from '@/services/Logger';
@@ -30,17 +30,17 @@ export default {
     const invalidSearch = ref(false);
 
     logger.info('Checking if Mealog store container mealtype');
-    const mealType = ref(useMealLogStore().getMealLog().mealtype);
+    const mealType = ref(useLogStore().getMealLog().mealtype);
 
     function containValidCharacters(str: string) {
       const alphanumericMatches = str.match(/[a-zA-Z0-9]/g) || [];
       const alphanumericRatio = alphanumericMatches.length / str.length;
-      console.log(alphanumericRatio);
+      logger.info('Alphanumeric ratio:', alphanumericRatio);
       if (alphanumericRatio < .5) {
         invalidSearch.value = true;
         return true;
       }
-      console.log('VALUEEEE', invalidSearch.value);
+      logger.info('No special characters found in search bar');
       return false;
     }
 
@@ -127,15 +127,15 @@ export default {
         logger.info('Adding food item:', selectedFoodItem.value);
         mealLog.barcode = selectedFoodItem.value.barcode;
         mealLog.mealtype = mealType.value || '';
-        mealLog.dateadded = useMealLogStore().currentDateMealLog;
+        mealLog.dateadded = useLogStore().getMealLog().dateadded;
         if(servingConsumed.value){
           mealLog.servingconsumed = servingConsumed.value;
         }
         logger.info('Adding meal log to store:', mealLog);
-        useMealLogStore().setMealLog(mealLog);
+        useLogStore().setMealLog(mealLog);
 
         logger.info('Navigating to meal logs page');
-        router.push({ path: '/meallogs' });
+        router.push({ path: '/logs' });
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
         if (modal) {

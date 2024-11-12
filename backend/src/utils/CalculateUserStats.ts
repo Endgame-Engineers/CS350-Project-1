@@ -146,6 +146,10 @@ export class CalculateUserStats {
         }
     }
 
+    public getWeightKgs(): number {
+        return this.stats.weightkgs;
+    }
+
     public calculateProteinGoal(): number {
         return this.stats.caloriegoal * (this.stats.proteinpercentage / 100) / 4;
     }
