@@ -4,7 +4,7 @@ import { useUserStore } from '@/stores/User';
 import { getUserStat, userStats } from '@/services/UserStats';
 import { getActivityLogs } from '@/services/ActivityLogs';
 import { getMealLogs } from '@/services/MealLogs';
-import { ExtendedMealLog, UserStat, ActivityLog } from '@/types';
+import { ExtendedMealLog, UserStat, ActivityLog } from '@/models/Models';
 
 export default defineComponent({
   name: 'HomePage',
@@ -60,7 +60,9 @@ export default defineComponent({
         const logs = await getActivityLogs(new Date(), new Date()) as ActivityLog[];
 
         logs.forEach((log) => {
-          totals.value.caloriesburned += log.caloriesburned;
+          if (log.caloriesburned !== undefined) {
+            totals.value.caloriesburned += log.caloriesburned;
+          }
         });
       } catch (error) {
         console.error(error);

@@ -66,8 +66,18 @@ export interface ExtendedMealLog extends MealLog {
 }
 
 export interface ActivityLog {
+  id?: number;
   dateadded: Date;
   userid: number;
   activityid: number;
   durationminutes: number;
+  activity?: Activity;
+  caloriesburned?: number;
+}
+
+export interface Activity {
+  id?: number;
+  activity: string;
+  MET: number;
+  description: string;
 }
