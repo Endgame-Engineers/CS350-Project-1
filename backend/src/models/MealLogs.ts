@@ -12,6 +12,7 @@ export interface MealLog {
 }
 
 function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
+    // Also add recipe types here for when I add recipes
     const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water'];
     return mealTypes.includes(mealLog.mealtype) && mealLog.servingconsumed > 0;
 }

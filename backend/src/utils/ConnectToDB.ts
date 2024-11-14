@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { config } from 'dotenv';
-import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema, activityLogSchema, activitiesSchema } from '../models/tableSchema';
+import { userStatsSchema, userSchema, mealLogSchema, foodItemSchema, activityLogSchema, activitiesSchema, recipeSchema } from '../models/tableSchema';
 import { logger } from './Logging';
 
 config();
@@ -35,7 +35,8 @@ class ConnectToDB {
                     { name: 'MealLogs', schema: mealLogSchema },
                     { name: 'FoodItems', schema: foodItemSchema },
                     { name: 'ActivityLogs', schema: activityLogSchema },
-                    { name: 'Activities', schema: activitiesSchema }
+                    { name: 'Activities', schema: activitiesSchema },
+                    { name: 'Recipes', schema: recipeSchema }
                 ];
 
                 this.client.query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' ORDER BY table_name;', (err, res) => {

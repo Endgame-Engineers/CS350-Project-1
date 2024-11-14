@@ -89,3 +89,16 @@ export const activitiesSchema = `
         PRIMARY KEY ("id"),
     );
 `;
+
+// ingredients will be a JSON 0bject with barcode as key and servings as the value
+export const recipeSchema = `
+    CREATE SEQUENCE IF NOT EXISTS "Recipes_id_seq";
+    CREATE TABLE IF NOT EXISTS "Recipes" (
+        "id" int4 NOT NULL DEFAULT nextval('"Recipes_id_seq"'::regclass),
+        "name" varchar,
+        "userid" int8,
+        "ingredients" jsonb,
+        "servings" int4,
+        PRIMARY KEY ("id")
+    );
+`;
