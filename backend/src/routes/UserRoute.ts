@@ -9,6 +9,7 @@ import FoodItems, { FoodItem } from '../models/FoodItems';
 import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { logger } from '../utils/Logging';
 import { CalculateActivityLogs } from '../utils/CalculateActivityStats';
+import Recipes from '../models/Recipes';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
@@ -31,7 +32,7 @@ class UserRoute {
         this.router.get('/user', isAuthenticated, (req, res) => {
             logger.info('/user GET');
             logger.info('User authenticated');
-            
+
             const user = req.user as User;
             res.json(user);
         });
@@ -307,12 +308,12 @@ class UserRoute {
                 return res.status(400).json({ error: 'All fields are required' });
             }
 
-            if(req.body.durationminutes < 0) {
+            if (req.body.durationminutes < 0) {
                 logger.error('Duration must be greater than 0');
                 return res.status(400).json({ error: 'Duration must be greater than 0' });
             }
 
-            if(!ActivityLogs.doesActivityExist(req.body.activityid)) {
+            if (!ActivityLogs.doesActivityExist(req.body.activityid)) {
                 logger.error('Activity does not exist');
                 return res.status(400).json({ error: 'Activity does not exist' });
             }
@@ -327,7 +328,7 @@ class UserRoute {
                     res.status(500).json({ error: 'An error occurred' });
                 });
         });
-        
+
         this.router.get('/user/activities', isAuthenticated, (req, res) => {
             logger.info('/user/activities GET');
             const user = req.user as User;
@@ -348,7 +349,50 @@ class UserRoute {
                 res.status(400).json({ error: 'User not authenticated' });
             }
         });
+
+        this.router.post('/user/recipes', isAuthenticated, (req, res) => {
+            logger.info('/user/recipes POST');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+
+                Recipes.addRecipe({ ...req.body, userid: user.id})
+                .then((Recipe) => {
+                    logger.info('Recipe created');
+                    res.status(201).json(Recipe);
+                })
+                .catch((error) => {
+                    logger.error(error);
+                    res.status(500).json({ error: 'An error occurred' });
+                });
+
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.get('/user/recipes', isAuthenticated, (req, res) => {
+            logger.info('/user/recipes GET');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated for recipes');
+                Recipes.getRecipes(user.id)
+                    .then((recipes) => {
+                        logger.info('Recipes retrieved');
+                        res.json(recipes);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
     }
 }
-
 export default new UserRoute().router;
