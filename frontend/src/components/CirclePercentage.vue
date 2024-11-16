@@ -9,7 +9,7 @@
             <path v-if="props.progress > 0" class="circle" :stroke-dasharray="props.progress + ', 100'" d="M18 2.0845
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <text x="18" y="18" class="percentage">{{ props.progress || 0 }}%</text>
+            <text x="18" y="18" class="percentage">{{ isNaN(props.progress) ? 0 : props.progress }}%</text>
             <text v-if="props.title" x="18" y="22" class="circle-title">{{ props.title }}</text>
         </svg> 
     </div>
