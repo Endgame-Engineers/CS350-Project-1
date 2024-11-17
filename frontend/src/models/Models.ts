@@ -81,3 +81,21 @@ export interface Activity {
   MET: number;
   description: string;
 }
+
+export interface Recipe {
+  id?: number;
+  userid: number;
+  name: string;
+  ingredients: { [barcode: string]: number };
+  servings: number;
+  dateadded: Date;
+  lastupdated: Date;
+  protein_per_serv: number;
+  carb_per_serv: number;
+  fat_per_serv: number;
+  calories_per_serv: number;
+  total_protein: number;
+  total_carbs: number;
+  total_fat: number;
+  total_calories: number;
+}
