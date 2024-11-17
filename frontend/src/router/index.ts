@@ -9,6 +9,7 @@ import welcomescreen from '@/views/WelcomeScreen.vue';
 import { createPinia } from 'pinia';
 import { useUserStore } from '@/stores/User';
 import UserLogs from '@/views/Logs.vue';
+import Recipe from '@/views/CreateRecipe.vue';
 
 const pinia = createPinia();
 const userStore = useUserStore(pinia);
@@ -63,6 +64,11 @@ const routes = [
         next();
       }
     }
+  },
+  {
+    path: '/recipe',
+    name: 'CreateRecipe',
+    component: Recipe,
   }
 ];
 
