@@ -6,6 +6,16 @@ export interface Recipe {
     name: string;
     ingredients: string;
     servings: number;
+    dateadded?: Date;
+    lastupdated?: Date;
+    protein_per_serv?: number;
+    carb_per_serv?: number;
+    fat_per_serv?: number;
+    calories_per_serv?: number;
+    total_protein?: number;
+    total_carbs?: number;
+    total_fat?: number;
+    total_calories?: number;
 }
 
 class Recipes {
@@ -27,20 +37,25 @@ class Recipes {
         return result.rows;
     }
 
-    async addRecipe(Recipe: Recipe): Promise<void> {
+    async addRecipe(recipe: Recipe): Promise<void> {
         logger.info('Adding recipe to database');
         await (await this.client).query(
-            'INSERT INTO "Recipes" (userid, name, ingredients, servings) VALUES ($1, $2, $3, $4)',
-            [Recipe.userid, Recipe.name, Recipe.ingredients, Recipe.servings]
+            `INSERT INTO "Recipes" (userid, name, ingredients, servings, dateadded, lastupdated, protein_per_serv, carb_per_serv, fat_per_serv, calories_per_serv, total_protein, total_carbs, total_fat, total_calories) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+            [
+                recipe.userid, recipe.name, recipe.ingredients, recipe.servings, recipe.dateadded, recipe.lastupdated,
+                recipe.protein_per_serv, recipe.carb_per_serv, recipe.fat_per_serv, recipe.calories_per_serv,
+                recipe.total_protein, recipe.total_carbs, recipe.total_fat, recipe.total_calories
+            ]
         );
         logger.info('Recipe added to database');
     }
 
-    async deleteRecipe(Recipe: Recipe): Promise<void> {
+    async deleteRecipe(recipe: Recipe): Promise<void> {
         logger.info('Deleting recipe from database');
         await (await this.client).query(
             'DELETE FROM "Recipes" WHERE userid = $1 AND name = $2',
-            [Recipe.userid, Recipe.name]
+            [recipe.userid, recipe.name]
         );
         logger.info('Recipe deleted from database');
     }

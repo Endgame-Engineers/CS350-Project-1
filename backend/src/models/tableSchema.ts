@@ -99,6 +99,16 @@ export const recipeSchema = `
         "userid" int8,
         "ingredients" jsonb,
         "servings" int4,
+        "protein_per_serv" float8,
+        "carb_per_serv" float8,
+        "fat_per_serv" float8,
+        "calories_per_serv" float8,
+        "total_protein" float8,
+        "total_carbs" float8,
+        "total_fat" float8,
+        "total_calories" float8,
+        "dateadded" timestamptz,
+        "lastupdated" timestamptz,
         PRIMARY KEY ("id")
     );
 `;
