@@ -234,9 +234,13 @@ export default {
         </button>
       </div>
       <div class="d-flex justify-content-end mb-3">
-        <button @click="toggleSearchMode" class="btn btn-outline-primary">
+        <button @click="toggleSearchMode" class="btn btn-outline-primary me-2">
           {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
         </button>
+        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary">
+          Create Recipe
+        </button>
+      </div>
     </div>
   </div>
     <div class="col-12 mb-3">
@@ -311,7 +315,7 @@ export default {
 </div>
 
     </div>
-  </div>
+
 
   <!-- Modal -->
   <div class="modal fade" id="servingModal" tabindex="-1" aria-labelledby="servingModalLabel" aria-hidden="true">
