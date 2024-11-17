@@ -10,6 +10,8 @@ export async function getRecipes(): Promise<Recipe[]> {
   try {
     const response = await axios.get<Recipe[]>('/api/user/recipes');
     recipes.value = response.data;
+    console.log('Recipes retrieved');
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching recipes", error);
