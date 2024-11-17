@@ -237,7 +237,7 @@ export default {
         <button @click="toggleSearchMode" class="btn btn-outline-primary me-2">
           {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
         </button>
-        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary">
+        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary"> <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
           Create Recipe
         </button>
       </div>
@@ -290,7 +290,7 @@ export default {
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title">{{ recipe.name }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Servings: {{ recipe.servings }}</h6>
+          <h6 class="card-subtitle mb-2 text-muted">Servings in Recipe: {{ recipe.servings }}</h6>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
               Calories per Serving: {{ recipe.calories_per_serv.toFixed(2) }} kcal
@@ -302,7 +302,7 @@ export default {
               Carbs per Serving: {{ recipe.carb_per_serv.toFixed(2) }} g
             </li>
             <li class="list-group-item">
-              Fat per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
+              Fats per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
             </li>
           </ul>
         </div>
