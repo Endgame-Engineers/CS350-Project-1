@@ -6,20 +6,24 @@
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
             <!-- Progress circle -->
+            <text v-if="props.subtitle" x="18" y="26" class="circle-subtitle">{{ props.subtitle }}</text>
             <path v-if="props.progress > 0" class="circle" :stroke-dasharray="props.progress + ', 100'" d="M18 2.0845
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <text x="18" y="18" class="percentage">{{ isNaN(props.progress) ? 0 : props.progress }}%</text>
+            <text x="18" y="18" class="percentage">{{ computedProgress }}%</text>
             <text v-if="props.title" x="18" y="22" class="circle-title">{{ props.title }}</text>
-        </svg> 
+        </svg>
     </div>
 </template>
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 
 const props = defineProps<{
     progress: number | 0;
     size: number;
     title?: string;
+    subtitle?: string;
 }>();
+
+const computedProgress = computed(() => isNaN(props.progress) ? 0 : props.progress);
 </script>
