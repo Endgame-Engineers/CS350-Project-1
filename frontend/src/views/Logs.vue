@@ -77,16 +77,20 @@
             title="Water" />
           <circle-percentage
             :progress="(((computeTotals('all').day.calories - computeTotals('all').caloriesburned)) / (userStatValue?.caloriegoal ?? 1) * 100).toFixed(0)"
-            size="8" title="Calories" />
+            size="8" title="Calories"
+            :subtitle="`${computeTotals('all').day.calories.toFixed(1)}/${userStatValue?.caloriegoal ?? 1}`" />
           <circle-percentage
             :progress="(((computeTotals('all').day.carbs) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
-            size="8" title="Carbs" />
+            size="8" title="Carbs"
+            :subtitle="`${computeTotals('all').day.carbs.toFixed(1)}/${Math.round(userStatValue?.carbgrams ?? 1)}g`" />
           <circle-percentage
             :progress="(((computeTotals('all').day.protein) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
-            size="8" title="Proteins" />
+            size="8" title="Proteins"
+            :subtitle="`${computeTotals('all').day.protein.toFixed(1)}/${Math.round(userStatValue?.proteingrams ?? 1)}g`" />
           <circle-percentage
             :progress="(((computeTotals('all').day.fat) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
-            size="8" title="Fats" />
+            size="8" title="Fats"
+            :subtitle="`${computeTotals('all').day.fat.toFixed(1)}/${Math.round(userStatValue?.fatgrams ?? 1)}g`" />
         </div>
       </div>
     </div>
@@ -211,7 +215,9 @@
         </div>
         <!-- No Meals Message -->
         <div v-if="filteredLogs.length === 0" class="col-12">
-          <p>No logs for {{ selectedLogType }} during this period.</p>
+          <div class="text-center mb-3">
+            No {{ selectedLogType }} logs available.
+          </div>
         </div>
 
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"

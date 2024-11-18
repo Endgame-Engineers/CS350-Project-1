@@ -134,14 +134,12 @@ export default defineComponent({
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
       <circle-percentage :progress="((totals.water / 128) * 100).toFixed(0)" size=8 title="Water" />
-      <circle-percentage :progress="(totals.calories / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)" size=8 title="Calories" />
-      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)"
-        size=8 title="Carbs" />
       <circle-percentage
-        :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size="8"
-        title="Proteins" />
-      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)"
-        size=8 title="Fats" />
+        :progress="(totals.calories / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)"
+        size=8 title="Calories" :subtitle="`${totals.calories}/${userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1}`" />
+      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)" size=8 title="Carbs" :subtitle="`${totals.carbs.toFixed(0)}/${Math.round(userStats.carbgrams)}g`" />
+      <circle-percentage :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size=8 title="Proteins" :subtitle="`${totals.proteins.toFixed(0)}/${Math.round(userStats.proteingrams)}g`" />
+      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)" size=8 title="Fats" :subtitle="`${totals.fats.toFixed(0)}/${Math.round(userStats.fatgrams)}g`" />
     </div>
     <template v-if="mealLogs.length > 0">
       <h2 class="text-center">Recently Consumed Food Items</h2>
