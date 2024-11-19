@@ -4,7 +4,7 @@ import { logger } from "../utils/Logging";
 export interface Recipe {
     userid: number;
     name: string;
-    ingredients: string;
+    ingredients: JSON;
     servings: number;
     dateadded?: Date;
     lastupdated?: Date;

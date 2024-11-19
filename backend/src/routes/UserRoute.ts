@@ -380,8 +380,17 @@ class UserRoute {
             if (user.id) {
                 logger.info('User authenticated for recipes');
                 Recipes.getRecipes(user.id)
-                    .then((recipes) => {
+                    .then(async (recipes) => {
                         logger.info('Recipes retrieved');
+                        for(const recipe of recipes){
+                            const foodItems = [];
+                            for (const barcode of Object.keys(recipe.ingredients)) {
+                                logger.info('Retrieving food item');
+                                const foodItem = await FoodItems.getFoodItem(barcode);
+                                foodItems.push(foodItem);
+                            }
+                            recipe.foodItems = foodItems;
+                        }
                         res.json(recipes);
                     })
                     .catch((error) => {
