@@ -73,35 +73,40 @@
       <div class="card-body">
         <div class="d-grid todays-stats">
           <!-- Days Stats -->
-           <div>
-            <p>Water: {{ computeTotals('all').day.water.toFixed(1) }} oz</p>
-           </div>
-          <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)" size="8"
-            title="Water" />
-            <div>
-            <p>Calories: {{ computeTotals('all').day.calories.toFixed(1) }} kcal</p>
-           </div>
+          <circle-percentage :progress="(((computeTotals('all').day.water) / 128) * (100)).toFixed(0)"  size="8"
+            title="Water"
+            :totals="computeTotals('all').day.water" 
+            goal="128"
+            unit="Oz"/>
+
           <circle-percentage
             :progress="(((computeTotals('all').day.calories - computeTotals('all').caloriesburned)) / (userStatValue?.caloriegoal ?? 1) * 100).toFixed(0)"
-            size="8" title="Calories" />
-            <div>
-            <p>Carbs:  {{ computeTotals('all').day.carbs.toFixed(1) }} g </p>
-           </div>
+            size="8" title="Calories"
+            :totals="computeTotals('all').day.calories - computeTotals('all').caloriesburned"
+            :goal="userStatValue?.caloriegoal ?? 1"
+             unit="grams"
+            />
+           
             <circle-percentage
             :progress="(((computeTotals('all').day.carbs) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
-            size="8" title="Carbs" />
-            <div>
-            <p>Protein:  {{ computeTotals('all').day.protein.toFixed(1) }} g </p>
-           </div>
+            size="8" title="Carbs" 
+            :totals="computeTotals('all').day.carbs"
+            :goal="computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat"
+            unit="grams"/>
+            
           <circle-percentage
             :progress="(((computeTotals('all').day.protein) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
-            size="8" title="Proteins" />
-            <div>
-            <p>Fats:  {{ computeTotals('all').day.fat.toFixed(1) }} g </p>
-           </div>
+            size="8" title="Proteins"
+            :totals="computeTotals('all').day.protein"
+            :goal="computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat"
+            unit="grams"/>
+            
           <circle-percentage
             :progress="(((computeTotals('all').day.fat) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
-            size="8" title="Fats" />
+            size="8" title="Fats" 
+            :totals="computeTotals('all').day.fat"
+            :goal="computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat"      
+            unit="grams"/>
         </div>
       </div>
     </div>
