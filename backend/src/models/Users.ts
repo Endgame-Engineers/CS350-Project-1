@@ -17,7 +17,7 @@ export interface User {
 class Users {
     private client: any;
 
-   constructor() {
+    constructor() {
         this.client = ConnectToDB.getClient();
     }
 

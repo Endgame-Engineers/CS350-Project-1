@@ -23,7 +23,8 @@ export const userStats = ref<ProfileStats>({
     proteingrams: 0,
     fatgrams: 0,
     carbgrams: 0,
-    recommendedcaloriegoal: 0
+    recommendedcaloriegoal: 0,
+    watergoal: 0
 });
 
 // Function to fetch user stats from the backend

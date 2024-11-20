@@ -6,6 +6,7 @@ export interface UserStat {
     weight: number;
     goal: number;
     caloriegoal: number;
+    watergoal: number;
     activitylevel: number;
     proteinpercentage: number;
     fatpercentage: number;
@@ -60,6 +61,7 @@ class UserStats {
                     latestRecord.weight === userStats.weight &&
                     latestRecord.goal === userStats.goal &&
                     latestRecord.caloriegoal === userStats.caloriegoal &&
+                    latestRecord.watergoal === userStats.watergoal &&
                     latestRecord.activitylevel === userStats.activitylevel &&
                     latestRecord.proteinpercentage === userStats.proteinpercentage &&
                     latestRecord.fatpercentage === userStats.fatpercentage &&
@@ -74,8 +76,8 @@ class UserStats {
                 }
             }
     
-            const query = 'INSERT INTO "UserStats" (userid, height, weight, goal, caloriegoal, activitylevel, proteinpercentage, fatpercentage, carbpercentage, proteingrams, fatgrams, carbgrams, sex, dateofbirth, updatedon) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())';
-            const values = [userid, userStats.height, userStats.weight, userStats.goal, userStats.caloriegoal, userStats.activitylevel, userStats.proteinpercentage, userStats.fatpercentage, userStats.carbpercentage, userStats.proteingrams, userStats.fatgrams, userStats.carbgrams, userStats.sex, userStats.dateofbirth];
+            const query = 'INSERT INTO "UserStats" (userid, height, weight, goal, caloriegoal, watergoal, activitylevel, proteinpercentage, fatpercentage, carbpercentage, proteingrams, fatgrams, carbgrams, sex, dateofbirth, updatedon) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())';
+            const values = [userid, userStats.height, userStats.weight, userStats.goal, userStats.caloriegoal, userStats.watergoal, userStats.activitylevel, userStats.proteinpercentage, userStats.fatpercentage, userStats.carbpercentage, userStats.proteingrams, userStats.fatgrams, userStats.carbgrams, userStats.sex, userStats.dateofbirth];
             await (await this.client).query(query, values);
             return true;
         }
