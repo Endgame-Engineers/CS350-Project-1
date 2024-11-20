@@ -206,27 +206,29 @@
             </div>
           </template>
           <template v-else>
-            <div v-for="item in filteredLogs" :key="item.id" class="col-12 col-md-6 col-lg-4 mb-3">
-              <div class="card h-100">
-                <div class="card-body">
-                  <h5 class="card-title" v-if="item.activity">{{ item.activity.activity }}</h5>
-                  <ul class="list-group">
-                    <li class="list-group">
-                      Duration: {{ item.durationminutes }} minutes
-                    </li>
-                    <li class="list-group">
-                      Description: {{ item.activity?.description }}
-                    </li>
-                    <li class="list-group">
-                      Calories Burned: {{ item.caloriesburned }} kcal
-                    </li>
-                    <li class="list-group">
-                      <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
-                    </li>
-                  </ul>
-                  <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+              <div v-for="item in filteredLogs" :key="item.id" class="col">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title" v-if="item.activity">{{ item.activity.activity }}</h5>
+                    <ul class="list-group">
+                      <li class="list-group">
+                        Duration: {{ item.durationminutes }} minutes
+                      </li>
+                      <li class="list-group">
+                        Description: {{ item.activity?.description }}
+                      </li>
+                      <li class="list-group">
+                        Calories Burned: {{ item.caloriesburned }} kcal
+                      </li>
+                      <li class="list-group">
+                        <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
+                      </li>
+                    </ul>
+                    <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -258,7 +260,8 @@
                     style="height: 200px; object-fit: cover;" />
                 </template>
                 <template v-else-if="itemToDelete && 'activityid' in itemToDelete">
-                  <p>Are you sure you want to remove "{{itemToDelete.activity?.activity + " - " + itemToDelete.activity?.description }}" from your activity log? </p>
+                  <p>Are you sure you want to remove "{{ itemToDelete.activity?.activity + " - " +
+                    itemToDelete.activity?.description }}" from your activity log? </p>
                 </template>
                 <template v-else>
                   <p>Are you sure you want to remove this water log from your meal log?</p>
@@ -266,12 +269,12 @@
               </div>
 
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">
-                    Cancel
-                  </button>
-                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">
-                    Confirm
-                  </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelDelete">
+                  Cancel
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">
+                  Confirm
+                </button>
               </div>
             </div>
           </div>
@@ -318,8 +321,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="addActivity">Add
-                  Activity</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="addActivity" :disabled="!newActivity.activityName || !newActivity.subActivity || !newActivity.duration || newActivity.duration <= 0">Add Activity</button>
               </div>
             </div>
           </div>
@@ -527,7 +529,7 @@ export default defineComponent({
     const removeItem = async (item: ExtendedMealLog | ActivityLog) => {
       const modal = new Modal(document.getElementById('confirmDeleteModal')!);
       itemToDelete.value = item;
-      if(itemToDelete.value && 'foodItem' in itemToDelete.value) {
+      if (itemToDelete.value && 'foodItem' in itemToDelete.value) {
         logger.info('Removing meal log');
       } else if (itemToDelete.value && 'activity' in itemToDelete.value) {
         logger.info('Removing activity log');
