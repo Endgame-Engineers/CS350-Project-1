@@ -167,39 +167,41 @@
 
           <!-- Logs -->
           <template v-if="isExtendedMealLogArray(filteredLogs)">
-            <div v-for="item in filteredLogs" :key="item.id" class="col-12 col-md-6 col-lg-4 mb-3">
-              <div v-if="item.foodItem" class="card h-100">
-                <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
-                  style="height: 200px; object-fit: cover;" />
-                <div class="card-body">
-                  <h5 class="card-title">{{ item.foodItem.foodname }}</h5>
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      Calories: {{ (item.foodItem.calories_per_serv * item.servingconsumed).toFixed(1) }} kcal
-                    </li>
-                    <li class="list-group-item">
-                      Protein: {{ (item.foodItem.protein_per_serv * item.servingconsumed).toFixed(1) }} g
-                    </li>
-                    <li class="list-group-item">
-                      Carbs: {{ (item.foodItem.carb_per_serv * item.servingconsumed).toFixed(1) }} g
-                    </li>
-                    <li class="list-group-item">
-                      Fat: {{ (item.foodItem.fat_per_serv * item.servingconsumed).toFixed(1) }} g
-                    </li>
-                    <li class="list-group-item">
-                      Serving Consumed: {{ item.servingconsumed }}
-                    </li>
-                  </ul>
-                </div>
-                <div class="card-footer text-muted d-grid grid-template-columns-1-2 align-items-center">
-                  <div class="text-start">
-                    <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
-                      <font-awesome-icon :icon="['fas', 'trash']" />
-                    </button>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+              <div v-for="item in filteredLogs" :key="item.id" class="col">
+                <div v-if="item.foodItem" class="card h-100">
+                  <img :src="item.foodItem.image" class="card-img-top" alt="{{ item.foodItem.foodname }}"
+                    style="height: 200px; object-fit: cover;" />
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.foodItem.foodname }}</h5>
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item">
+                        Calories: {{ (item.foodItem.calories_per_serv * item.servingconsumed).toFixed(1) }} kcal
+                      </li>
+                      <li class="list-group-item">
+                        Protein: {{ (item.foodItem.protein_per_serv * item.servingconsumed).toFixed(1) }} g
+                      </li>
+                      <li class="list-group-item">
+                        Carbs: {{ (item.foodItem.carb_per_serv * item.servingconsumed).toFixed(1) }} g
+                      </li>
+                      <li class="list-group-item">
+                        Fat: {{ (item.foodItem.fat_per_serv * item.servingconsumed).toFixed(1) }} g
+                      </li>
+                      <li class="list-group-item">
+                        Serving Consumed: {{ item.servingconsumed }}
+                      </li>
+                    </ul>
                   </div>
-                  <div class="text-end">
-                    <font-awesome-icon :icon="['fas', 'calendar-alt']" class="me-2" />
-                    <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
+                  <div class="card-footer text-muted d-grid grid-template-columns-1-2 align-items-center">
+                    <div class="text-start">
+                      <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
+                        <font-awesome-icon :icon="['fas', 'trash']" />
+                      </button>
+                    </div>
+                    <div class="text-end">
+                      <font-awesome-icon :icon="['fas', 'calendar-alt']" class="me-2" />
+                      <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -208,26 +210,31 @@
           <template v-else>
             <div class="row row-cols-1 row-cols-md-3 g-4">
               <div v-for="item in filteredLogs" :key="item.id" class="col">
-                <div class="card h-100">
+                <div v-if="item.activity" class="card h-100">
                   <div class="card-body">
-                    <h5 class="card-title" v-if="item.activity">{{ item.activity.activity }}</h5>
-                    <ul class="list-group">
-                      <li class="list-group">
+                    <h5 class="card-title">{{ item.activity.activity }}</h5>
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item">
                         Duration: {{ item.durationminutes }} minutes
                       </li>
-                      <li class="list-group">
+                      <li class="list-group-item">
                         Description: {{ item.activity?.description }}
                       </li>
-                      <li class="list-group">
+                      <li class="list-group-item">
                         Calories Burned: {{ item.caloriesburned }} kcal
                       </li>
-                      <li class="list-group">
-                        <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
-                      </li>
                     </ul>
-                    <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
-                      <font-awesome-icon :icon="['fas', 'trash']" />
-                    </button>
+                  </div>
+                  <div class="card-footer text-muted d-grid grid-template-columns-1-2 align-items-center">
+                    <div class="text-start">
+                      <button class="btn btn-outline-primary mb-2" id="removeFoodItem" @click="removeItem(item)">
+                        <font-awesome-icon :icon="['fas', 'trash']" />
+                      </button>
+                    </div>
+                    <div class="text-end">
+                      <font-awesome-icon :icon="['fas', 'calendar-alt']" class="me-2" />
+                      <small>{{ prettyDate(item.dateadded ?? new Date()) }}</small>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -321,7 +328,9 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="addActivity" :disabled="!newActivity.activityName || !newActivity.subActivity || !newActivity.duration || newActivity.duration <= 0">Add Activity</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="addActivity"
+                  :disabled="!newActivity.activityName || !newActivity.subActivity || !newActivity.duration || newActivity.duration <= 0">Add
+                  Activity</button>
               </div>
             </div>
           </div>
