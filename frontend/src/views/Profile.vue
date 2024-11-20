@@ -36,7 +36,7 @@ export default defineComponent({
       lastname: 'Last Name',
       email: 'Email',
       lastlogin: 'Last Login Date',
-      providername: 'Authentication Method'
+      providername: 'Authentication Method',
     };
     const isFormValid = ref(true);
 
@@ -227,7 +227,7 @@ export default defineComponent({
 
             <!-- Sex and Percentages -->
             <div class="row">
-              <div class="col-12 col-md-6 mb-3">
+                <div class="col-12 col-md-6 mb-3">
                 <label for="sex" class="form-label"><strong>Sex</strong></label>
                 <div v-if="!isEditing">
                   {{ userStats.sex === 1 ? 'Male' : 'Female' }}
@@ -236,7 +236,13 @@ export default defineComponent({
                   <option value="1">Male</option>
                   <option value="2">Female</option>
                 </select>
-              </div>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                <label for="waterGoal" class="form-label"><strong>Water Goal</strong></label>
+                <div v-if="!isEditing">{{ userStats.watergoal }} oz</div>
+                <input v-else type="number" placeholder="Enter water goal in ounces" class="form-control"
+                  id="waterGoal" v-model.number="editUserStats.watergoal">
+                </div>
               <user-stats-percentages :is-editing="isEditing" :user-stats="userStats" :edit-user-stats="editUserStats"
                 @reset-warning="handleValidityUpdate(false)" @update-validity="handleValidityUpdate" />
             </div>

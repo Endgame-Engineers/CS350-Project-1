@@ -36,6 +36,8 @@ export default defineComponent({
                 userStats.value.Error = 'Please select your goal.';
             } else if (step.value === 8 && !userStats.value.caloriegoal) {
                 userStats.value.Error = 'Please enter your calorie goal.';
+            } else if (step.value === 9 && !userStats.value.watergoal) {
+                userStats.value.Error = 'Please enter your water goal.';
             } else {
                 userStats.value.Error = '';
                 step.value += 1;
@@ -229,6 +231,21 @@ export default defineComponent({
                 </div>
 
                 <div v-if="step === 9" class="col-12 col-md-5 mb-3 text-center">
+                    <h1>Enter Water Goal</h1>
+                    <label for="waterGoal" class="form-label"></label>
+                    <input type="number" placeholder="Enter water goal in ounces" class="form-control" id="waterGoal"
+                        v-model.number="userStats.watergoal" @keydown.enter="nextStep">
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-primary" @click="prevStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+                        </button>
+                        <button class="btn btn-outline-primary" @click="nextStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="step === 10" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Macronutrient Distribution</h1>
                     <user-stats-percentages :is-editing="true" :user-stats="userStats" :edit-user-stats="userStats"
                 @reset-warning="handleValidityUpdate(false)" @update-validity="handleValidityUpdate" />

@@ -54,12 +54,9 @@ class ActivityLogs {
         logger.info('Health log added to database');
     }
 
-    async deleteActivityLog(userid: number, dateadded: Date): Promise<void> {
+    async deleteActivityLog(userid: number, activityid: number): Promise<void> {
         logger.info('Deleting health log from database');
-        await (await this.client).query(
-            'DELETE FROM "ActivityLogs" WHERE userid = $1 AND dateadded = $2',
-            [userid, dateadded]
-        );
+        await (await this.client).query('DELETE FROM "ActivityLogs" WHERE userid = $1 AND id = $2', [userid, activityid]);
         logger.info('Health log deleted from database');
     }
 

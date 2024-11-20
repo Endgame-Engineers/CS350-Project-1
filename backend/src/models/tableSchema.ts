@@ -38,8 +38,6 @@ export const userSchema = `
         "lastlogin" timestamptz,
         "providername" varchar,
         "providerid" varchar,
-        "accesstoken" varchar,
-        "refreshtoken" varchar,
         PRIMARY KEY ("id")
     );
 `;
@@ -51,6 +49,7 @@ export const userStatsSchema = `
         "height" float8,
         "weight" float8,
         "caloriegoal" float8,
+        "watergoal" float8,
         "dateofbirth" timestamptz,
         "updatedon" timestamptz,
         "proteinpercentage" float4,
