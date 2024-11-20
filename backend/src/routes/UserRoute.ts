@@ -307,7 +307,7 @@ class UserRoute {
                 return res.status(400).json({ error: 'All fields are required' });
             }
 
-            if(req.body.durationminutes < 0) {
+            if(req.body.durationminutes <= 0) {
                 logger.error('Duration must be greater than 0');
                 return res.status(400).json({ error: 'Duration must be greater than 0' });
             }
