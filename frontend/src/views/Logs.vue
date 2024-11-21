@@ -153,12 +153,12 @@
             </div>
           </template>
           <template v-else>
-            <div class="row row-cols-1 row-cols-md-2 text-center mb-3">
-              <div class="col">
+            <div class="row text-center mb-3">
+              <div class="col-6 col-md-3">
                 <h5>Total Duration</h5>
                 <p>{{ computeTotals('Activity').durationminutes.toFixed(1) }} minutes</p>
               </div>
-              <div class="col">
+              <div class="col-6 col-md-3">
                 <h5>Total Calories Burned</h5>
                 <p>{{ computeTotals('Activity').caloriesburned.toFixed(1) }} kcal</p>
               </div>
@@ -221,7 +221,7 @@
                         Description: {{ item.activity?.description }}
                       </li>
                       <li class="list-group-item">
-                        Calories Burned: {{ item.caloriesburned?.toFixed(1) }} kcal
+                        Calories Burned: {{ item.caloriesburned }} kcal
                       </li>
                     </ul>
                   </div>
