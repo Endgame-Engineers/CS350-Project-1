@@ -6,7 +6,6 @@
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
             <!-- Progress circle -->
-            <text v-if="props.subtitle" x="18" y="26" class="circle-subtitle">{{ props.subtitle }}</text>
             <path v-if="Number(props.progress) > 0" class="circle" :stroke-dasharray="props.progress + ', 100'" d="M18 2.0845
            a 15.9155 15.9155 0 0 1 0 31.831
            a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -24,6 +23,8 @@ const props = defineProps<{
     title?: string;
     subtitle?: string;
 }>();
+
+//             <text v-if="props.subtitle" x="18" y="26" class="circle-subtitle">{{ props.subtitle }}</text>
 
 const computedProgress = computed(() => isNaN(Number(props.progress)) ? 0 : Number(props.progress));
 </script>
