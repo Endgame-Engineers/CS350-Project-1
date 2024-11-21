@@ -120,10 +120,13 @@ $circle-text-size: 0.3rem;
 .circle-title {
   font-size: $circle-text-size;
   text-anchor: middle;
-  align-baseline: middle;
   fill: $primary;
 }
-
+.unit-totals{
+  font-size: 0.25rem;
+  text-anchor: middle;
+  fill: $primary;
+}
 .circle {
   fill: none;
   stroke-width: 2.8;

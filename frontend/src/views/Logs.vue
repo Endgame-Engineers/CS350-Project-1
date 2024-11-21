@@ -77,14 +77,14 @@
             title="Water"
             :totals="computeTotals('all').day.water" 
             goal="128"
-            unit="Oz"/>
+            unit="oz"/>
 
           <circle-percentage
             :progress="(((computeTotals('all').day.calories - computeTotals('all').caloriesburned)) / (userStatValue?.caloriegoal ?? 1) * 100).toFixed(0)"
             size="8" title="Calories"
             :totals="computeTotals('all').day.calories - computeTotals('all').caloriesburned"
             :goal="userStatValue?.caloriegoal ?? 1"
-             unit="grams"
+             unit="g"
             />
            
             <circle-percentage
@@ -92,21 +92,21 @@
             size="8" title="Carbs" 
             :totals="computeTotals('all').day.carbs"
             :goal="computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat"
-            unit="grams"/>
+            unit="g"/>
             
           <circle-percentage
             :progress="(((computeTotals('all').day.protein) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
             size="8" title="Proteins"
             :totals="computeTotals('all').day.protein"
             :goal="computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat"
-            unit="grams"/>
+            unit="g"/>
             
           <circle-percentage
             :progress="(((computeTotals('all').day.fat) / (computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat)) * (100)).toFixed(0)"
             size="8" title="Fats" 
             :totals="computeTotals('all').day.fat"
             :goal="computeTotals('all').day.carbs + computeTotals('all').day.protein + computeTotals('all').day.fat"      
-            unit="grams"/>
+            unit="g"/>
         </div>
       </div>
     </div>
