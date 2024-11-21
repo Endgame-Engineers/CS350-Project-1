@@ -346,7 +346,7 @@ import { ExtendedMealLog, MealType, ActivityLog, UserStat, Activity } from '@/mo
 import router from '@/router';
 import { useLogStore } from '@/stores/Log';
 import { getMealLogs, addMealLog, deleteMealLog } from '@/services/MealLogs';
-import { getUserStat } from '@/services/UserStats';
+import { getUserStats } from '@/services/UserStats';
 import { logger } from '@/services/Logger';
 import { Modal } from 'bootstrap';
 import { getActivityLogs, addActivityLog, deleteActivityLog, getActivities, ExtendedActivityLog } from '@/services/ActivityLogs';
@@ -456,7 +456,18 @@ export default defineComponent({
 
     const updateUserStat = async () => {
       logger.info('Fetching user stats');
-      userStatValue.value = await getUserStat() as UserStat;
+
+      const data = await getUserStats();
+      const currentDateString = currentDate.value.toISOString().split('T')[0];
+
+      let filteredData = data.filter((stat) => new Date(stat.updatedon).toISOString().split('T')[0] === currentDateString);
+
+      if (filteredData.length === 0) {
+        logger.info('No data available for the current date, fetching the most recent data');
+        filteredData = data.sort((a, b) => new Date(b.updatedon).getTime() - new Date(a.updatedon).getTime());
+      }
+
+      userStatValue.value = filteredData[0];
     };
 
     const adjustDates = (days: number) => {
@@ -532,6 +543,7 @@ export default defineComponent({
     watch([currentDate], ([newcurrentDate]) => {
       if (newcurrentDate) {
         updateLogs(newcurrentDate);
+        updateUserStat();
       }
     });
 
