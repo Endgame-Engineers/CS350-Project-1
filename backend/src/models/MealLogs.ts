@@ -1,7 +1,7 @@
 import ConnectToDB from "../utils/ConnectToDB";
 import { logger } from "../utils/Logging";
 
-export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water';
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water' | 'Recipe';
 
 export interface MealLog {
     mealtype: MealType;
@@ -12,7 +12,7 @@ export interface MealLog {
 }
 
 function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
-    const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water'];
+    const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water', 'Recipe'];
     return mealTypes.includes(mealLog.mealtype) && mealLog.servingconsumed > 0;
 }
 

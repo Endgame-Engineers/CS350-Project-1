@@ -1,8 +1,9 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { FoodItem, SearchResult, MealLog, MealType } from '@/models/Models';
+import { FoodItem, SearchResult, MealLog, MealType, Recipe } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
+import { getRecipes } from '@/services/Recipes';
 import { useLogStore } from '@/stores/Log';
 import router from '@/router';
 import * as bootstrap from 'bootstrap';
@@ -28,6 +29,8 @@ export default {
     const servingConsumed = ref<number | null>(null);
     const isBarcode = ref(false);
     const invalidSearch = ref(false);
+    const searchMode = ref<'food' | 'recipes'>('food');
+    const recipeData = ref<Recipe[] | null>(null);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useLogStore().getMealLog().mealtype);
@@ -144,6 +147,27 @@ export default {
       }
     };
 
+    const toggleSearchMode = async () => {
+      searchMode.value = searchMode.value === 'food' ? 'recipes' : 'food';
+      searchBar.value = '';
+      foodData.value = null;
+      recipeData.value = null;
+
+      if (searchMode.value === 'recipes') {
+        try {
+          const response = await getRecipes();
+          recipeData.value = response;
+          console.log('Fetched recipes:', recipeData.value); // Add this line
+        } catch (error) {
+          console.error('Error fetching recipes:', error);
+        }
+      }
+    };
+
+    const viewRecipe = (id: number) => {
+      router.push({ name: 'ViewRecipe', params: { id } });
+    };
+
     const handleInputChange = (event: Event) => {
       const value = (event.target as HTMLInputElement).value;
 
@@ -181,6 +205,10 @@ export default {
       invalidSearch,
       handleInputChange,
       setServingConsumedNull: () => servingConsumed.value = null,
+      toggleSearchMode,
+      searchMode,
+      viewRecipe,
+      recipeData,
     };
   },
 };
@@ -196,8 +224,8 @@ export default {
             <font-awesome-icon :icon="['fas', 'barcode']" />
           </button>
         </router-link>
-        <input type="text" v-model="searchBar" class="form-control" placeholder="Search for food"
-          aria-label="Search for food" @keyup.enter="search" />
+        <input type="text" v-model="searchBar" class="form-control" placeholder="Search for food or recipes"
+          aria-label="Search for food or recipes" @keyup.enter="search" />
         <button @click="clearSearchBar" class="btn btn-secondary">
           <font-awesome-icon :icon="['fas', 'delete-left']" />
         </button>
@@ -205,9 +233,16 @@ export default {
           <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
         </button>
       </div>
+      <div class="d-flex justify-content-end mb-3">
+        <button @click="toggleSearchMode" class="btn btn-outline-primary me-2">
+          {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
+        </button>
+        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary"> <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
+          Create Recipe
+        </button>
+      </div>
     </div>
   </div>
-  <div class="row">
     <div class="col-12 mb-3">
       <!-- Error message -->
       <div v-if="invalidSearch" class="alert alert-danger" role="alert">
@@ -248,8 +283,39 @@ export default {
         </div>
         <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
       </div>
+
+      <div v-if="searchMode === 'recipes' && recipeData && recipeData.length">
+  <div class="row">
+    <div v-for="recipe in recipeData" :key="recipe.id" class="col-12 col-md-6 col-lg-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ recipe.name }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Servings in Recipe: {{ recipe.servings }}</h6>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              Calories per Serving: {{ recipe.calories_per_serv.toFixed(2) }} kcal
+            </li>
+            <li class="list-group-item">
+              Protein per Serving: {{ recipe.protein_per_serv.toFixed(2) }} g
+            </li>
+            <li class="list-group-item">
+              Carbs per Serving: {{ recipe.carb_per_serv.toFixed(2) }} g
+            </li>
+            <li class="list-group-item">
+              Fats per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
+            </li>
+          </ul>
+        </div>
+        <div class="card-footer text-muted d-flex align-items-center">
+          <button @click="recipe.id !== undefined && viewRecipe(recipe.id)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
+        </div>
+      </div>
     </div>
   </div>
+</div>
+
+    </div>
+
 
   <!-- Modal -->
   <div class="modal fade" id="servingModal" tabindex="-1" aria-labelledby="servingModalLabel" aria-hidden="true">
