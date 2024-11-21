@@ -144,13 +144,14 @@ export default defineComponent({
       <h2 class="text-center">Recently Consumed Food Items</h2>
       <div id="mealCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-          <div v-for="(log, index) in mealLogs.filter((log, index) =>  log.mealtype.toLowerCase() !== 'water')" :key="index">
-            <img :src="log.foodItem?.image" class="d-block w-100" alt="Food Image" style="height: 300px; object-fit: cover;" />
-            <div class="carousel-caption d-none d-md-block text-white">
-              <h5>{{ log.foodItem?.foodname }}</h5>
-              <p>{{ log.mealtype }}</p>
-              <p>Comsumed at: {{ new Date(log.dateadded ?? 0).toLocaleString() }}</p>
-            </div>
+          <div v-for="(log, index) in mealLogs.filter(log => log.mealtype.toLowerCase() !== 'water')" :key="log.id" :class="['carousel-item', { active: index === 0 }]">
+              <img :src="log.foodItem?.image" class="d-block w-100" alt="Food Image"
+                style="height: 300px; object-fit: cover;">
+              <div class="carousel-caption d-none d-md-block text-white">
+                <h5>{{ log.foodItem?.foodname }}</h5>
+                <p>{{ log.mealtype }}</p>
+                <p>Comsumed at: {{ new Date(log.dateadded ?? 0).toLocaleString() }}</p>
+              </div>
           </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#mealCarousel" data-bs-slide="prev">
