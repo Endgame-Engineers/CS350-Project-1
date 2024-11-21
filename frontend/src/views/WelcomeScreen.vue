@@ -67,7 +67,7 @@ export default defineComponent({
                 console.error('Failed to fetch water goal:', error);
             }
         };
-
+        
         const saveUserStats = async () => {
             try {
                 await addUserStats(userStats.value);
@@ -101,7 +101,8 @@ export default defineComponent({
             formattedDateOfBirth,
             getRecommendedCalorieGoal,
             handleValidityUpdate,
-            isFormValid
+            isFormValid,
+            getwatergoal
         }
     }
 });
@@ -237,9 +238,9 @@ export default defineComponent({
                         </button>
                     </div>
                 </div>
-//water goal still working on it
+
                 <div v-if="step === 9" class="col-12 col-md-5 mb-3 text-center">
-                    <h1>Enter Calorie Goal</h1>
+                    <h1>Enter Water Goal</h1>
                     <label for="waterGoal" class="form-label"></label>
                     <input type="number" placeholder="Enter your daily water goal" class="form-control" id="calorieGoal"
                         v-model.number="userStats.Watergoal" @keydown.enter="nextStep">
