@@ -109,41 +109,39 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="container">
-    <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
-    <div class="d-flex flex-column justify-content-center align-items-center">
-      <div v-if="userStats.caloriegoal !== null && totals.calories > userStats.caloriegoal" class="alert alert-danger"
-        role="alert">
-        You have consumed <i>{{ totals.calories }}</i> calories today, which is more than your daily goal of
-        <i>{{ userStats.caloriegoal }}</i> calories.
+    <div class="container">
+      <h1 class="text-center">Welcome, {{ user.firstname }}!</h1>
+      <div class="d-flex flex-column justify-content-center align-items-center">
+        <div v-if="userStats.caloriegoal !== null && totals.calories > userStats.caloriegoal" class="alert alert-danger"
+          role="alert">
+          You have consumed <i>{{ Math.round(totals.calories) }}</i> calories today, which is more than your daily goal of
+          <i>{{ Math.round(userStats.caloriegoal) }}</i> calories.
+        </div>
+        <div v-else-if="userStats.caloriegoal !== null && totals.calories === userStats.caloriegoal"
+          class="alert alert-success" role="alert">
+          You have consumed <i>{{ Math.round(totals.calories) }}</i> calories today, which is exactly your daily goal of
+          <i>{{ Math.round(userStats.caloriegoal) }}</i> calories.
+        </div>
+        <div v-else class="alert alert-info" role="alert">
+          You have consumed <i>{{ Math.round(totals.calories) }}</i> calories today and have <i>{{ userStats.caloriegoal ?
+            Math.round(userStats.caloriegoal - totals.calories) : 0 }}</i> calories left to consume.
+        </div>
+        <div v-if="totals.caloriesburned > 0" class="alert alert-info" role="alert">
+          You have burned <i>{{ Math.round(totals.caloriesburned) }}</i> calories today.
+        </div>
       </div>
-      <div v-else-if="userStats.caloriegoal !== null && totals.calories === userStats.caloriegoal"
-        class="alert alert-success" role="alert">
-        You have consumed <i>{{ totals.calories }}</i> calories today, which is exactly your daily goal of
-        <i>{{ userStats.caloriegoal }}</i> calories.
-      </div>
-      <div v-else class="alert alert-info" role="alert">
-        You have consumed <i>{{ totals.calories }}</i> calories today and have <i>{{ userStats.caloriegoal ?
-          userStats.caloriegoal -
-          totals.calories : 0 }}</i> calories left to consume.
-      </div>
-      <div v-if="totals.caloriesburned > 0" class="alert alert-info" role="alert">
-        You have burned <i>{{ totals.caloriesburned.toFixed(0) }}</i> calories today.
-      </div>
-    </div>
     <h2 class="text-center">Today's Progress</h2>
     <div class="d-grid todays-stats">
-      <circle-percentage :progress="((totals.water / 128) * 100).toFixed(0)" size=8 title="Water" />
+      <circle-percentage :progress="((totals.water / 128) * 100).toFixed(0)" size=8 title="Water" :subtitle="`${totals.water.toFixed(0)}/${userStats.watergoal}oz`" />
       <circle-percentage
         :progress="(totals.calories / (userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1) * 100).toFixed(0)"
-        size=8 title="Calories" />
-      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)" size=8 title="Carbs" />
-      <circle-percentage :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size="8"
-        title="Proteins" />
-      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)" size=8 title="Fats" />
+        size=8 title="Calories" :subtitle="`${Math.round(totals.calories)}/${Math.round(userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1)}kcal`" />
+      <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)" size=8 title="Carbs" :subtitle="`${Math.round(totals.carbs)}/${Math.round(userStats.carbgrams)}g`" />
+      <circle-percentage :progress="((totals.proteins / userStats.proteingrams) * 100).toFixed(0)" size=8 title="Proteins" :subtitle="`${Math.round(totals.proteins)}/${Math.round(userStats.proteingrams)}g`" />
+      <circle-percentage :progress="((totals.fats / userStats.fatgrams) * 100).toFixed(0)" size=8 title="Fats" :subtitle="`${Math.round(totals.fats)}/${Math.round(userStats.fatgrams)}g`" />
     </div>
-    <template v-if="mealLogs.length > 0">
-      <h2 v-if="mealLogs.filter(log => log.mealtype.toLowerCase() !== 'water').length > 0" class="text-center">Recently Consumed Food Items</h2>
+    <template v-if="mealLogs.filter((log, index) =>  log.mealtype.toLowerCase() !== 'water').length > 0">
+      <h2 class="text-center">Recently Consumed Food Items</h2>
       <div id="mealCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
           <div v-for="(log, index) in mealLogs.filter(log => log.mealtype.toLowerCase() !== 'water')" :key="log.id" :class="['carousel-item', { active: index === 0 }]">

@@ -116,11 +116,19 @@ video {
 }
 
 $circle-text-size: 0.3rem;
+$circle-text-size-small: $circle-text-size - 0.1rem;
 
 .circle-title {
   font-size: $circle-text-size;
   text-anchor: middle;
-  align-baseline: middle;
+  vertical-align: middle;
+  fill: $primary;
+}
+
+.circle-subtitle {
+  font-size: $circle-text-size-small;
+  text-anchor: middle;
+  vertical-align: middle;
   fill: $primary;
 }
 

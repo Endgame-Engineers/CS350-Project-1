@@ -308,7 +308,7 @@ class UserRoute {
                 return res.status(400).json({ error: 'All fields are required' });
             }
 
-            if (req.body.durationminutes < 0) {
+            if(req.body.durationminutes <= 0) {
                 logger.error('Duration must be greater than 0');
                 return res.status(400).json({ error: 'Duration must be greater than 0' });
             }
@@ -329,6 +329,44 @@ class UserRoute {
                 });
         });
 
+        this.router.delete('/user/activity/:id', isAuthenticated, (req, res) => {
+            logger.info('/user/activity/:id DELETE');
+            const user = req.user as User;
+
+            if (req.params.id === undefined) {
+                logger.error('ID is required');
+                return res.status(400).json({ error: 'ID is required' });
+            }
+
+            let id: number;
+            try {
+                id = Number(req.params.id);
+                if (isNaN(id)) {
+                    logger.error('Invalid ID');
+                    return res.status(400).json({ error: 'Invalid ID' });
+                }
+            } catch (error) {
+                logger.error('Invalid ID:', (error as Error).message);
+                return res.status(400).json({ error: 'Invalid ID' });
+            }
+
+            if (user.id) {
+                logger.info('User authenticated');
+                ActivityLogs.deleteActivityLog(user.id, id)
+                    .then((activityLog) => {
+                        logger.info('Activity log deleted');
+                        res.json(activityLog);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+        
         this.router.get('/user/activities', isAuthenticated, (req, res) => {
             logger.info('/user/activities GET');
             const user = req.user as User;

@@ -48,6 +48,7 @@ export interface UserStat {
   weight: number | null;
   goal: number;
   caloriegoal: number | null;
+  watergoal: number | 0;
   activitylevel: number
   proteinpercentage: number;
   fatpercentage: number;
