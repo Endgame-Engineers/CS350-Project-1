@@ -84,7 +84,7 @@
             size="8" title="Calories"
             :totals="computeTotals('all').day.calories - computeTotals('all').caloriesburned"
             :goal="userStatValue?.caloriegoal ?? 1"
-             unit="kg"
+             unit="kcal"
             />
            
             <circle-percentage
