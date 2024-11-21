@@ -142,7 +142,7 @@ export default defineComponent({
         size=8 title="Calories" 
         :totals="totals.calories"
         :goal="userStats.caloriegoal ?? userStats.recommendedcaloriegoal ?? 1"
-        unit="g"
+        unit="kg"
         />
 
       <circle-percentage :progress="((totals.carbs / userStats.carbgrams) * 100).toFixed(0)" size=8 title="Carbs" 
