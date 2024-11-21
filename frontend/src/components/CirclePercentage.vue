@@ -12,9 +12,7 @@
             <text x="18" y="18" class="percentage">{{ props.progress || 0 }}%</text>
             <text v-if="props.title" x="18" y="22" class="circle-title">{{ props.title }}</text>
         </svg> 
-        <svg>
-            <text x="'18" y="18" class="unit-totals">{{ props.totals }}/{{ props.goal }} {{ props.unit }}</text>
-        </svg>
+        <text x="'18" y="24" text-anchor="middle" class="unit-totals">{{ props.totals }}/{{ Math.round(props.goal) }} {{ props.unit }}</text>
     </div>
     
 </template>
@@ -26,7 +24,7 @@ const props = defineProps<{
     size: number;
     title?: string;
     totals: string;
-    goal: string;
+    goal: number;
     unit?: string;
 }>();
 </script>
