@@ -3,7 +3,7 @@ import { useUserStore } from '@/stores/User';
 import { defineComponent, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { UserStat } from '@/models/Models';
-import { addUserStats, fetchCalorieGoal } from '@/services/UserStats';
+import { addUserStats, fetchCalorieGoal, fetchwaterGoal } from '@/services/UserStats';
 import { userStats } from '@/services/UserStats';
 
 export default defineComponent({
@@ -36,6 +36,8 @@ export default defineComponent({
                 userStats.value.Error = 'Please select your goal.';
             } else if (step.value === 8 && !userStats.value.caloriegoal) {
                 userStats.value.Error = 'Please enter your calorie goal.';
+            }else if (step.value === 9 && !userStats.value.watergoal) {
+                userStats.value.Error = 'Please enter your calorie goal.';
             } else {
                 userStats.value.Error = '';
                 step.value += 1;
@@ -55,6 +57,14 @@ export default defineComponent({
                 userStats.value.recommendedcaloriegoal = calorieGoal;
             } catch (error) {
                 console.error('Failed to fetch calorie goal:', error);
+            }
+        };
+        const getwatergoal = async () => {
+            try {
+                const waterGoal = await fetchwaterGoal(userStats.value as UserStat);
+                userStats.value.recommendedwatergoal = waterGoal;
+            } catch (error) {
+                console.error('Failed to fetch water goal:', error);
             }
         };
 
@@ -227,8 +237,25 @@ export default defineComponent({
                         </button>
                     </div>
                 </div>
-
+//water goal still working on it
                 <div v-if="step === 9" class="col-12 col-md-5 mb-3 text-center">
+                    <h1>Enter Calorie Goal</h1>
+                    <label for="waterGoal" class="form-label"></label>
+                    <input type="number" placeholder="Enter your daily water goal" class="form-control" id="calorieGoal"
+                        v-model.number="userStats.Watergoal" @keydown.enter="nextStep">
+                    <div class="form-text">Your Recommended Water Intake is {{ userStats.watergoal }} per
+                        day</div>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-primary" @click="prevStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+                        </button>
+                        <button class="btn btn-outline-primary" @click="nextStep">
+                            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="step === 10" class="col-12 col-md-5 mb-3 text-center">
                     <h1>Macronutrient Distribution</h1>
                     <user-stats-percentages :is-editing="true" :user-stats="userStats" :edit-user-stats="userStats"
                 @reset-warning="handleValidityUpdate(false)" @update-validity="handleValidityUpdate" />

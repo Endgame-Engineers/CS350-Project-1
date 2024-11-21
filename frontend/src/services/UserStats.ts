@@ -4,6 +4,7 @@ import axios from "axios";
 
 
 export interface ProfileStats extends UserStat {
+    [x: string]: any;
     recommendedcaloriegoal?: number;
     Error?: string;
 }
@@ -12,6 +13,7 @@ export const userStats = ref<ProfileStats>({
     weight: null,
     height: null,
     caloriegoal: null,
+    watergoal: null,
     dateofbirth: new Date(),
     activitylevel: 1,
     sex: 1,
@@ -79,5 +81,18 @@ export async function fetchCalorieGoal(userStat: UserStat): Promise<number> {
     } catch (error) {
         console.error("Error fetching calorie goal", error);
         throw new Error("Could not fetch calorie goal.");
+    }
+}
+export async function fetchwaterGoal(userStat: UserStat): Promise<number> {
+    try {
+        const response = await axios.post<number>('/api/user/stats/watergoal', userStat, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching water goal", error);
+        throw new Error("Could not fetch Water goal.");
     }
 }
