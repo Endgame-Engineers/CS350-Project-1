@@ -472,19 +472,34 @@ class UserRoute {
                 logger.info('User authenticated');
                 const token = uuidv4();
                 if (!req.body.expiration) {
-                    req.body.expires = false;
+                    req.body.expiration = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                    req.body.expires = true;
                 } else {
                     req.body.expires = true;
                 }
+
+                logger.debug(req.body);
+
+                if (new Date(req.body.expiration).getTime() < Date.now()) {
+                    logger.error('Expiration date must be in the future');
+                    return res.status(400).json({ error: 'Expiration date must be in the future' });
+                } 
+                if (new Date(req.body.expiration).getTime() > Date.now() + 30 * 24 * 60 * 60 * 1000) {
+                    logger.error('Expiration date must be within 30 days');
+                    return res.status(400).json({ error: 'Expiration date must be within 30 days' });
+                }
+
+                logger.debug(req.body);
+
                 AccessTokens.addAccessToken({ ...req.body, userid: user.id, token })
-                    .then((accessToken) => {
-                        logger.info('Access token created');
-                        res.status(201).json(accessToken);
-                    })
-                    .catch((error) => {
-                        logger.error(error);
-                        res.status(500).json({ error: 'An error occurred' });
+                .then((accessToken) => {
+                    logger.info('Access token created');
+                    res.status(201).json({
+                        token: accessToken.token,
+                        expires: accessToken.expires,
+                        expiration: accessToken.expiration
                     });
+                });
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
