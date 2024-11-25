@@ -111,3 +111,15 @@ export const recipeSchema = `
         PRIMARY KEY ("id")
     );
 `;
+
+export const accessTokenSchema = `
+    CREATE SEQUENCE IF NOT EXISTS "AccessTokens_id_seq";
+    CREATE TABLE IF NOT EXISTS "AccessTokens" (
+        "id" int4 NOT NULL DEFAULT nextval('"AccessTokens_id_seq"'::regclass),
+        "token" varchar,
+        "userid" int8,
+        "expires" boolean,
+        "expiration" timestamptz,
+        PRIMARY KEY ("id")
+    );
+`;

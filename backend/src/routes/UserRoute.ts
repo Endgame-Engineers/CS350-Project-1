@@ -10,6 +10,8 @@ import OpenFoodFacts from '../utils/OpenFoodFacts';
 import { logger } from '../utils/Logging';
 import { CalculateActivityLogs } from '../utils/CalculateActivityStats';
 import Recipes from '../models/Recipes';
+import AccessTokens from '../models/AccessTokens';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ExtendedMealLog extends MealLog {
     foodItem: FoodItem;
@@ -308,7 +310,7 @@ class UserRoute {
                 return res.status(400).json({ error: 'All fields are required' });
             }
 
-            if(req.body.durationminutes <= 0) {
+            if (req.body.durationminutes <= 0) {
                 logger.error('Duration must be greater than 0');
                 return res.status(400).json({ error: 'Duration must be greater than 0' });
             }
@@ -366,7 +368,7 @@ class UserRoute {
                 res.status(400).json({ error: 'User not authenticated' });
             }
         });
-        
+
         this.router.get('/user/activities', isAuthenticated, (req, res) => {
             logger.info('/user/activities GET');
             const user = req.user as User;
@@ -395,15 +397,15 @@ class UserRoute {
             if (user.id) {
                 logger.info('User authenticated');
 
-                Recipes.addRecipe({ ...req.body, userid: user.id})
-                .then((Recipe) => {
-                    logger.info('Recipe created');
-                    res.status(201).json(Recipe);
-                })
-                .catch((error) => {
-                    logger.error(error);
-                    res.status(500).json({ error: 'An error occurred' });
-                });
+                Recipes.addRecipe({ ...req.body, userid: user.id })
+                    .then((Recipe) => {
+                        logger.info('Recipe created');
+                        res.status(201).json(Recipe);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
 
             } else {
                 logger.error('User not authenticated');
@@ -420,7 +422,7 @@ class UserRoute {
                 Recipes.getRecipes(user.id)
                     .then(async (recipes) => {
                         logger.info('Recipes retrieved');
-                        for(const recipe of recipes){
+                        for (const recipe of recipes) {
                             const foodItems = [];
                             for (const barcode of Object.keys(recipe.ingredients)) {
                                 logger.info('Retrieving food item');
@@ -430,6 +432,54 @@ class UserRoute {
                             recipe.foodItems = foodItems;
                         }
                         res.json(recipes);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.get('/user/accesstokens', isAuthenticated, (req, res) => {
+            logger.info('/user/accesstokens GET');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+                AccessTokens.getAccessTokens(user.id)
+                    .then((accessTokens) => {
+                        logger.info('Access tokens retrieved');
+                        res.json(accessTokens);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.post('/user/accesstoken', isAuthenticated, (req, res) => {
+            logger.info('/user/accesstokens POST');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+                const token = uuidv4();
+                if (!req.body.expiration) {
+                    req.body.expires = false;
+                } else {
+                    req.body.expires = true;
+                }
+                AccessTokens.addAccessToken({ ...req.body, userid: user.id, token })
+                    .then((accessToken) => {
+                        logger.info('Access token created');
+                        res.status(201).json(accessToken);
                     })
                     .catch((error) => {
                         logger.error(error);

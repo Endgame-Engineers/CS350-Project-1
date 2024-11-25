@@ -34,6 +34,14 @@ class Users {
         return result.rows[0];
     }
 
+    async getUserById(id: number): Promise<User | null> {
+        const result = await (await this.client).query('SELECT * FROM "Users" WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return null;
+        }
+        return result.rows[0];
+    }
+
     async addUser(user: User): Promise<User> {
         const result = await (await this.client).query(
             'INSERT INTO "Users" (username, email, firstname, lastname, uuid, lastlogin, providername, providerid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
