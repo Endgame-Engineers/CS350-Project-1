@@ -4,6 +4,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import Users, { User } from '../models/Users';
 import UserStats from '../models/UserStats';
 import { logger } from './Logging';
+import AccessTokens from '../models/AccessTokens';
 
 class AuthGoogle {
     constructor() {
@@ -96,5 +97,24 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/login');
+
+    logger.info('User is not authenticated');
+    const bearerHeader = req.headers.authorization;
+    if (bearerHeader) {
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1];
+        logger.debug('Checking access token:', token);
+        AccessTokens.getAccessToken(token).then((accessToken) => {
+            if (accessToken !== null) {
+                Users.getUserById(accessToken.userid).then((user) => {
+                    if (user !== null) {
+                        req.user = user;
+                        return next();
+                    }
+                });
+            }
+        });
+    } else {
+        res.redirect('/login');
+    }
 }
