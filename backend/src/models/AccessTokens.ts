@@ -29,13 +29,15 @@ class AccessTokens {
         return result.rows;
     }
     
-    async addAccessToken(accessToken: AccessToken): Promise<void> {
+    async addAccessToken(accessToken: AccessToken): Promise<AccessToken> {
         logger.info('Adding access token to database');
         await (await this.client).query(
-            'INSERT INTO "AccessTokens" (token, userid, expires) VALUES ($1, $2, $3)',
-            [accessToken.token, accessToken.userid, accessToken.expires]
+            'INSERT INTO "AccessTokens" (token, userid, expires, expiration) VALUES ($1, $2, $3, $4)',
+            [accessToken.token, accessToken.userid, accessToken.expires, accessToken.expiration]
         );
         logger.info('Access token added to database');
+
+        return accessToken;
     }
 
     async deleteAccessToken(token: string): Promise<void> {
