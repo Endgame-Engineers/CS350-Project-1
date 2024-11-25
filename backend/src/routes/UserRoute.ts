@@ -489,8 +489,6 @@ class UserRoute {
                     return res.status(400).json({ error: 'Expiration date must be within 30 days' });
                 }
 
-                logger.debug(req.body);
-
                 AccessTokens.addAccessToken({ ...req.body, userid: user.id, token })
                 .then((accessToken) => {
                     logger.info('Access token created');
