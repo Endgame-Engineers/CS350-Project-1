@@ -129,7 +129,7 @@ export default {
       if (selectedFoodItem.value) {
         logger.info('Adding food item:', selectedFoodItem.value);
         mealLog.barcode = selectedFoodItem.value.barcode;
-        mealLog.mealtype = mealType.value || '';
+        mealLog.mealtype = searchMode.value === 'recipes' ? 'Recipe' : mealType.value || '';
         mealLog.dateadded = useLogStore().getMealLog().dateadded;
         if(servingConsumed.value){
           mealLog.servingconsumed = servingConsumed.value;
@@ -157,7 +157,7 @@ export default {
         try {
           const response = await getRecipes();
           recipeData.value = response;
-          console.log('Fetched recipes:', recipeData.value); // Add this line
+          console.log('Fetched recipes:', recipeData.value);
         } catch (error) {
           console.error('Error fetching recipes:', error);
         }
@@ -166,6 +166,18 @@ export default {
 
     const viewRecipe = (id: number) => {
       router.push({ name: 'ViewRecipe', params: { id } });
+    };
+
+    const convertRecipeToFoodItem = (recipe: Recipe): FoodItem => {
+      return {
+        foodname: recipe.name,
+        barcode: 'Recipe', // Placeholder value
+        image: 'Recipe', // Placeholder value
+        calories_per_serv: recipe.calories_per_serv,
+        protein_per_serv: recipe.protein_per_serv,
+        carb_per_serv: recipe.carb_per_serv,
+        fat_per_serv: recipe.fat_per_serv,
+      };
     };
 
     const handleInputChange = (event: Event) => {
@@ -209,6 +221,7 @@ export default {
       searchMode,
       viewRecipe,
       recipeData,
+      convertRecipeToFoodItem,
     };
   },
 };
@@ -307,7 +320,7 @@ export default {
           </ul>
         </div>
         <div class="card-footer text-muted d-flex align-items-center">
-          <button @click="recipe.id !== undefined && viewRecipe(recipe.id)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
+            <button @click="addFoodItem(convertRecipeToFoodItem(recipe))" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
         </div>
       </div>
     </div>

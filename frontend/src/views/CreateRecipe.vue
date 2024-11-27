@@ -69,7 +69,7 @@
   
         try {
           await addRecipe(newRecipe);
-          router.push({ name: 'Recipes' });
+          router.push({ name: 'Search' });
         } catch (error) {
           console.error('Error saving recipe:', error);
         }
