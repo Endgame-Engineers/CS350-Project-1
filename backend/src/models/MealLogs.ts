@@ -12,7 +12,7 @@ export interface MealLog {
 }
 
 function isValidMealLog(mealLog: MealLog): mealLog is MealLog {
-    const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water', 'Recipe'];
+    const mealTypes: MealType[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Water'];
     return mealTypes.includes(mealLog.mealtype) && mealLog.servingconsumed > 0;
 }
 
