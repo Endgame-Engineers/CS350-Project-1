@@ -22,10 +22,9 @@ export const useLogStore = defineStore('mealLog', {
 
     clearMealLog() {
       this.mealLog = {
-        mealtype: 'Breakfast', // Default to a valid MealType
-        dateadded: undefined,
-        barcode: '',
-        servingconsumed: 0,
+      mealtype: this.mealLog.mealtype, // Retain the current meal type
+      barcode: '',
+      servingconsumed: 0,
       } as MealLog;
     },
 
