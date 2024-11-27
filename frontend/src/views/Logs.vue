@@ -485,27 +485,6 @@ export default defineComponent({
       return (item as ExtendedMealLog[]).every((log) => log.foodItem !== undefined);
     };
 
-    onMounted(async () => {
-      const userLogStore = useLogStore();
-      const existingMealLog = userLogStore.getMealLog();
-      if (
-        existingMealLog.barcode !== '' &&
-        existingMealLog.dateadded !== undefined &&
-        existingMealLog.servingconsumed !== 0
-      ) {
-        await addMealLog(existingMealLog);
-        logger.info('Added existing meal log to meal logs');
-        logger.info('Clearing existing meal log');
-
-        userLogStore.clearMealLog();
-      }
-
-      await updateLogs(currentDate.value);
-
-      logger.info('Fetching user stats');
-      await updateUserStat();
-    });
-
     const prettyDate = (date: Date) => {
       return new Date(date).toLocaleString();
     };
