@@ -95,7 +95,6 @@ class UserRoute {
 
         this.router.post('/user/stats/caloriegoal', isAuthenticated, (req, res) => {
             logger.info('/user/stats/caloriegoal POST');
-            // TODO: restructure this ;-;
             const user = req.user as User;
             const userStat = { ...req.body, updatedon: new Date() } as UserStat;
             const calculatedStats = new CalculateUserStats(userStat);
@@ -185,6 +184,13 @@ class UserRoute {
                 if (req.body.mealtype.toLowerCase() == 'water') {
                     logger.info('Meal type is water');
                     const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, barcode: 'Water', dateadded: req.body.dateadded || new Date() });
+                    logger.info('Meal log created');
+                    res.status(201).json(mealLog);
+                    return;
+                }
+                else if (req.body.mealtype.toLowerCase() == 'recipe') {
+                    logger.info('Meal type is recipe');
+                    const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() });
                     logger.info('Meal log created');
                     res.status(201).json(mealLog);
                     return;

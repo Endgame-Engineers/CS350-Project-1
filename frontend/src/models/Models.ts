@@ -8,7 +8,7 @@ export interface FoodItem {
   image: string;
 }
 
-export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water';
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water' | 'Recipe';
 
 export interface MealLog {
   mealtype: MealType;
