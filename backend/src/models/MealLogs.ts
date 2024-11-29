@@ -55,8 +55,8 @@ class MealLogs {
 
         logger.info('Adding meal log to database');
         await (await this.client).query(
-            'INSERT INTO "MealLogs" (mealtype, dateadded, barcode, userid, servingconsumed) VALUES ($1, $2, $3, $4, $5)',
-            [mealLog.mealtype, mealLog.dateadded, mealLog.barcode, mealLog.userid, mealLog.servingconsumed]
+            'INSERT INTO "MealLogs" (mealtype, dateadded, barcode, userid, servingconsumed, recipeid) VALUES ($1, $2, $3, $4, $5, $6)',
+            [mealLog.mealtype, mealLog.dateadded, mealLog.barcode, mealLog.userid, mealLog.servingconsumed, mealLog.recipeid]
         );
         logger.info('Meal log added to database');
     }
