@@ -15,6 +15,8 @@ export interface MealLog {
   dateadded?: Date;
   barcode: string;
   servingconsumed: number;
+  recipeid?: number;
+  recipeName?: string;
 }
 
 export interface ErrorMessage {

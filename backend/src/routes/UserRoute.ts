@@ -116,48 +116,94 @@ class UserRoute {
             const startDate = start ? new Date(start as string) : undefined;
             const endDate = end ? new Date(end as string) : undefined;
             const user = req.user as User;
+        
             if (user.id) {
                 logger.info('User authenticated');
+        
+                const handleMealLog = async (mealLog: ExtendedMealLog) => {
+                    if (mealLog.barcode === 'Recipe' && mealLog.recipeid) {
+                        logger.info('Handling Recipe meal log');
+                        console.log(mealLog);
+                        const recipe = await Recipes.getRecipeById(mealLog.recipeid); // Fetch the recipe by ID
+                        console.log(recipe);
+                        if (recipe) {
+                            logger.info('Recipe found, mapping to foodItem structure');
+                            mealLog.foodItem = {
+                                foodname: recipe.name,
+                                barcode: 'Recipe',
+                                protein_per_serv: recipe.protein_per_serv || 0,
+                                carb_per_serv: recipe.carb_per_serv || 0,
+                                fat_per_serv: recipe.fat_per_serv || 0,
+                                calories_per_serv: recipe.calories_per_serv || 0,
+                                image: 'No-Image-Placeholder.svg', // Add actual image if available
+                            };
+                        } else {
+                            logger.error('Recipe not found, using dummy foodItem');
+                            mealLog.foodItem = {
+                                foodname: 'Unknown Recipe',
+                                barcode: 'Recipe',
+                                protein_per_serv: 0,
+                                carb_per_serv: 0,
+                                fat_per_serv: 0,
+                                calories_per_serv: 0,
+                                image: 'No-Image-Placeholder.svg',
+                            };
+                        }
+                    } else {
+                        logger.info('Handling non-recipe meal log');
+                        const foodItem = await FoodItems.getFoodItem(mealLog.barcode); // Fetch the food item
+                        if (foodItem) {
+                            logger.info('Food item retrieved');
+                            mealLog.foodItem = foodItem;
+                        } else {
+                            logger.error('Food item not found, using dummy foodItem');
+                            mealLog.foodItem = {
+                                foodname: 'Unknown Food Item',
+                                barcode: mealLog.barcode,
+                                protein_per_serv: 0,
+                                carb_per_serv: 0,
+                                fat_per_serv: 0,
+                                calories_per_serv: 0,
+                                image: 'No-Image-Placeholder.svg',
+                            };
+                        }
+                    }
+                    return mealLog;
+                };
+        
+                const fetchAndMapMealLogs = (mealLogs: ExtendedMealLog[]) => {
+                    const mealLogPromises = mealLogs.map(handleMealLog);
+                    return Promise.all(mealLogPromises);
+                };
+        
+                const handleLogsRetrieval = (mealLogs: ExtendedMealLog[]) => {
+                    logger.info('Meal logs retrieved');
+                    return fetchAndMapMealLogs(mealLogs);
+                };
+        
                 if (startDate && endDate) {
                     logger.info('Using date range');
                     MealLogs.getMealLogs(user.id, startDate, endDate)
-                        .then((mealLogs) => {
-                            logger.info('Meal logs retrieved');
-                            const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
-                                logger.info('Retrieving food item');
-                                const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
-                                if (foodItem) {
-                                    logger.info('Food item retrieved');
-                                    logger.info('Mapping meal logs');
-                                    mealLog.foodItem = foodItem;
-                                }
-                                return mealLog;
-                            });
-                            return Promise.all(mealLogPromises);
-                        })
+                        .then(handleLogsRetrieval)
                         .then((mappedMealLogs) => {
                             logger.info('Returning meal logs');
                             res.json(mappedMealLogs);
+                        })
+                        .catch((error) => {
+                            logger.error('Error retrieving meal logs:', error);
+                            res.status(500).json({ error: 'Failed to retrieve meal logs' });
                         });
                 } else {
                     logger.info('Using all meal logs');
                     MealLogs.getMealLogs(user.id)
-                        .then((mealLogs) => {
-                            logger.info('Meal logs retrieved');
-                            const mealLogPromises = mealLogs.map(async (mealLog: ExtendedMealLog) => {
-                                const foodItem = await FoodItems.getFoodItem(mealLog.barcode);
-                                if (foodItem) {
-                                    logger.info('Food item retrieved');
-                                    logger.info('Mapping meal logs');
-                                    mealLog.foodItem = foodItem;
-                                }
-                                return mealLog;
-                            });
-                            return Promise.all(mealLogPromises);
-                        })
+                        .then(handleLogsRetrieval)
                         .then((mappedMealLogs) => {
                             logger.info('Returning meal logs');
                             res.json(mappedMealLogs);
+                        })
+                        .catch((error) => {
+                            logger.error('Error retrieving meal logs:', error);
+                            res.status(500).json({ error: 'Failed to retrieve meal logs' });
                         });
                 }
             } else {
@@ -165,10 +211,13 @@ class UserRoute {
                 res.status(400).json({ error: 'User not authenticated' });
             }
         });
+        
 
         this.router.post('/user/logs', isAuthenticated, async (req, res) => {
             logger.info('/user/logs POST');
             const user = req.user as User;
+
+            console.log(req.body);
 
             if (!user.id) {
                 logger.error('User not authenticated');
@@ -188,13 +237,42 @@ class UserRoute {
                     res.status(201).json(mealLog);
                     return;
                 }
-                else if (req.body.mealtype.toLowerCase() == 'recipe') {
-                    logger.info('Meal type is recipe');
-                    const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() });
-                    logger.info('Meal log created');
-                    res.status(201).json(mealLog);
-                    return;
+                if (req.body.barcode.toLowerCase() === 'recipe') {
+                    console.log('this is a Recipe meal log');
+                    const recipe = await Recipes.getRecipe(user.id, req.body.recipeName);
+                    console.log(recipe);
+                    if (!recipe) {
+                        logger.error('Recipe not found');
+                        return res.status(404).json({ error: 'Recipe not found' });
+                    }
+                
+                    const mealLogData = {
+                        ...req.body,
+                        userid: user.id,
+                        dateadded: req.body.dateadded || new Date(),
+                        recipeid: recipe.id, // Include the recipe id
+                        recipeName: recipe.name, // Include the recipe name
+                    };
+                
+                    await MealLogs.addMealLog(mealLogData);
+                    logger.info('Meal log for recipe created');
+                
+                    const response = {
+                        ...mealLogData,
+                        foodItem: {
+                            foodname: recipe.name,
+                            barcode: 'Recipe',
+                            protein_per_serv: recipe.protein_per_serv || 0,
+                            carb_per_serv: recipe.carb_per_serv || 0,
+                            fat_per_serv: recipe.fat_per_serv || 0,
+                            calories_per_serv: recipe.calories_per_serv || 0,
+                            image: 'No-Image-Placeholder.svg',
+                        },
+                    };
+                
+                    return res.status(201).json(response);
                 }
+                
 
                 logger.info('Checking if food item exists');
                 OpenFoodFacts.fetchProductFromAPI(req.body.barcode)

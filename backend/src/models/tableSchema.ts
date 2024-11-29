@@ -22,6 +22,7 @@ export const mealLogSchema = `
         barcode VARCHAR,
         userid BIGINT,
         servingconsumed FLOAT8,
+        recipeid BIGINT,
         PRIMARY KEY (id)
     );
 `;

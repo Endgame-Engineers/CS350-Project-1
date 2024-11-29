@@ -9,6 +9,7 @@ export interface MealLog {
     barcode: string;
     userid: number;
     servingconsumed: number;
+    recipeid?: number; // optional field for recipes
 }
 
 function isValidMealLog(mealLog: MealLog): mealLog is MealLog {

@@ -49,6 +49,19 @@ class Recipes {
         return result.rows[0];
     }
 
+    async getRecipeById(recipeid: number): Promise<any> {
+        logger.info('Fetching Recipe by ID from database');
+        const query = 'SELECT * FROM "Recipes" WHERE id = $1';
+        const params = [recipeid];
+    
+        logger.info('Querying database');
+        const result = await (await this.client).query(query, params);
+    
+        logger.info('Returning Recipe by ID');
+        return result.rows[0];
+    }
+    
+
     async addRecipe(recipe: Recipe): Promise<void> {
         logger.info('Adding recipe to database');
         await (await this.client).query(
