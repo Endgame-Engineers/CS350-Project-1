@@ -6,6 +6,8 @@ export interface FoodItem {
   fat_per_serv: number;
   calories_per_serv: number;
   image: string;
+  recipeid?: number;
+  recipeName?: string;
 }
 
 export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water' | 'Recipe';

@@ -61,7 +61,7 @@ export default {
         } else {
           logger.info('Found non-digits in search bar');
           try {
-            if(containValidCharacters(searchBar.value)){
+            if (containValidCharacters(searchBar.value)) {
               throw new Error('Special characters found in search bar');
             }
             const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
@@ -121,31 +121,50 @@ export default {
 
     const addFoodItem = (item: FoodItem) => {
       selectedFoodItem.value = item;
+      console.log('Selected food item:', selectedFoodItem.value);
       const modal = new bootstrap.Modal(document.getElementById('servingModal')!);
       modal.show();
     };
 
     const confirmAddFoodItem = () => {
-      if (selectedFoodItem.value) {
-        logger.info('Adding food item:', selectedFoodItem.value);
-        mealLog.barcode = selectedFoodItem.value.barcode;
-        mealLog.mealtype = searchMode.value === 'recipes' ? 'Recipe' : mealType.value || '';
-        mealLog.dateadded = useLogStore().getMealLog().dateadded;
-        if(servingConsumed.value){
-          mealLog.servingconsumed = servingConsumed.value;
-        }
-        logger.info('Adding meal log to store:', mealLog);
-        useLogStore().setMealLog(mealLog);
+  if (selectedFoodItem.value) {
+    logger.info('Adding food item:', selectedFoodItem.value);
 
-        logger.info('Navigating to meal logs page');
-        router.push({ path: '/logs' });
+    // Determine if the selected item is a recipe
+    if (searchMode.value === 'recipes') {
+      console.log('Adding recipe to meal log:', selectedFoodItem.value);
+      mealLog.barcode = 'Recipe';
+      mealLog.mealtype = mealType.value || '';
+      mealLog.recipeName = selectedFoodItem.value.recipeName || '';
+      mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
+    } else {
+      mealLog.barcode = selectedFoodItem.value.barcode;
+      mealLog.mealtype = mealType.value || '';
+    }
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
-        if (modal) {
-          modal.hide();
-        }
-      }
-    };
+    mealLog.dateadded = useLogStore().getMealLog().dateadded;
+
+    if (servingConsumed.value) {
+      mealLog.servingconsumed = servingConsumed.value;
+    }
+
+    logger.info('Adding meal log to store:', mealLog);
+
+    // Assuming you have a function to handle sending the data to the backend
+    useLogStore().setMealLog(mealLog);
+
+    logger.info('Navigating to meal logs page');
+    router.push({ path: '/logs' });
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
+    if (modal) {
+      modal.hide();
+    }
+  } else {
+    logger.error('No selected food item to add');
+  }
+};
+
 
     const toggleSearchMode = async () => {
       searchMode.value = searchMode.value === 'food' ? 'recipes' : 'food';
@@ -169,16 +188,20 @@ export default {
     };
 
     const convertRecipeToFoodItem = (recipe: Recipe): FoodItem => {
+      console.log('Converting recipe to food item:', recipe);
       return {
         foodname: recipe.name,
-        barcode: 'Recipe', // Placeholder value
-        image: 'Recipe', // Placeholder value
+        barcode: 'Recipe', // Placeholder for recipes
+        image: 'No-Image-Placeholder.svg', // Placeholder image
         calories_per_serv: recipe.calories_per_serv,
         protein_per_serv: recipe.protein_per_serv,
         carb_per_serv: recipe.carb_per_serv,
         fat_per_serv: recipe.fat_per_serv,
+        recipeid: recipe.id, // Add recipe ID for logging
+        recipeName: recipe.name, // Add recipe name for logging
       };
     };
+
 
     const handleInputChange = (event: Event) => {
       const value = (event.target as HTMLInputElement).value;
@@ -250,84 +273,88 @@ export default {
         <button @click="toggleSearchMode" class="btn btn-outline-primary me-2">
           {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
         </button>
-        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary"> <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
+        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary">
+          <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
           Create Recipe
         </button>
       </div>
     </div>
   </div>
-    <div class="col-12 mb-3">
-      <!-- Error message -->
-      <div v-if="invalidSearch" class="alert alert-danger" role="alert">
-        Invalid Input
-      </div>
-      <div v-if="foodData && !foodData.length && !invalidSearch" class="alert alert-danger" role="alert">
-        No results found
-      </div>
-      <!-- Food Data Display -->
-      <div v-if="foodData && foodData.length">
-        <div class="row">
-          <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-              <img :src="item.image" class="card-img-top food-image" alt="Food image"/>
-              <div class="card-body">
-                <h5 class="card-title">{{ item.foodname }}</h5>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">
-                    Calories: {{ item.calories_per_serv.toFixed(2) }} kcal
-                  </li>
-                  <li class="list-group-item">
-                    Protein: {{ item.protein_per_serv.toFixed(2) }} g
-                  </li>
-                  <li class="list-group-item">
-                    Carbs: {{ item.carb_per_serv.toFixed(2) }} g
-                  </li>
-                  <li class="list-group-item">
-                    Fat: {{ item.fat_per_serv.toFixed(2) }} g
-                  </li>
-                </ul>
+  <div class="col-12 mb-3">
+    <!-- Error message -->
+    <div v-if="invalidSearch" class="alert alert-danger" role="alert">
+      Invalid Input
+    </div>
+    <div v-if="foodData && !foodData.length && !invalidSearch" class="alert alert-danger" role="alert">
+      No results found
+    </div>
+    <!-- Food Data Display -->
+    <div v-if="foodData && foodData.length">
+      <div class="row">
+        <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <img :src="item.image" class="card-img-top food-image" alt="Food image" />
+            <div class="card-body">
+              <h5 class="card-title">{{ item.foodname }}</h5>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  Calories: {{ item.calories_per_serv.toFixed(2) }} kcal
+                </li>
+                <li class="list-group-item">
+                  Protein: {{ item.protein_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Carbs: {{ item.carb_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Fat: {{ item.fat_per_serv.toFixed(2) }} g
+                </li>
+              </ul>
+            </div>
+            <div class="card-footer text-muted d-flex align-items-center">
+              <div class="justify-content-center"><font-awesome-icon :icon="['fas', 'barcode']" /> {{ item.barcode }}
               </div>
-              <div class="card-footer text-muted d-flex align-items-center">
-                <div class="justify-content-center"><font-awesome-icon :icon="['fas', 'barcode']" /> {{ item.barcode }}</div>
-                <button @click="addFoodItem(item)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
-              </div>
+              <button @click="addFoodItem(item)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon
+                  :icon="['fas', 'plus']" /></button>
             </div>
           </div>
         </div>
-        <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
       </div>
+      <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
+    </div>
 
-      <div v-if="searchMode === 'recipes' && recipeData && recipeData.length">
-  <div class="row">
-    <div v-for="recipe in recipeData" :key="recipe.id" class="col-12 col-md-6 col-lg-4 mb-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">{{ recipe.name }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Servings in Recipe: {{ recipe.servings }}</h6>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              Calories per Serving: {{ recipe.calories_per_serv.toFixed(2) }} kcal
-            </li>
-            <li class="list-group-item">
-              Protein per Serving: {{ recipe.protein_per_serv.toFixed(2) }} g
-            </li>
-            <li class="list-group-item">
-              Carbs per Serving: {{ recipe.carb_per_serv.toFixed(2) }} g
-            </li>
-            <li class="list-group-item">
-              Fats per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
-            </li>
-          </ul>
-        </div>
-        <div class="card-footer text-muted d-flex align-items-center">
-            <button @click="addFoodItem(convertRecipeToFoodItem(recipe))" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
+    <div v-if="searchMode === 'recipes' && recipeData && recipeData.length">
+      <div class="row">
+        <div v-for="recipe in recipeData" :key="recipe.id" class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ recipe.name }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">Servings in Recipe: {{ recipe.servings }}</h6>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  Calories per Serving: {{ recipe.calories_per_serv.toFixed(2) }} kcal
+                </li>
+                <li class="list-group-item">
+                  Protein per Serving: {{ recipe.protein_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Carbs per Serving: {{ recipe.carb_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Fats per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
+                </li>
+              </ul>
+            </div>
+            <div class="card-footer text-muted d-flex align-items-center">
+              <button @click="addFoodItem(convertRecipeToFoodItem(recipe))" class="btn btn-primary ms-auto"
+                type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
-</div>
-
-    </div>
 
 
   <!-- Modal -->
@@ -336,13 +363,15 @@ export default {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="servingModalLabel">Enter Grams Consumed</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="setServingConsumedNull"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="setServingConsumedNull"></button>
         </div>
         <div class="modal-body">
           <div v-if="selectedFoodItem">
             <div class="mb-3">
               <label for="servingConsumed" class="form-label">Grams Consumed</label>
-              <input type="number" placeholder="Enter the amount in grams" v-model="servingConsumed" class="form-control" id="servingConsumed" @input="handleInputChange" />
+              <input type="number" placeholder="Enter the amount in grams" v-model="servingConsumed"
+                class="form-control" id="servingConsumed" @input="handleInputChange" />
             </div>
             <div v-if="servingConsumed && servingConsumed > 0">
               <p><strong>Calories:</strong> {{ (selectedFoodItem.calories_per_serv * servingConsumed).toFixed(2)
@@ -361,8 +390,11 @@ export default {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="setServingConsumedNull">Close</button>
-          <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0 || servingConsumed > 1000" type="button" class="btn btn-primary">Add</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            @click="setServingConsumedNull">Close</button>
+          <button @click="confirmAddFoodItem"
+            :disabled="servingConsumed === null || servingConsumed <= 0 || servingConsumed > 1000" type="button"
+            class="btn btn-primary">Add</button>
         </div>
       </div>
     </div>
