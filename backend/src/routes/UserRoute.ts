@@ -527,6 +527,20 @@ class UserRoute {
             }
         });
 
+        this.router.put('/user/recipes/:id', isAuthenticated, async (req, res) => {
+            const { id } = req.params;
+            const user = req.user as User;
+            const recipe = req.body;
+        
+            try {
+                await Recipes.updateRecipe({ ...recipe, id: parseInt(id, 10) });
+                res.status(200).json({ message: 'Recipe updated successfully' });
+            } catch (error) {
+                res.status(500).json({ error: 'Failed to update recipe' });
+            }
+        });
+        
+
         this.router.get('/user/accesstokens', isAuthenticated, (req, res) => {
             logger.info('/user/accesstokens GET');
             const user = req.user as User;

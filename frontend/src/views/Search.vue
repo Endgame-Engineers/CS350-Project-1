@@ -127,43 +127,43 @@ export default {
     };
 
     const confirmAddFoodItem = () => {
-  if (selectedFoodItem.value) {
-    logger.info('Adding food item:', selectedFoodItem.value);
+      if (selectedFoodItem.value) {
+        logger.info('Adding food item:', selectedFoodItem.value);
 
-    // Determine if the selected item is a recipe
-    if (searchMode.value === 'recipes') {
-      console.log('Adding recipe to meal log:', selectedFoodItem.value);
-      mealLog.barcode = 'Recipe';
-      mealLog.mealtype = mealType.value || '';
-      mealLog.recipeName = selectedFoodItem.value.recipeName || '';
-      mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
-    } else {
-      mealLog.barcode = selectedFoodItem.value.barcode;
-      mealLog.mealtype = mealType.value || '';
-    }
+        // Determine if the selected item is a recipe
+        if (searchMode.value === 'recipes') {
+          console.log('Adding recipe to meal log:', selectedFoodItem.value);
+          mealLog.barcode = 'Recipe';
+          mealLog.mealtype = mealType.value || '';
+          mealLog.recipeName = selectedFoodItem.value.recipeName || '';
+          mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
+        } else {
+          mealLog.barcode = selectedFoodItem.value.barcode;
+          mealLog.mealtype = mealType.value || '';
+        }
 
-    mealLog.dateadded = useLogStore().getMealLog().dateadded;
+        mealLog.dateadded = useLogStore().getMealLog().dateadded;
 
-    if (servingConsumed.value) {
-      mealLog.servingconsumed = servingConsumed.value;
-    }
+        if (servingConsumed.value) {
+          mealLog.servingconsumed = servingConsumed.value;
+        }
 
-    logger.info('Adding meal log to store:', mealLog);
+        logger.info('Adding meal log to store:', mealLog);
 
-    // Assuming you have a function to handle sending the data to the backend
-    useLogStore().setMealLog(mealLog);
+        // Assuming you have a function to handle sending the data to the backend
+        useLogStore().setMealLog(mealLog);
 
-    logger.info('Navigating to meal logs page');
-    router.push({ path: '/logs' });
+        logger.info('Navigating to meal logs page');
+        router.push({ path: '/logs' });
 
-    const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
-    if (modal) {
-      modal.hide();
-    }
-  } else {
-    logger.error('No selected food item to add');
-  }
-};
+        const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
+        if (modal) {
+          modal.hide();
+        }
+      } else {
+        logger.error('No selected food item to add');
+      }
+    };
 
 
     const toggleSearchMode = async () => {
@@ -200,6 +200,18 @@ export default {
         recipeid: recipe.id, // Add recipe ID for logging
         recipeName: recipe.name, // Add recipe name for logging
       };
+    };
+
+    const editRecipeHandler = (recipe: Recipe) => {
+      router.push({
+        name: 'CreateRecipe',
+        query: {
+          id: (recipe.id ?? '').toString(),
+          name: recipe.name,
+          servings: recipe.servings.toString(),
+          ingredients: JSON.stringify(recipe.ingredients),
+        },
+      });
     };
 
 
@@ -245,6 +257,7 @@ export default {
       viewRecipe,
       recipeData,
       convertRecipeToFoodItem,
+      editRecipeHandler,
     };
   },
 };
@@ -348,6 +361,9 @@ export default {
             <div class="card-footer text-muted d-flex align-items-center">
               <button @click="addFoodItem(convertRecipeToFoodItem(recipe))" class="btn btn-primary ms-auto"
                 type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
+              <button @click="editRecipeHandler(recipe)" class="btn btn-warning ms-2" type="button">
+                <font-awesome-icon :icon="['fas', 'pencil-alt']" /> <!-- Pencil icon for edit -->
+              </button>
             </div>
           </div>
         </div>
