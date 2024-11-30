@@ -219,15 +219,9 @@ export default defineComponent({
           fat_per_serv: item.fat_per_serv,
           calories_per_serv: item.calories_per_serv,
         }));
-
-        // Recalculate macronutrients
-        calculateMacronutrients();
       }
+      calculateMacronutrients();
     });
-
-
-
-
 
     return {
       recipeStore,

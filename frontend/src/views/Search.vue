@@ -213,7 +213,7 @@ export default {
       return {
         foodname: recipe.name,
         barcode: 'Recipe', // Placeholder for recipes
-        image: 'No-Image-Placeholder.svg', // Placeholder image
+        image: 'img/No-Image-Placeholder.svg', // Placeholder image
         calories_per_serv: recipe.calories_per_serv,
         protein_per_serv: recipe.protein_per_serv,
         carb_per_serv: recipe.carb_per_serv,

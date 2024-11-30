@@ -135,7 +135,7 @@ class UserRoute {
                                 carb_per_serv: recipe.carb_per_serv || 0,
                                 fat_per_serv: recipe.fat_per_serv || 0,
                                 calories_per_serv: recipe.calories_per_serv || 0,
-                                image: 'No-Image-Placeholder.svg', // Add actual image if available
+                                image: '/img/No-Image-Placeholder.svg', // Add actual image if available
                             };
                         } else {
                             logger.error('Recipe not found, using dummy foodItem');
@@ -146,7 +146,7 @@ class UserRoute {
                                 carb_per_serv: 0,
                                 fat_per_serv: 0,
                                 calories_per_serv: 0,
-                                image: 'No-Image-Placeholder.svg',
+                                image: '/img/No-Image-Placeholder.svg',
                             };
                         }
                     } else {
@@ -164,7 +164,7 @@ class UserRoute {
                                 carb_per_serv: 0,
                                 fat_per_serv: 0,
                                 calories_per_serv: 0,
-                                image: 'No-Image-Placeholder.svg',
+                                image: '/img/No-Image-Placeholder.svg',
                             };
                         }
                     }
@@ -266,7 +266,7 @@ class UserRoute {
                             carb_per_serv: recipe.carb_per_serv || 0,
                             fat_per_serv: recipe.fat_per_serv || 0,
                             calories_per_serv: recipe.calories_per_serv || 0,
-                            image: 'No-Image-Placeholder.svg',
+                            image: '/img/No-Image-Placeholder.svg',
                         },
                     };
                 
