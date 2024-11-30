@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from 'vue';
+import { defineComponent, ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { addRecipe, updateRecipe } from '@/services/Recipes';
 import { useRecipeStore } from '@/stores/Recipe';
@@ -67,6 +67,7 @@ export default defineComponent({
     const recipeStore = useRecipeStore();
     const userStore = useUserStore();
     const isEditing = ref(false);
+    const leavingPageTemporarily = ref(false);
 
     // Macronutrient summary
     const macronutrientSummary = ref({
@@ -76,7 +77,9 @@ export default defineComponent({
       fatPerServing: 0,
     });
 
+    // Navigate to Search Page
     const navigateToSearch = () => {
+      leavingPageTemporarily.value = true;
       const recipe = recipeStore.currentRecipe;
       const ingredientsMap = recipeStore.ingredients.reduce((map, ingredient) => {
         map[ingredient.barcode] = ingredient.servings;
@@ -86,8 +89,8 @@ export default defineComponent({
       router.push({
         name: 'Search',
         query: {
-          source: 'createRecipe', // Indicate source page
-          id: route.query.id as string, // Preserve the recipe ID
+          source: 'createRecipe',
+          id: route.query.id as string,
           name: recipe.name,
           servings: recipe.servings.toString(),
           ingredients: encodeURIComponent(JSON.stringify(ingredientsMap)),
@@ -95,8 +98,7 @@ export default defineComponent({
       });
     };
 
-
-    // Calculate macronutrients
+    // Calculate Macronutrient Summary
     const calculateMacronutrients = () => {
       let totalCalories = 0,
         totalProtein = 0,
@@ -118,8 +120,12 @@ export default defineComponent({
         carbsPerServing: totalCarbs / servings || 0,
         fatPerServing: totalFat / servings || 0,
       };
+
+      // Mark as unsaved changes if recalculating macronutrients
+      recipeStore.hasUnSavedChanges = true;
     };
 
+    // Save Recipe
     const saveRecipe = async () => {
       if (!recipeStore.currentRecipe.name.trim()) {
         alert('Recipe name is required.');
@@ -136,19 +142,19 @@ export default defineComponent({
         return;
       }
 
-      await calculateMacronutrients(); // Ensure macronutrients are up-to-date
+      await calculateMacronutrients();
 
       const newRecipe: Recipe = {
-        id: isEditing.value ? Number(route.query.id) : undefined, // Include `id` if editing
-        userid: userStore.user.id ?? 0, // Ensure `userid` is set
-        name: recipeStore.currentRecipe.name.trim(), // Recipe name
-        servings: recipeStore.currentRecipe.servings, // Number of servings
+        id: isEditing.value ? Number(route.query.id) : undefined,
+        userid: userStore.user.id ?? 0,
+        name: recipeStore.currentRecipe.name.trim(),
+        servings: recipeStore.currentRecipe.servings,
         ingredients: recipeStore.ingredients.reduce((acc, ingredient) => {
           acc[ingredient.barcode] = ingredient.servings;
           return acc;
-        }, {} as { [barcode: string]: number }), // Barcode-to-servings map
-        dateadded: isEditing.value ? new Date(route.query.dateadded as string) : new Date(), // Date added
-        lastupdated: new Date(), // Last updated timestamp
+        }, {} as { [barcode: string]: number }),
+        dateadded: isEditing.value ? new Date(route.query.dateadded as string) : new Date(),
+        lastupdated: new Date(),
         protein_per_serv: macronutrientSummary.value.proteinPerServing,
         carb_per_serv: macronutrientSummary.value.carbsPerServing,
         fat_per_serv: macronutrientSummary.value.fatPerServing,
@@ -161,59 +167,51 @@ export default defineComponent({
 
       try {
         if (isEditing.value) {
-          await updateRecipe(newRecipe); // Update existing recipe
+          await updateRecipe(newRecipe);
         } else {
-          await addRecipe(newRecipe); // Add new recipe
+          await addRecipe(newRecipe);
         }
-        recipeStore.clearStore();
-        router.push({ name: 'Search' }); // Navigate to the recipe list page
+        recipeStore.clearStore(); // Clear store on successful save
+        router.push({ name: 'Search' });
       } catch (error) {
         console.error('Error saving recipe:', error);
         alert('Failed to save recipe.');
       }
     };
 
+    // Fetch Ingredient Details
     const fetchIngredientDetails = async (barcodes: string[]) => {
       try {
-        // Call your backend API to get food items by barcodes
         const response = await axios.post('/api/food-items', { barcodes });
-        return response.data; // An array of FoodItem objects
+        return response.data;
       } catch (error) {
         console.error('Error fetching ingredient details:', error);
         return [];
       }
     };
 
-
     watch(
       () => recipeStore.ingredients,
-      (newIngredients, oldIngredients) => {
-        console.log('Ingredients updated:', { newIngredients, oldIngredients });
-        calculateMacronutrients();
-      },
+      () => calculateMacronutrients(),
       { deep: true }
     );
 
     watch(
       () => recipeStore.currentRecipe.servings,
-      (newServings, oldServings) => {
-        console.log('Servings updated:', { newServings, oldServings });
-        calculateMacronutrients();
-      }
+      () => calculateMacronutrients()
     );
 
-
+    // Handle Component Mount
     onMounted(async () => {
+      leavingPageTemporarily.value = false;
+
       const { id, name, servings, ingredients } = route.query;
 
-      console.log('onMounted: route query', { id, name, servings, ingredients });
       if (id) {
         isEditing.value = true;
 
-        // Set the recipe name and servings
         recipeStore.setCurrentRecipe(name as string, Number(servings));
 
-        // Parse the ingredients (barcode-to-servings map)
         const parsedIngredients = ingredients
           ? JSON.parse(decodeURIComponent(ingredients as string))
           : {};
@@ -221,10 +219,8 @@ export default defineComponent({
         const barcodes = Object.keys(parsedIngredients);
         const servingsMap = parsedIngredients;
 
-        // Fetch the ingredient details from the backend
         const ingredientDetails = await fetchIngredientDetails(barcodes);
 
-        // Merge existing ingredients with new ones, avoiding duplicates
         const newIngredients = ingredientDetails.map((item: FoodItem) => ({
           name: item.foodname,
           barcode: item.barcode,
@@ -235,19 +231,22 @@ export default defineComponent({
           calories_per_serv: item.calories_per_serv,
         }));
 
-        // Filter out duplicate barcodes before merging
-        const existingBarcodes = new Set(recipeStore.ingredients.map(ing => ing.barcode));
-        const uniqueIngredients = newIngredients.filter(
-          (newIng: { barcode: string }) => !existingBarcodes.has(newIng.barcode)
-        );
-
-        // Add unique ingredients to the store
-        recipeStore.ingredients = [...recipeStore.ingredients, ...uniqueIngredients];
+        recipeStore.ingredients = newIngredients;
       }
+
       calculateMacronutrients();
     });
 
+    // Handle Component Unmount
+    onBeforeUnmount(() => {
+      if (leavingPageTemporarily.value) {
+        return;
+      }
 
+      if (!recipeStore.hasUnSavedChanges) {
+        recipeStore.clearStore();
+      }
+    });
 
     return {
       recipeStore,
