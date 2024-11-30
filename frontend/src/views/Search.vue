@@ -413,15 +413,16 @@ export default {
               </ul>
             </div>
             <div class="card-footer text-muted d-flex align-items-center">
-              <button @click="addFoodItem(convertRecipeToFoodItem(recipe))" class="btn btn-primary ms-auto"
-                type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
-              <button @click="editRecipeHandler(recipe)" class="btn btn-warning ms-2" type="button">
-                <font-awesome-icon :icon="['fas', 'pencil-alt']" /> <!-- Pencil icon for edit -->
+              <button class="btn btn-outline-primary btn-icon" @click="removeRecipe(recipe)">
+                <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
-              <button class="btn btn-danger" @click="removeRecipe(recipe)">
-                <font-awesome-icon :icon="['fas', 'trash']" class="me-2" />
-                Delete Recipe
+              <button class="btn btn-outline-primary btn-icon ms-2" @click="editRecipeHandler(recipe)">
+                <font-awesome-icon :icon="['fas', 'pencil-alt']" />
               </button>
+              <button class="btn btn-primary btn-icon ms-auto" @click="addFoodItem(convertRecipeToFoodItem(recipe))">
+                <font-awesome-icon :icon="['fas', 'plus']" />
+              </button>
+
             </div>
           </div>
         </div>
@@ -474,49 +475,29 @@ export default {
     </div>
   </div>
 
-  <div
-  class="modal fade"
-  id="confirmDeleteRecipeModal"
-  tabindex="-1"
-  aria-labelledby="confirmDeleteRecipeModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmDeleteRecipeModalLabel">Confirm Deletion</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          @click="cancelRecipeDelete"
-        ></button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to delete "{{ recipeToDelete?.name }}"?
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal"
-          @click="cancelRecipeDelete"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          class="btn btn-danger"
-          data-bs-dismiss="modal"
-          @click="confirmRecipeDelete"
-        >
-          Confirm
-        </button>
+  <div class="modal fade" id="confirmDeleteRecipeModal" tabindex="-1" aria-labelledby="confirmDeleteRecipeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteRecipeModalLabel">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="cancelRecipeDelete"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete "{{ recipeToDelete?.name }}"?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelRecipeDelete">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmRecipeDelete">
+            Confirm
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
 </template>
