@@ -1,5 +1,6 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { FoodItem, SearchResult, MealLog, MealType, Recipe } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
@@ -33,6 +34,7 @@ export default {
     const searchMode = ref<'food' | 'recipes'>('food');
     const recipeData = ref<Recipe[] | null>(null);
     const sourcePage = ref(route.query.source || null);
+    const recipeToDelete = ref<Recipe | null>(null);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useLogStore().getMealLog().mealtype);
@@ -219,6 +221,27 @@ export default {
       };
     };
 
+    const confirmRecipeDelete = async () => {
+      if (recipeToDelete.value) {
+        try {
+          // Call the API to delete the recipe
+          await axios.delete(`api/user/recipes/${recipeToDelete.value.id}`);
+          // Remove the deleted recipe from the UI
+          recipeData.value = recipeData.value?.filter((r) => r.id !== recipeToDelete.value?.id) || null;
+          logger.info(`Recipe "${recipeToDelete.value.name}" deleted successfully.`);
+        } catch (error) {
+          logger.error('Error deleting recipe:', error);
+          alert('Failed to delete the recipe. Please try again.');
+        } finally {
+          recipeToDelete.value = null;
+        }
+      }
+    };
+
+    const cancelRecipeDelete = () => {
+      recipeToDelete.value = null;
+    };
+
     const editRecipeHandler = (recipe: Recipe) => {
       router.push({
         name: 'CreateRecipe',
@@ -231,11 +254,16 @@ export default {
       });
     };
 
+    const removeRecipe = (recipe: Recipe) => {
+      recipeToDelete.value = recipe;
+      const modal = new bootstrap.Modal(document.getElementById('confirmDeleteRecipeModal')!);
+      modal.show();
+    };
+
     const navigateToCreateRecipe = () => {
       useRecipeStore().clearStore();
       router.push({ name: 'CreateRecipe' });
     };
-
 
     const handleInputChange = (event: Event) => {
       const value = (event.target as HTMLInputElement).value;
@@ -280,6 +308,10 @@ export default {
       convertRecipeToFoodItem,
       editRecipeHandler,
       navigateToCreateRecipe,
+      confirmRecipeDelete,
+      cancelRecipeDelete,
+      recipeToDelete,
+      removeRecipe,
     };
   },
 };
@@ -386,6 +418,10 @@ export default {
               <button @click="editRecipeHandler(recipe)" class="btn btn-warning ms-2" type="button">
                 <font-awesome-icon :icon="['fas', 'pencil-alt']" /> <!-- Pencil icon for edit -->
               </button>
+              <button class="btn btn-danger" @click="removeRecipe(recipe)">
+                <font-awesome-icon :icon="['fas', 'trash']" class="me-2" />
+                Delete Recipe
+              </button>
             </div>
           </div>
         </div>
@@ -437,4 +473,50 @@ export default {
       </div>
     </div>
   </div>
+
+  <div
+  class="modal fade"
+  id="confirmDeleteRecipeModal"
+  tabindex="-1"
+  aria-labelledby="confirmDeleteRecipeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteRecipeModalLabel">Confirm Deletion</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          @click="cancelRecipeDelete"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete "{{ recipeToDelete?.name }}"?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+          @click="cancelRecipeDelete"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          data-bs-dismiss="modal"
+          @click="confirmRecipeDelete"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </template>

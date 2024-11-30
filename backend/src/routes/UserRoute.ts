@@ -539,6 +539,22 @@ class UserRoute {
                 res.status(500).json({ error: 'Failed to update recipe' });
             }
         });
+
+        this.router.delete('/user/recipes/:id', isAuthenticated, async (req, res) => {
+            const { id } = req.params;
+            const user = req.user as User;
+        
+            try {
+                const recipe = await Recipes.getRecipeById(parseInt(id, 10));
+                console.log(recipe);
+        
+                await Recipes.deleteRecipe(parseInt(id, 10));
+                res.status(200).json({ message: 'Recipe deleted successfully' });
+            } catch (error) {
+                console.error('Failed to delete recipe:', error);
+                res.status(500).json({ error: 'Failed to delete recipe' });
+            }
+        });
         
 
         this.router.get('/user/accesstokens', isAuthenticated, (req, res) => {

@@ -115,14 +115,15 @@ class Recipes {
         }
     }    
     
-    async deleteRecipe(recipe: Recipe): Promise<void> {
+    async deleteRecipe(id: number): Promise<void> {
         logger.info('Deleting recipe from database');
         await (await this.client).query(
-            'DELETE FROM "Recipes" WHERE userid = $1 AND name = $2',
-            [recipe.userid, recipe.name]
+            'DELETE FROM "Recipes" WHERE id = $1',
+            [id]
         );
         logger.info('Recipe deleted from database');
     }
+    
 }
 
 export default new Recipes();
