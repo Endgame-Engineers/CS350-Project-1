@@ -68,47 +68,49 @@ class FoodItemsRoute {
         // and return an array of food items
         this.router.post('/food-items', isAuthenticated, async (req, res) => {
             const barcodes = req.body.barcodes;
-            if (!barcodes) {
-                res.status(400).json({ error: 'No barcodes provided' });
-                return;
+          
+            if (!barcodes || !Array.isArray(barcodes)) {
+              res.status(400).json({ error: 'No barcodes provided or invalid format' });
+              return;
             }
-
+          
             try {
-                const foodItems: FoodItem[] = await Promise.all(
-                    barcodes.map(async (barcode: string) => {
-                        FoodItems.getFoodItem(barcode)
-                            .then((foodItem) => {
-                                if (foodItem) {
-                                    console.log('Food item found in database');
-                                    return foodItem;
-                                } else {
-                                    OpenFoodFacts.fetchProductFromAPI(barcode)
-                                        .then((product) => {
-                                            if (product) {
-                                                console.log('Food item not found in database');
-                                                if ('foodname' in product) {
-                                                    FoodItems.addFoodItem(product as FoodItem);
-                                                }
-                                                return product;
-                                            }
-                                        })
-                                        .catch((error) => {
-                                            console.log('Error fetching food item:', error);
-                                        });
-                                }
-                            })
-                            .catch((error) => {
-                                console.log('Error fetching food item:', error);
-                            });
-                    })
-                );
-
-                console.log('Returning food items');
-                res.json(foodItems.filter(item => item !== undefined));
+              // Use Promise.all with proper async/await
+              const foodItems = await Promise.all(
+                barcodes.map(async (barcode: string) => {
+                  try {
+                    const foodItem = await FoodItems.getFoodItem(barcode);
+                    if (foodItem) {
+                      console.log('Food item found in database:', foodItem);
+                      return foodItem; // Return the food item from the database
+                    } else {
+                      const product = await OpenFoodFacts.fetchProductFromAPI(barcode);
+                      if (product && 'foodname' in product) {
+                        console.log('Food item not found in database. Adding to database:', product);
+                        await FoodItems.addFoodItem(product as FoodItem); // Save fetched product to DB
+                        return product; // Return the fetched product
+                      }
+                      console.log(`No product found for barcode: ${barcode}`);
+                      return null; // Return null if no product found
+                    }
+                  } catch (error) {
+                    console.error(`Error processing barcode ${barcode}:`, error);
+                    return null; // Return null on error for this barcode
+                  }
+                })
+              );
+          
+              // Filter out null values
+              const validFoodItems: FoodItem[] = foodItems.filter((item): item is FoodItem => item !== null);
+          
+              console.log('Returning valid food items:', validFoodItems);
+              res.json(validFoodItems);
             } catch (error) {
-                res.status(500).json({ error: (error as Error).message });
+              console.error('Error processing food items:', error);
+              res.status(500).json({ error: 'Internal server error' });
             }
-        });
+          });
+          
     }
 }
 

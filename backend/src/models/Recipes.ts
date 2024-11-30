@@ -80,6 +80,7 @@ class Recipes {
     async updateRecipe(recipe: Recipe): Promise<void> {
         logger.info(`Editing recipe in database: ${recipe.name}`);
         try {
+            console.log(recipe);
             const result = await (await this.client).query(
                 `UPDATE "Recipes" 
                 SET name = $2, ingredients = $3, servings = $4, lastupdated = $5, protein_per_serv = $6, 
