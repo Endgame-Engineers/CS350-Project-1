@@ -56,7 +56,8 @@ import { useRouter, useRoute } from 'vue-router';
 import { addRecipe, updateRecipe } from '@/services/Recipes';
 import { useRecipeStore } from '@/stores/Recipe';
 import { useUserStore } from '@/stores/User';
-import { Recipe } from '@/models/Models';
+import { FoodItem, Recipe } from '@/models/Models';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'CreateRecipe',
@@ -158,6 +159,17 @@ export default defineComponent({
       }
     };
 
+    const fetchIngredientDetails = async (barcodes: string[]) => {
+      try {
+        // Call your backend API to get food items by barcodes
+        const response = await axios.post('/api/food-items', { barcodes });
+        return response.data; // An array of FoodItem objects
+      } catch (error) {
+        console.error('Error fetching ingredient details:', error);
+        return [];
+      }
+    };
+
 
     watch(
       () => recipeStore.ingredients,
@@ -177,14 +189,43 @@ export default defineComponent({
     );
 
 
-    onMounted(() => {
-      const { id, name, servings } = route.query;
+    onMounted(async () => {
+      const { id, name, servings, ingredients } = route.query;
+
       if (id) {
         isEditing.value = true;
+
+        // Set the recipe name and servings
         recipeStore.setCurrentRecipe(name as string, Number(servings));
+
+        // Parse the ingredients (barcode-to-servings map)
+        const parsedIngredients = ingredients
+          ? JSON.parse(decodeURIComponent(ingredients as string))
+          : {};
+
+        const barcodes = Object.keys(parsedIngredients);
+        const servingsMap = parsedIngredients;
+
+        // Fetch the ingredient details from the backend
+        const ingredientDetails = await fetchIngredientDetails(barcodes);
+
+        // Update the store with the full ingredient details
+        recipeStore.ingredients = ingredientDetails.map((item: FoodItem) => ({
+          name: item.foodname,
+          barcode: item.barcode,
+          servings: servingsMap[item.barcode] || 0,
+          protein_per_serv: item.protein_per_serv,
+          carb_per_serv: item.carb_per_serv,
+          fat_per_serv: item.fat_per_serv,
+          calories_per_serv: item.calories_per_serv,
+        }));
+
+        // Recalculate macronutrients
+        calculateMacronutrients();
       }
-      calculateMacronutrients();
     });
+
+
 
 
 
