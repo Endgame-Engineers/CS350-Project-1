@@ -8,6 +8,7 @@ import { useLogStore } from '@/stores/Log';
 import router from '@/router';
 import * as bootstrap from 'bootstrap';
 import { logger } from '@/services/Logger';
+import { useRecipeStore } from '@/stores/Recipe';
 
 export default {
   name: 'SearchPage',
@@ -31,6 +32,7 @@ export default {
     const invalidSearch = ref(false);
     const searchMode = ref<'food' | 'recipes'>('food');
     const recipeData = ref<Recipe[] | null>(null);
+    const sourcePage = ref(route.query.source || null);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useLogStore().getMealLog().mealtype);
@@ -127,43 +129,62 @@ export default {
     };
 
     const confirmAddFoodItem = () => {
-      if (selectedFoodItem.value) {
-        logger.info('Adding food item:', selectedFoodItem.value);
+  if (selectedFoodItem.value && servingConsumed.value !== null && servingConsumed.value > 0) {
+    logger.info('Adding food item:', selectedFoodItem.value);
 
-        // Determine if the selected item is a recipe
-        if (searchMode.value === 'recipes') {
-          console.log('Adding recipe to meal log:', selectedFoodItem.value);
-          mealLog.barcode = 'Recipe';
-          mealLog.mealtype = mealType.value || '';
-          mealLog.recipeName = selectedFoodItem.value.recipeName || '';
-          mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
-        } else {
-          mealLog.barcode = selectedFoodItem.value.barcode;
-          mealLog.mealtype = mealType.value || '';
-        }
+    // Check the source page
+    if (sourcePage.value === 'createRecipe') {
+      // Add the item to the Recipe store
+      useRecipeStore().addIngredient({
+        name: selectedFoodItem.value.foodname,
+        barcode: selectedFoodItem.value.barcode,
+        servings: servingConsumed.value,
+        protein_per_serv: selectedFoodItem.value.protein_per_serv || 0,
+        carb_per_serv: selectedFoodItem.value.carb_per_serv || 0,
+        fat_per_serv: selectedFoodItem.value.fat_per_serv || 0,
+        calories_per_serv: selectedFoodItem.value.calories_per_serv || 0,
+      });
 
-        mealLog.dateadded = useLogStore().getMealLog().dateadded;
+      // Navigate back to CreateRecipe.vue
+      logger.info('Navigating back to CreateRecipe.vue');
+      router.push({ name: 'CreateRecipe' });
+    } else {
+      // Adding to meal logs
+      logger.info('Adding food item to meal logs');
 
-        if (servingConsumed.value) {
-          mealLog.servingconsumed = servingConsumed.value;
-        }
-
-        logger.info('Adding meal log to store:', mealLog);
-
-        // Assuming you have a function to handle sending the data to the backend
-        useLogStore().setMealLog(mealLog);
-
-        logger.info('Navigating to meal logs page');
-        router.push({ path: '/logs' });
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
-        if (modal) {
-          modal.hide();
-        }
+      // Determine if the selected item is a recipe
+      if (searchMode.value === 'recipes') {
+        logger.info('Adding recipe to meal log:', selectedFoodItem.value);
+        mealLog.barcode = 'Recipe';
+        mealLog.mealtype = mealType.value || '';
+        mealLog.recipeName = selectedFoodItem.value.recipeName || '';
+        mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
       } else {
-        logger.error('No selected food item to add');
+        mealLog.barcode = selectedFoodItem.value.barcode;
+        mealLog.mealtype = mealType.value || '';
       }
-    };
+
+      mealLog.dateadded = useLogStore().getMealLog().dateadded;
+      mealLog.servingconsumed = servingConsumed.value ?? 0;
+
+      logger.info('Adding meal log to store:', mealLog);
+      useLogStore().setMealLog(mealLog);
+
+      logger.info('Navigating to meal logs page');
+      router.push({ path: '/logs' });
+    }
+
+    // Close the modal if open
+    const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
+    if (modal) {
+      modal.hide();
+    }
+  } else {
+    logger.error('No selected food item or invalid serving size');
+    alert('Please select a valid food item and enter a serving size.');
+  }
+};
+
 
 
     const toggleSearchMode = async () => {
