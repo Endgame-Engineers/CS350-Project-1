@@ -147,9 +147,22 @@ export default {
             calories_per_serv: selectedFoodItem.value.calories_per_serv || 0,
           });
 
-          // Navigate back to CreateRecipe.vue
-          logger.info('Navigating back to CreateRecipe.vue');
-          router.push({ name: 'CreateRecipe' });
+          const recipe = useRecipeStore().currentRecipe;
+          const ingredientsMap = useRecipeStore().ingredients.reduce((map, ingredient) => {
+            map[ingredient.barcode] = ingredient.servings;
+            return map;
+          }, {} as { [barcode: string]: number });
+
+          router.push({
+            name: 'CreateRecipe',
+            query: {
+              id: route.query.id as string, // Preserve the recipe ID
+              name: recipe.name,
+              servings: recipe.servings.toString(),
+              ingredients: encodeURIComponent(JSON.stringify(ingredientsMap)),
+            },
+          });
+          
         } else {
           // Adding to meal logs
           logger.info('Adding food item to meal logs');

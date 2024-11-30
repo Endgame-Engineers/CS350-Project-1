@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { nextTick } from 'vue';
 
 export const useRecipeStore = defineStore('recipe', {
     state: () => ({
@@ -27,7 +28,11 @@ export const useRecipeStore = defineStore('recipe', {
             fat_per_serv: number;
             calories_per_serv: number;
         }) {
+            console.log('Adding ingredient:', ingredient);
             this.ingredients = [...this.ingredients, ingredient]; // Create a new array reference
+            nextTick(() => {
+                console.log('Updated ingredients after nextTick:', this.ingredients);
+            });
         },
 
         setCurrentRecipe(name: string, servings: number) {

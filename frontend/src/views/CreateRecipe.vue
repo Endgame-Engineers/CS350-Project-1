@@ -76,11 +76,25 @@ export default defineComponent({
       fatPerServing: 0,
     });
 
-    // Navigate to Search.vue
     const navigateToSearch = () => {
-      recipeStore.saveCurrentRecipeState();
-      router.push({ name: 'Search', query: { source: 'createRecipe' } });
+      const recipe = recipeStore.currentRecipe;
+      const ingredientsMap = recipeStore.ingredients.reduce((map, ingredient) => {
+        map[ingredient.barcode] = ingredient.servings;
+        return map;
+      }, {} as { [barcode: string]: number });
+
+      router.push({
+        name: 'Search',
+        query: {
+          source: 'createRecipe', // Indicate source page
+          id: route.query.id as string, // Preserve the recipe ID
+          name: recipe.name,
+          servings: recipe.servings.toString(),
+          ingredients: encodeURIComponent(JSON.stringify(ingredientsMap)),
+        },
+      });
     };
+
 
     // Calculate macronutrients
     const calculateMacronutrients = () => {
@@ -192,6 +206,7 @@ export default defineComponent({
     onMounted(async () => {
       const { id, name, servings, ingredients } = route.query;
 
+      console.log('onMounted: route query', { id, name, servings, ingredients });
       if (id) {
         isEditing.value = true;
 
@@ -209,8 +224,8 @@ export default defineComponent({
         // Fetch the ingredient details from the backend
         const ingredientDetails = await fetchIngredientDetails(barcodes);
 
-        // Update the store with the full ingredient details
-        recipeStore.ingredients = ingredientDetails.map((item: FoodItem) => ({
+        // Merge existing ingredients with new ones, avoiding duplicates
+        const newIngredients = ingredientDetails.map((item: FoodItem) => ({
           name: item.foodname,
           barcode: item.barcode,
           servings: servingsMap[item.barcode] || 0,
@@ -219,9 +234,20 @@ export default defineComponent({
           fat_per_serv: item.fat_per_serv,
           calories_per_serv: item.calories_per_serv,
         }));
+
+        // Filter out duplicate barcodes before merging
+        const existingBarcodes = new Set(recipeStore.ingredients.map(ing => ing.barcode));
+        const uniqueIngredients = newIngredients.filter(
+          (newIng: { barcode: string }) => !existingBarcodes.has(newIng.barcode)
+        );
+
+        // Add unique ingredients to the store
+        recipeStore.ingredients = [...recipeStore.ingredients, ...uniqueIngredients];
       }
       calculateMacronutrients();
     });
+
+
 
     return {
       recipeStore,

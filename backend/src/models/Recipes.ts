@@ -65,6 +65,19 @@ class Recipes {
 
     async addRecipe(recipe: Recipe): Promise<void> {
         logger.info('Adding recipe to database');
+    
+        // Check for existing recipe
+        const existingRecipe = await (await this.client).query(
+            `SELECT id FROM "Recipes" WHERE userid = $1 AND name = $2`,
+            [recipe.userid, recipe.name]
+        );
+    
+        if (existingRecipe.rows.length > 0) {
+            logger.warn(`Recipe with name "${recipe.name}" already exists for user ID: ${recipe.userid}.`);
+            throw new Error('Recipe already exists.');
+        }
+    
+        // Insert the new recipe
         await (await this.client).query(
             `INSERT INTO "Recipes" (userid, name, ingredients, servings, dateadded, lastupdated, protein_per_serv, carb_per_serv, fat_per_serv, calories_per_serv, total_protein, total_carbs, total_fat, total_calories) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
@@ -74,8 +87,10 @@ class Recipes {
                 recipe.total_protein, recipe.total_carbs, recipe.total_fat, recipe.total_calories
             ]
         );
+    
         logger.info('Recipe added to database');
     }
+    
 
     async updateRecipe(recipe: Recipe): Promise<void> {
         logger.info(`Editing recipe in database: ${recipe.name}`);
