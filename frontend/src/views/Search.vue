@@ -129,61 +129,61 @@ export default {
     };
 
     const confirmAddFoodItem = () => {
-  if (selectedFoodItem.value && servingConsumed.value !== null && servingConsumed.value > 0) {
-    logger.info('Adding food item:', selectedFoodItem.value);
+      if (selectedFoodItem.value && servingConsumed.value !== null && servingConsumed.value > 0) {
+        logger.info('Adding food item:', selectedFoodItem.value);
 
-    // Check the source page
-    if (sourcePage.value === 'createRecipe') {
-      // Add the item to the Recipe store
-      useRecipeStore().addIngredient({
-        name: selectedFoodItem.value.foodname,
-        barcode: selectedFoodItem.value.barcode,
-        servings: servingConsumed.value,
-        protein_per_serv: selectedFoodItem.value.protein_per_serv || 0,
-        carb_per_serv: selectedFoodItem.value.carb_per_serv || 0,
-        fat_per_serv: selectedFoodItem.value.fat_per_serv || 0,
-        calories_per_serv: selectedFoodItem.value.calories_per_serv || 0,
-      });
+        // Check the source page
+        if (sourcePage.value === 'createRecipe') {
+          // Add the item to the Recipe store
+          useRecipeStore().addIngredient({
+            name: selectedFoodItem.value.foodname,
+            barcode: selectedFoodItem.value.barcode,
+            servings: servingConsumed.value,
+            protein_per_serv: selectedFoodItem.value.protein_per_serv || 0,
+            carb_per_serv: selectedFoodItem.value.carb_per_serv || 0,
+            fat_per_serv: selectedFoodItem.value.fat_per_serv || 0,
+            calories_per_serv: selectedFoodItem.value.calories_per_serv || 0,
+          });
 
-      // Navigate back to CreateRecipe.vue
-      logger.info('Navigating back to CreateRecipe.vue');
-      router.push({ name: 'CreateRecipe' });
-    } else {
-      // Adding to meal logs
-      logger.info('Adding food item to meal logs');
+          // Navigate back to CreateRecipe.vue
+          logger.info('Navigating back to CreateRecipe.vue');
+          router.push({ name: 'CreateRecipe' });
+        } else {
+          // Adding to meal logs
+          logger.info('Adding food item to meal logs');
 
-      // Determine if the selected item is a recipe
-      if (searchMode.value === 'recipes') {
-        logger.info('Adding recipe to meal log:', selectedFoodItem.value);
-        mealLog.barcode = 'Recipe';
-        mealLog.mealtype = mealType.value || '';
-        mealLog.recipeName = selectedFoodItem.value.recipeName || '';
-        mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
+          // Determine if the selected item is a recipe
+          if (searchMode.value === 'recipes') {
+            logger.info('Adding recipe to meal log:', selectedFoodItem.value);
+            mealLog.barcode = 'Recipe';
+            mealLog.mealtype = mealType.value || '';
+            mealLog.recipeName = selectedFoodItem.value.recipeName || '';
+            mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
+          } else {
+            mealLog.barcode = selectedFoodItem.value.barcode;
+            mealLog.mealtype = mealType.value || '';
+          }
+
+          mealLog.dateadded = useLogStore().getMealLog().dateadded;
+          mealLog.servingconsumed = servingConsumed.value ?? 0;
+
+          logger.info('Adding meal log to store:', mealLog);
+          useLogStore().setMealLog(mealLog);
+
+          logger.info('Navigating to meal logs page');
+          router.push({ path: '/logs' });
+        }
+
+        // Close the modal if open
+        const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
+        if (modal) {
+          modal.hide();
+        }
       } else {
-        mealLog.barcode = selectedFoodItem.value.barcode;
-        mealLog.mealtype = mealType.value || '';
+        logger.error('No selected food item or invalid serving size');
+        alert('Please select a valid food item and enter a serving size.');
       }
-
-      mealLog.dateadded = useLogStore().getMealLog().dateadded;
-      mealLog.servingconsumed = servingConsumed.value ?? 0;
-
-      logger.info('Adding meal log to store:', mealLog);
-      useLogStore().setMealLog(mealLog);
-
-      logger.info('Navigating to meal logs page');
-      router.push({ path: '/logs' });
-    }
-
-    // Close the modal if open
-    const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
-    if (modal) {
-      modal.hide();
-    }
-  } else {
-    logger.error('No selected food item or invalid serving size');
-    alert('Please select a valid food item and enter a serving size.');
-  }
-};
+    };
 
 
 
@@ -202,10 +202,6 @@ export default {
           console.error('Error fetching recipes:', error);
         }
       }
-    };
-
-    const viewRecipe = (id: number) => {
-      router.push({ name: 'ViewRecipe', params: { id } });
     };
 
     const convertRecipeToFoodItem = (recipe: Recipe): FoodItem => {
@@ -233,6 +229,11 @@ export default {
           ingredients: JSON.stringify(recipe.ingredients),
         },
       });
+    };
+
+    const navigateToCreateRecipe = () => {
+      useRecipeStore().clearStore();
+      router.push({ name: 'CreateRecipe' });
     };
 
 
@@ -275,10 +276,10 @@ export default {
       setServingConsumedNull: () => servingConsumed.value = null,
       toggleSearchMode,
       searchMode,
-      viewRecipe,
       recipeData,
       convertRecipeToFoodItem,
       editRecipeHandler,
+      navigateToCreateRecipe,
     };
   },
 };
@@ -307,7 +308,7 @@ export default {
         <button @click="toggleSearchMode" class="btn btn-outline-primary me-2">
           {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
         </button>
-        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary">
+        <button @click="navigateToCreateRecipe()" class="btn btn-outline-primary">
           <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
           Create Recipe
         </button>

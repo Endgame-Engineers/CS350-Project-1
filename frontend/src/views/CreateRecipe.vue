@@ -151,7 +151,7 @@ export default defineComponent({
         } else {
           await addRecipe(newRecipe); // Add new recipe
         }
-        recipeStore.clearIngredients(); // Clear ingredients from store after saving
+        recipeStore.clearStore();
         router.push({ name: 'Search' }); // Navigate to the recipe list page
       } catch (error) {
         console.error('Error saving recipe:', error);

@@ -39,6 +39,14 @@ export const useRecipeStore = defineStore('recipe', {
             this.ingredients = [];
         },
 
+        clearStore() {
+            this.ingredients = [];
+            this.currentRecipe = {
+                name: '',
+                servings: 1,
+            };
+        },
+
         saveCurrentRecipeState() {
             console.log('Saving current recipe state:', this.currentRecipe, this.ingredients);
         },
