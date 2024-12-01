@@ -556,7 +556,6 @@ class UserRoute {
             }
         });
         
-
         this.router.get('/user/accesstokens', isAuthenticated, (req, res) => {
             logger.info('/user/accesstokens GET');
             const user = req.user as User;
