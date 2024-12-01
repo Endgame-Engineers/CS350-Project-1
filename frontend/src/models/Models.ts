@@ -6,15 +6,19 @@ export interface FoodItem {
   fat_per_serv: number;
   calories_per_serv: number;
   image: string;
+  recipeid?: number;
+  recipeName?: string;
 }
 
-export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water';
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Water' | 'Recipe';
 
 export interface MealLog {
   mealtype: MealType;
   dateadded?: Date;
   barcode: string;
   servingconsumed: number;
+  recipeid?: number;
+  recipeName?: string;
 }
 
 export interface ErrorMessage {

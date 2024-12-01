@@ -1,5 +1,6 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { FoodItem, SearchResult, MealLog, MealType, Recipe } from '@/models/Models';
 import { barcodeLookup, searchForProducts, } from '@/services/foodSearch';
@@ -8,6 +9,7 @@ import { useLogStore } from '@/stores/Log';
 import router from '@/router';
 import * as bootstrap from 'bootstrap';
 import { logger } from '@/services/Logger';
+import { useRecipeStore } from '@/stores/Recipe';
 
 export default {
   name: 'SearchPage',
@@ -31,6 +33,8 @@ export default {
     const invalidSearch = ref(false);
     const searchMode = ref<'food' | 'recipes'>('food');
     const recipeData = ref<Recipe[] | null>(null);
+    const sourcePage = ref(route.query.source || null);
+    const recipeToDelete = ref<Recipe | null>(null);
 
     logger.info('Checking if Mealog store container mealtype');
     const mealType = ref(useLogStore().getMealLog().mealtype);
@@ -61,7 +65,7 @@ export default {
         } else {
           logger.info('Found non-digits in search bar');
           try {
-            if(containValidCharacters(searchBar.value)){
+            if (containValidCharacters(searchBar.value)) {
               throw new Error('Special characters found in search bar');
             }
             const data = await searchForProducts(searchBar.value, page.value) as SearchResult;
@@ -121,31 +125,82 @@ export default {
 
     const addFoodItem = (item: FoodItem) => {
       selectedFoodItem.value = item;
+      console.log('Selected food item:', selectedFoodItem.value);
       const modal = new bootstrap.Modal(document.getElementById('servingModal')!);
       modal.show();
     };
 
     const confirmAddFoodItem = () => {
-      if (selectedFoodItem.value) {
+      if (selectedFoodItem.value && servingConsumed.value !== null && servingConsumed.value > 0) {
         logger.info('Adding food item:', selectedFoodItem.value);
-        mealLog.barcode = selectedFoodItem.value.barcode;
-        mealLog.mealtype = mealType.value || '';
-        mealLog.dateadded = useLogStore().getMealLog().dateadded;
-        if(servingConsumed.value){
-          mealLog.servingconsumed = servingConsumed.value;
+
+        // Check the source page
+        if (sourcePage.value === 'createRecipe') {
+          // Add the item to the Recipe store
+          useRecipeStore().addIngredient({
+            name: selectedFoodItem.value.foodname,
+            barcode: selectedFoodItem.value.barcode,
+            servings: servingConsumed.value,
+            protein_per_serv: selectedFoodItem.value.protein_per_serv || 0,
+            carb_per_serv: selectedFoodItem.value.carb_per_serv || 0,
+            fat_per_serv: selectedFoodItem.value.fat_per_serv || 0,
+            calories_per_serv: selectedFoodItem.value.calories_per_serv || 0,
+          });
+
+          const recipe = useRecipeStore().currentRecipe;
+          const ingredientsMap = useRecipeStore().ingredients.reduce((map, ingredient) => {
+            map[ingredient.barcode] = ingredient.servings;
+            return map;
+          }, {} as { [barcode: string]: number });
+
+          router.push({
+            name: 'CreateRecipe',
+            query: {
+              id: route.query.id as string, // Preserve the recipe ID
+              name: recipe.name,
+              servings: recipe.servings.toString(),
+              ingredients: encodeURIComponent(JSON.stringify(ingredientsMap)),
+            },
+          });
+          
+        } else {
+          // Adding to meal logs
+          logger.info('Adding food item to meal logs');
+
+          // Determine if the selected item is a recipe
+          if (searchMode.value === 'recipes') {
+            logger.info('Adding recipe to meal log:', selectedFoodItem.value);
+            mealLog.barcode = 'Recipe';
+            mealLog.mealtype = mealType.value || '';
+            mealLog.recipeName = selectedFoodItem.value.recipeName || '';
+            mealLog.recipeid = selectedFoodItem.value.recipeid || 0;
+          } else {
+            mealLog.barcode = selectedFoodItem.value.barcode;
+            mealLog.mealtype = mealType.value || '';
+          }
+
+          mealLog.dateadded = useLogStore().getMealLog().dateadded;
+          mealLog.servingconsumed = servingConsumed.value ?? 0;
+
+          logger.info('Adding meal log to store:', mealLog);
+          useLogStore().setMealLog(mealLog);
+
+          logger.info('Navigating to meal logs page');
+          router.push({ path: '/logs' });
         }
-        logger.info('Adding meal log to store:', mealLog);
-        useLogStore().setMealLog(mealLog);
 
-        logger.info('Navigating to meal logs page');
-        router.push({ path: '/logs' });
-
+        // Close the modal if open
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
         if (modal) {
           modal.hide();
         }
+      } else {
+        logger.error('No selected food item or invalid serving size');
+        alert('Please select a valid food item and enter a serving size.');
       }
     };
+
+
 
     const toggleSearchMode = async () => {
       searchMode.value = searchMode.value === 'food' ? 'recipes' : 'food';
@@ -157,15 +212,70 @@ export default {
         try {
           const response = await getRecipes();
           recipeData.value = response;
-          console.log('Fetched recipes:', recipeData.value); // Add this line
+          console.log('Fetched recipes:', recipeData.value);
         } catch (error) {
           console.error('Error fetching recipes:', error);
         }
       }
     };
 
-    const viewRecipe = (id: number) => {
-      router.push({ name: 'ViewRecipe', params: { id } });
+    const convertRecipeToFoodItem = (recipe: Recipe): FoodItem => {
+      console.log('Converting recipe to food item:', recipe);
+      return {
+        foodname: recipe.name,
+        barcode: 'Recipe', // Placeholder for recipes
+        image: 'img/No-Image-Placeholder.svg', // Placeholder image
+        calories_per_serv: recipe.calories_per_serv,
+        protein_per_serv: recipe.protein_per_serv,
+        carb_per_serv: recipe.carb_per_serv,
+        fat_per_serv: recipe.fat_per_serv,
+        recipeid: recipe.id, // Add recipe ID for logging
+        recipeName: recipe.name, // Add recipe name for logging
+      };
+    };
+
+    const confirmRecipeDelete = async () => {
+      if (recipeToDelete.value) {
+        try {
+          // Call the API to delete the recipe
+          await axios.delete(`api/user/recipes/${recipeToDelete.value.id}`);
+          // Remove the deleted recipe from the UI
+          recipeData.value = recipeData.value?.filter((r) => r.id !== recipeToDelete.value?.id) || null;
+          logger.info(`Recipe "${recipeToDelete.value.name}" deleted successfully.`);
+        } catch (error) {
+          logger.error('Error deleting recipe:', error);
+          alert('Failed to delete the recipe. Please try again.');
+        } finally {
+          recipeToDelete.value = null;
+        }
+      }
+    };
+
+    const cancelRecipeDelete = () => {
+      recipeToDelete.value = null;
+    };
+
+    const editRecipeHandler = (recipe: Recipe) => {
+      router.push({
+        name: 'CreateRecipe',
+        query: {
+          id: (recipe.id ?? '').toString(),
+          name: recipe.name,
+          servings: recipe.servings.toString(),
+          ingredients: JSON.stringify(recipe.ingredients),
+        },
+      });
+    };
+
+    const removeRecipe = (recipe: Recipe) => {
+      recipeToDelete.value = recipe;
+      const modal = new bootstrap.Modal(document.getElementById('confirmDeleteRecipeModal')!);
+      modal.show();
+    };
+
+    const navigateToCreateRecipe = () => {
+      useRecipeStore().clearStore();
+      router.push({ name: 'CreateRecipe' });
     };
 
     const handleInputChange = (event: Event) => {
@@ -207,8 +317,14 @@ export default {
       setServingConsumedNull: () => servingConsumed.value = null,
       toggleSearchMode,
       searchMode,
-      viewRecipe,
       recipeData,
+      convertRecipeToFoodItem,
+      editRecipeHandler,
+      navigateToCreateRecipe,
+      confirmRecipeDelete,
+      cancelRecipeDelete,
+      recipeToDelete,
+      removeRecipe,
     };
   },
 };
@@ -237,84 +353,96 @@ export default {
         <button @click="toggleSearchMode" class="btn btn-outline-primary me-2">
           {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
         </button>
-        <button @click="$router.push({ name: 'CreateRecipe' })" class="btn btn-outline-primary"> <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
+        <button @click="navigateToCreateRecipe()" class="btn btn-outline-primary">
+          <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
           Create Recipe
         </button>
       </div>
     </div>
   </div>
-    <div class="col-12 mb-3">
-      <!-- Error message -->
-      <div v-if="invalidSearch" class="alert alert-danger" role="alert">
-        Invalid Input
-      </div>
-      <div v-if="foodData && !foodData.length && !invalidSearch" class="alert alert-danger" role="alert">
-        No results found
-      </div>
-      <!-- Food Data Display -->
-      <div v-if="foodData && foodData.length">
-        <div class="row">
-          <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-              <img :src="item.image" class="card-img-top food-image" alt="Food image"/>
-              <div class="card-body">
-                <h5 class="card-title">{{ item.foodname }}</h5>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">
-                    Calories: {{ item.calories_per_serv.toFixed(2) }} kcal
-                  </li>
-                  <li class="list-group-item">
-                    Protein: {{ item.protein_per_serv.toFixed(2) }} g
-                  </li>
-                  <li class="list-group-item">
-                    Carbs: {{ item.carb_per_serv.toFixed(2) }} g
-                  </li>
-                  <li class="list-group-item">
-                    Fat: {{ item.fat_per_serv.toFixed(2) }} g
-                  </li>
-                </ul>
+  <div class="col-12 mb-3">
+    <!-- Error message -->
+    <div v-if="invalidSearch" class="alert alert-danger" role="alert">
+      Invalid Input
+    </div>
+    <div v-if="foodData && !foodData.length && !invalidSearch" class="alert alert-danger" role="alert">
+      No results found
+    </div>
+    <!-- Food Data Display -->
+    <div v-if="foodData && foodData.length">
+      <div class="row">
+        <div v-for="item in foodData" :key="item.barcode" class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <img :src="item.image" class="card-img-top food-image" alt="Food image" />
+            <div class="card-body">
+              <h5 class="card-title">{{ item.foodname }}</h5>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  Calories: {{ item.calories_per_serv.toFixed(2) }} kcal
+                </li>
+                <li class="list-group-item">
+                  Protein: {{ item.protein_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Carbs: {{ item.carb_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Fat: {{ item.fat_per_serv.toFixed(2) }} g
+                </li>
+              </ul>
+            </div>
+            <div class="card-footer text-muted d-flex align-items-center">
+              <div class="justify-content-center"><font-awesome-icon :icon="['fas', 'barcode']" /> {{ item.barcode }}
               </div>
-              <div class="card-footer text-muted d-flex align-items-center">
-                <div class="justify-content-center"><font-awesome-icon :icon="['fas', 'barcode']" /> {{ item.barcode }}</div>
-                <button @click="addFoodItem(item)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
-              </div>
+              <button @click="addFoodItem(item)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon
+                  :icon="['fas', 'plus']" /></button>
             </div>
           </div>
         </div>
-        <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
       </div>
+      <button v-if="!isBarcode" @click="loadMore" class="btn btn-primary mt-3">Load More</button>
+    </div>
 
-      <div v-if="searchMode === 'recipes' && recipeData && recipeData.length">
-  <div class="row">
-    <div v-for="recipe in recipeData" :key="recipe.id" class="col-12 col-md-6 col-lg-4 mb-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">{{ recipe.name }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Servings in Recipe: {{ recipe.servings }}</h6>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              Calories per Serving: {{ recipe.calories_per_serv.toFixed(2) }} kcal
-            </li>
-            <li class="list-group-item">
-              Protein per Serving: {{ recipe.protein_per_serv.toFixed(2) }} g
-            </li>
-            <li class="list-group-item">
-              Carbs per Serving: {{ recipe.carb_per_serv.toFixed(2) }} g
-            </li>
-            <li class="list-group-item">
-              Fats per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
-            </li>
-          </ul>
-        </div>
-        <div class="card-footer text-muted d-flex align-items-center">
-          <button @click="recipe.id !== undefined && viewRecipe(recipe.id)" class="btn btn-primary ms-auto" type="button"><font-awesome-icon :icon="['fas', 'plus']" /></button>
+    <div v-if="searchMode === 'recipes' && recipeData && recipeData.length">
+      <div class="row">
+        <div v-for="recipe in recipeData" :key="recipe.id" class="col-12 col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ recipe.name }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">Servings in Recipe: {{ recipe.servings }}</h6>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  Calories per Serving: {{ recipe.calories_per_serv.toFixed(2) }} kcal
+                </li>
+                <li class="list-group-item">
+                  Protein per Serving: {{ recipe.protein_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Carbs per Serving: {{ recipe.carb_per_serv.toFixed(2) }} g
+                </li>
+                <li class="list-group-item">
+                  Fats per Serving: {{ recipe.fat_per_serv.toFixed(2) }} g
+                </li>
+              </ul>
+            </div>
+            <div class="card-footer text-muted d-flex align-items-center">
+              <button class="btn btn-outline-primary btn-icon" @click="removeRecipe(recipe)">
+                <font-awesome-icon :icon="['fas', 'trash']" />
+              </button>
+              <button class="btn btn-outline-primary btn-icon ms-2" @click="editRecipeHandler(recipe)">
+                <font-awesome-icon :icon="['fas', 'pencil-alt']" />
+              </button>
+              <button class="btn btn-primary btn-icon ms-auto" @click="addFoodItem(convertRecipeToFoodItem(recipe))">
+                <font-awesome-icon :icon="['fas', 'plus']" />
+              </button>
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
-</div>
-
-    </div>
 
 
   <!-- Modal -->
@@ -323,13 +451,15 @@ export default {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="servingModalLabel">Enter Grams Consumed</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="setServingConsumedNull"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="setServingConsumedNull"></button>
         </div>
         <div class="modal-body">
           <div v-if="selectedFoodItem">
             <div class="mb-3">
               <label for="servingConsumed" class="form-label">Grams Consumed</label>
-              <input type="number" placeholder="Enter the amount in grams" v-model="servingConsumed" class="form-control" id="servingConsumed" @input="handleInputChange" />
+              <input type="number" placeholder="Enter the amount in grams" v-model="servingConsumed"
+                class="form-control" id="servingConsumed" @input="handleInputChange" />
             </div>
             <div v-if="servingConsumed && servingConsumed > 0">
               <p><strong>Calories:</strong> {{ (selectedFoodItem.calories_per_serv * servingConsumed).toFixed(2)
@@ -348,10 +478,39 @@ export default {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="setServingConsumedNull">Close</button>
-          <button @click="confirmAddFoodItem" :disabled="servingConsumed === null || servingConsumed <=0 || servingConsumed > 1000" type="button" class="btn btn-primary">Add</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            @click="setServingConsumedNull">Close</button>
+          <button @click="confirmAddFoodItem"
+            :disabled="servingConsumed === null || servingConsumed <= 0 || servingConsumed > 1000" type="button"
+            class="btn btn-primary">Add</button>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="confirmDeleteRecipeModal" tabindex="-1" aria-labelledby="confirmDeleteRecipeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteRecipeModalLabel">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="cancelRecipeDelete"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete "{{ recipeToDelete?.name }}"?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelRecipeDelete">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmRecipeDelete">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </template>

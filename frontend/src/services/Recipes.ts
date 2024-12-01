@@ -30,6 +30,23 @@ export async function addRecipe(recipe: Recipe): Promise<void> {
   }
 }
 
+// Function to update a recipe
+export async function updateRecipe(recipe: Recipe): Promise<void> {
+  try {
+    await axios.put(`/api/user/recipes/${recipe.id}`, recipe);
+    const index = recipes.value.findIndex(r => r.id === recipe.id);
+    if (index !== -1) {
+      recipes.value[index] = recipe; // Update existing recipe in state
+    } else {
+      recipes.value.push(recipe); // Add to state if not already present
+    }
+    console.log(`Recipe successfully updated: ${recipe.name}`);
+  } catch (error) {
+    console.error("Error updating recipe", error);
+    throw new Error("Could not update recipe.");
+  }
+}
+
 // Function to delete a recipe
 export async function deleteRecipe(recipeId: number): Promise<void> {
   try {
