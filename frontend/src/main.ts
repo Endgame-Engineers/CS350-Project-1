@@ -4,6 +4,7 @@ import router from './router';
 import './assets/scss/custom.scss';
 import UserStatsPercentages from './components/UserStatsPercentages.vue';
 import CirclePercentage from './components/CirclePercentage.vue';
+import NutritionDataGraph from './components/NutritionDataGraph.vue';
 import { logger } from './services/Logger';
 
 // Font Awesome imports
@@ -22,6 +23,7 @@ createApp(App)
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('user-stats-percentages', UserStatsPercentages)
   .component('circle-percentage', CirclePercentage)
+  .component('nutrition-data', NutritionDataGraph)
 
   .mount('#app');
 

@@ -172,3 +172,11 @@ $circle-text-size-small: $circle-text-size - 0.1rem;
   text-anchor: middle;
   fill: $primary;
 }
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  max-width: 1200px;
+  margin: 0 auto;
+}

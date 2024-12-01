@@ -1,35 +1,102 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <!-- Date Range Selection -->
-    <div class="row mb-4 d-grid grid-template-columns-small1-3 gap-1">
-      <button class="btn btn-primary" @click="resetDates">
-        <font-awesome-icon :icon="['fas', 'rotate-right']" />
-      </button>
-      <div class="input-group">
-        <button type="button" class="btn btn-primary" @click="adjustDates(-1)">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" />
-        </button>
-        <input type="date" class="form-control" id="startDate" :value="startDateFormatted"
-          @input="updateStartDate($event)" />
-      </div>
-      <div class="input-group">
-        <input type="date" class="form-control" id="endDate" :value="endDateFormatted" @input="updateEndDate($event)" />
-        <button type="button" class="btn btn-primary" @click="adjustDates(1)">
-          <font-awesome-icon :icon="['fas', 'arrow-right']" />
+    <div class="card mb-2">
+      <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+        <div class="input-group">
+          <button type="button" class="btn btn-outline-primary" @click="adjustDates(-1)">
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+          </button>
+          <input type="date" class="form-control" id="startDate" :value="startDateFormatted" @input="updateStartDate($event)" />
+          <input type="date" class="form-control" id="endDate" :value="endDateFormatted" @input="updateEndDate($event)" />
+          <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
+            <font-awesome-icon :icon="['fas', 'arrow-right']" />
+          </button>
+        </div>
+        <button class="btn btn-outline-secondary d-flex gap-1" @click="resetDates">
+          <font-awesome-icon :icon="['fas', 'rotate-right']" />Reset
         </button>
       </div>
     </div>
-  </div>
-  <div class="container w-100 pt-4">
-    <!-- Chart -->
-    <div class="row">
-      <div class="col">
-        <div class="cal-chart">
-          <h2 class="pb-1">Calories Consumed vs Calorie Goal</h2>
-          <Bar v-if="mealLogs.length > 0" :data="chartData" :options="chartOptions" />
-          <div v-else class="alert alert-warning" role="alert">
-            No meal logs found for the selected date range.
+
+    <!-- Chart Type Selection -->
+    <div class="card mb-2">
+      <div class="card-header d-flex gap-2 justify-content-center flex-wrap">
+        <button 
+          type="button" 
+          class="btn flex-fill d-flex align-items-center justify-content-center"
+          :class="selectedChart === 'calories' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="selectedChart = 'calories'">
+          <font-awesome-icon icon="hamburger" class="me-2" alt="Calories" />
+          <span class="d-none d-md-inline">Calories</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn flex-fill d-flex align-items-center justify-content-center"
+          :class="selectedChart === 'protein' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="selectedChart = 'protein'">
+          <font-awesome-icon icon="drumstick-bite" class="me-2" alt="Protein" />
+          <span class="d-none d-md-inline">Protein</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn flex-fill d-flex align-items-center justify-content-center"
+          :class="selectedChart === 'carbs' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="selectedChart = 'carbs'">
+          <font-awesome-icon icon="bread-slice" class="me-2" alt="Carbohydrates" />
+          <span class="d-none d-md-inline">Carbohydrates</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn flex-fill d-flex align-items-center justify-content-center"
+          :class="selectedChart === 'fats' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="selectedChart = 'fats'">
+          <font-awesome-icon icon="bacon" class="me-2" alt="Fats" />
+          <span class="d-none d-md-inline">Fats</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn flex-fill d-flex align-items-center justify-content-center"
+          :class="selectedChart === 'water' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="selectedChart = 'water'">
+          <font-awesome-icon icon="glass-water-droplet" class="me-2" alt="Water" />
+          <span class="d-none d-md-inline">Water</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chart Display -->
+    <div class="card">
+      <div class="card-body">
+        <div v-if="mealLogs.length > 0">
+          <div v-if="selectedChart === 'calories'">
+            <div class="d-flex justify-content-center"><h2 class="pb-1">Calories Consumed vs Calorie Goal</h2></div>
+            <nutrition-data :type="'Calories Consumed'" :goalType="'Calorie Goal'" :labels="labels"
+              :data="caloriesConsumed" :goalData="calorieGoals" />
           </div>
+          <div v-else-if="selectedChart === 'protein'">
+            <div class="d-flex justify-content-center"><h2 class="pb-1">Protein Consumed vs Protein Goal</h2></div>
+            <nutrition-data :type="'Protein Consumed'" :goalType="'Protein Goal'" :labels="labels"
+              :data="proteinConsumed" :goalData="proteinGoals" />
+          </div>
+          <div v-else-if="selectedChart === 'carbs'">
+            <div class="d-flex justify-content-center"><h2 class="pb-1">Carbohydrates Consumed vs Carbohydrate Goal</h2></div>
+            <nutrition-data :type="'Carbohydrates Consumed'" :goalType="'Carbohydrate Goal'" :labels="labels"
+              :data="carbsConsumed" :goalData="carbsGoals" />
+          </div>
+          <div v-else-if="selectedChart === 'fats'">
+            <div class="d-flex justify-content-center"><h2 class="pb-1">Fat Consumed vs Fat Goal</h2></div>
+            <nutrition-data :type="'Fats Consumed'" :goalType="'Fat Goal'" :labels="labels"
+              :data="fatsConsumed" :goalData="fatGoals" />
+          </div>
+          <div v-else-if="selectedChart === 'water'">
+            <div class="d-flex justify-content-center"><h2 class="pb-1">Water Consumed vs Water Goal</h2></div>
+            <nutrition-data :type="'Water Consumed'" :goalType="'Water Goal'" :labels="labels"
+              :data="waterConsumed" :goalData="waterGoals" />
+          </div>
+        </div>
+        <div v-else class="alert alert-warning text-center">
+          No meal logs found for the selected date range.
         </div>
       </div>
     </div>
@@ -38,60 +105,35 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
-import { Bar } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartData, ChartOptions } from 'chart.js';
 import { ExtendedMealLog, UserStat } from '@/models/Models';
 import { getMealLogs } from '@/services/MealLogs';
 import { getUserStats } from '@/services/UserStats';
 import { logger } from '@/services/Logger';
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 export default defineComponent({
   name: 'HistoryPage',
   components: {
-    Bar,
   },
 
   data() {
     return {
-      chartData: {
-        labels: [] as string[],
-        datasets: [
-          {
-            label: 'Calories Consumed',
-            data: [] as number[],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Calorie Goal',
-            data: [] as number[],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1,
-          },
-        ],
-      } as ChartData<'bar'>,
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            type: 'category',
-            stacked: true,
-          },
-          y: {
-            stacked: false,
-            beginAtZero: true,
-          },
-        },
-      } as ChartOptions<'bar'>,
+      selectedChart: 'calories',
       startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1) as Date,
       endDate: new Date() as Date,
       mealLogs: ref([] as ExtendedMealLog[]),
       userStats: ref([] as UserStat[]),
+      labels: [] as string[],
+      caloriesConsumed: [] as number[],
+      proteinConsumed: [] as number[],
+      carbsConsumed: [] as number[],
+      fatsConsumed: [] as number[],
+      waterConsumed: [] as number[],
+      calorieGoals: [] as number[],
+      proteinGoals: [] as number[],
+      carbsGoals: [] as number[],
+      fatGoals: [] as number[],
+      waterGoals: [] as number[],
     };
   },
 
@@ -107,13 +149,13 @@ export default defineComponent({
   async mounted() {
     await this.fetchUserStats();
     await this.fetchMealLogs(this.startDate, this.endDate);
-    this.updateChartData();
+    await this.updateChartData();
 
     watch([() => this.startDate, () => this.endDate], async () => {
       logger.info('Date Range Updated');
       await this.fetchMealLogs(this.startDate, this.endDate);
       await this.fetchUserStats();
-      this.updateChartData();
+      await this.updateChartData();
     },
       { deep: true });
   },
@@ -132,15 +174,30 @@ export default defineComponent({
     },
 
     updateChartData() {
-      const labels: string[] = [];
-      const caloriesConsumed: number[] = [];
-      const calorieGoals: number[] = [];
+      this.labels = [];
+      this.caloriesConsumed = [];
+      this.calorieGoals = [];
+      this.proteinGoals = [];
+      this.carbsGoals = [];
+      this.fatGoals = [];
+      this.waterGoals = [];
+      this.proteinConsumed = [];
+      this.carbsConsumed = [];
+      this.fatsConsumed = [];
+      this.waterConsumed = [];
       const sortedStats = [...this.userStats].sort((a, b) => new Date(a.updatedon).getTime() - new Date(b.updatedon).getTime());
       let currentIndex = 0;
-      let currentGoal = 0;
+      let currentCalorieGoal = 0;
+      let currentProteinGoal = 0;
+      let currentCarbsGoal = 0;
+      let currentFatsGoal = 0;
+      let currentWaterGoal = 0;
 
-      // Populate labels and calories consumed
       const dailyCalories: { [key: string]: number } = {};
+      const dailyProtein: { [key: string]: number } = {};
+      const dailyCarbs: { [key: string]: number } = {};
+      const dailyFats: { [key: string]: number } = {};
+      const dailyWater: { [key: string]: number } = {};
 
       this.mealLogs.forEach((log: ExtendedMealLog) => {
         if (log.dateadded) {
@@ -148,50 +205,84 @@ export default defineComponent({
           if (!dailyCalories[date]) {
             dailyCalories[date] = 0;
           }
+          if (!dailyProtein[date]) {
+            dailyProtein[date] = 0;
+          }
+          if (!dailyCarbs[date]) {
+            dailyCarbs[date] = 0;
+          }
+          if (!dailyFats[date]) {
+            dailyFats[date] = 0;
+          }
+          if (!dailyWater[date]) {
+            dailyWater[date] = 0;
+          }
           if (log.foodItem && log.foodItem.calories_per_serv) {
             dailyCalories[date] += Math.round(log.servingconsumed * log.foodItem.calories_per_serv);
+            dailyProtein[date] += Math.round(log.servingconsumed * log.foodItem.protein_per_serv);
+            dailyCarbs[date] += Math.round(log.servingconsumed * log.foodItem.carb_per_serv);
+            dailyFats[date] += Math.round(log.servingconsumed * log.foodItem.fat_per_serv);
+          }
+          if (log.mealtype.toLocaleLowerCase() === 'water' && log.servingconsumed !== 0) {
+            dailyWater[date] += Math.round(log.servingconsumed);
           }
         }
       });
 
       Object.keys(dailyCalories).forEach((date) => {
-        labels.push(date);
-        caloriesConsumed.push(dailyCalories[date]);
+        this.labels.push(date);
+        this.caloriesConsumed.push(dailyCalories[date]);
+        this.proteinConsumed.push(dailyProtein[date]);
+        this.carbsConsumed.push(dailyCarbs[date]);
+        this.fatsConsumed.push(dailyFats[date]);
+        this.waterConsumed.push(dailyWater[date]);
       });
 
       logger.info('Calories Consumed Calculated');
+      logger.info('Protein Consumed Calculated');
+      logger.info('Carbs Consumed Calculated');
+      logger.info('Fats Consumed Calculated');
+      logger.info('Water Consumed Calculated');
 
-      labels.forEach((labelDate) => {
-        const labelDateTime = new Date(labelDate).getTime();
+      this.labels.forEach((labelDate) => {
+      const labelDateTime = new Date(labelDate).getTime();
+      while (currentIndex < sortedStats.length && new Date(sortedStats[currentIndex].updatedon).getTime() <= labelDateTime) {
+        currentCalorieGoal = sortedStats[currentIndex].caloriegoal ?? 0;
+        currentProteinGoal = sortedStats[currentIndex].proteingrams ?? 0;
+        currentCarbsGoal = sortedStats[currentIndex].carbgrams ?? 0;
+        currentFatsGoal = sortedStats[currentIndex].fatgrams ?? 0;
+        currentWaterGoal = sortedStats[currentIndex].watergoal ?? 0;
+        currentIndex++;
+      }
+      this.calorieGoals.push(currentCalorieGoal);
+      this.proteinGoals.push(currentProteinGoal);
+      this.carbsGoals.push(currentCarbsGoal);
+      this.fatGoals.push(currentFatsGoal);  
+      this.waterGoals.push(currentWaterGoal);
+    });
+    
 
-        while (currentIndex < sortedStats.length && new Date(sortedStats[currentIndex].updatedon).getTime() <= labelDateTime) {
-          currentGoal = sortedStats[currentIndex].caloriegoal ?? 0;
-          currentIndex++;
-        }
+      const sortedData = this.labels
+        .map((label, index) => ({
+          label,
+          calories: this.caloriesConsumed[index],
+          goal: this.calorieGoals[index],
+          protein: this.proteinConsumed[index],
+          carbs: this.carbsConsumed[index],
+          fats: this.fatsConsumed[index],
+          water: this.waterConsumed[index],
+        }))
+        .sort((a, b) => new Date(a.label).getTime() - new Date(b.label).getTime());
 
-        calorieGoals.push(currentGoal);
-      });
+      this.labels = sortedData.map((item) => item.label);
+      this.caloriesConsumed = sortedData.map((item) => item.calories);
+      this.calorieGoals = sortedData.map((item) => item.goal);
+      this.proteinConsumed = sortedData.map((item) => item.protein);
+      this.carbsConsumed = sortedData.map((item) => item.carbs);
+      this.fatsConsumed = sortedData.map((item) => item.fats);
+      this.waterConsumed = sortedData.map((item) => item.water);
 
-      // Replace the chartData object to trigger reactivity
-      this.chartData = {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Calories Consumed',
-            data: caloriesConsumed,
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Calorie Goal',
-            data: calorieGoals,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1,
-          },
-        ],
-      };
+      logger.info('Chart data sorted and updated');
     },
 
     resetDates() {
