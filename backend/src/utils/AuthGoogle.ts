@@ -117,14 +117,14 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
                         if (user !== null) {
                             req.user = user;
                             return next();
+                        } else {
+                            return res.status(401).json({ message: 'User not found' });
                         }
                     });
+                } else {
+                    return res.status(401).json({ message: 'Invalid access token' });
                 }
-            })
-            .catch((error) => {
-                return res.status(401).json({ message: 'Invalid access token' });
             });
-            return res.status(401).json({ message: 'Invalid access token' });
     } else {
         res.redirect('/login');
     }
