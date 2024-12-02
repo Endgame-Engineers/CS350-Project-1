@@ -52,7 +52,7 @@ export interface UserStat {
   weight: number | null;
   goal: number;
   caloriegoal: number | null;
-  watergoal: number | 0;
+  watergoal: number | null | 0;
   activitylevel: number
   proteinpercentage: number;
   fatpercentage: number;
@@ -61,7 +61,7 @@ export interface UserStat {
   fatgrams: number;
   carbgrams: number;
   sex: number;
-  dateofbirth: Date;
+  dateofbirth: Date | null;
   updatedon: Date;
 }
 

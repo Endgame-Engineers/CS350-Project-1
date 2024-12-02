@@ -6,6 +6,7 @@ import axios from "axios";
 export interface ProfileStats extends UserStat {
     recommendedcaloriegoal?: number;
     Error?: string;
+    step?: number;
 }
 
 export const userStats = ref<ProfileStats>({
@@ -24,7 +25,7 @@ export const userStats = ref<ProfileStats>({
     fatgrams: 0,
     carbgrams: 0,
     recommendedcaloriegoal: 0,
-    watergoal: 0
+    watergoal: 0,
 });
 
 // Function to fetch user stats from the backend
