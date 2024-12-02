@@ -18,7 +18,8 @@
           <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </button>
-          <button type="button" class="btn btn-outline-primary" @click="currentDate = new Date()">
+          <button type="button" class="btn btn-primary" @click="currentDate = new Date(new Date().toDateString())"
+            v-if="currentDate.toDateString() !== new Date().toDateString()">
             <font-awesome-icon :icon="['fas', 'redo']" />
           </button>
         </div>
