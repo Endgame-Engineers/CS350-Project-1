@@ -86,7 +86,7 @@ export const activitiesSchema = `
         "activity" varchar,
         "description" varchar,
         "MET" float8,
-        PRIMARY KEY ("id"),
+        PRIMARY KEY ("id")
     );
 `;
 
