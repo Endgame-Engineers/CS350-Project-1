@@ -58,7 +58,7 @@
         <div class="input-group">
           <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
             aria-expanded="false">
-            <font-awesome-icon :icon="['fas', 'droplet']" />
+            <font-awesome-icon :icon="['fas', 'glass-water-droplet']" />
           </button>
           <ul class="dropdown-menu">
             <template v-if="filteredWaterLogs.length === 0">
@@ -264,18 +264,18 @@
                 </button>
               </div>
               <div class="modal-body">
-                <template v-if="itemToDelete && 'foodItem' in itemToDelete">
-                  <p>Are you sure you want to remove "{{ itemToDelete.foodItem?.foodname }}" from your meal log?
-                  </p>
-                  <img :src="itemToDelete.foodItem?.image" :alt="itemToDelete.foodItem?.foodname"
-                    style="height: 200px; object-fit: cover;" />
+                <template v-if="itemToDelete && 'foodItem' in itemToDelete && itemToDelete.foodItem?.barcode.toLowerCase() === 'water'">
+                  <p>Are you sure you want to remove this water log from your meal log?</p>
                 </template>
                 <template v-else-if="itemToDelete && 'activityid' in itemToDelete">
                   <p>Are you sure you want to remove "{{ itemToDelete.activity?.activity + " - " +
                     itemToDelete.activity?.description }}" from your activity log? </p>
                 </template>
-                <template v-else>
-                  <p>Are you sure you want to remove this water log from your meal log?</p>
+                <template v-else-if="itemToDelete && 'foodItem' in itemToDelete">
+                  <p>Are you sure you want to remove "{{ itemToDelete.foodItem?.foodname }}" from your meal log?
+                  </p>
+                  <img :src="itemToDelete.foodItem?.image" :alt="itemToDelete.foodItem?.foodname"
+                    style="height: 200px; object-fit: cover;" />
                 </template>
               </div>
 
