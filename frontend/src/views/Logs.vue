@@ -18,6 +18,9 @@
           <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </button>
+          <button type="button" class="btn btn-outline-primary" @click="currentDate = new Date()">
+            <font-awesome-icon :icon="['fas', 'redo']" />
+          </button>
         </div>
         <div class="d-flex gap-2 justify-content-center flex-wrap flex-md-nowrap w-100">
           <button type="button" class="btn flex-fill d-flex align-items-center justify-content-center"
@@ -418,8 +421,8 @@ export default defineComponent({
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const userStatValue = ref<UserStat | null>(null);
     const activityLogs = ref<ActivityLog[]>([]);
-    const currentDate = ref(new Date());
     const userLogStore = useLogStore();
+    const currentDate = ref(userLogStore.getCurrentDate());
     const selectedLogType = ref<string>(userLogStore.getSelectedLogType());
     const itemToDelete = ref<ExtendedMealLog | ActivityLog | null>(null);
     const water = ref<number | null>(null);
@@ -523,6 +526,7 @@ export default defineComponent({
       if (newcurrentDate) {
         updateLogs(newcurrentDate);
         updateUserStat();
+        userLogStore.setCurrentDate(newcurrentDate);
       }
     });
 
