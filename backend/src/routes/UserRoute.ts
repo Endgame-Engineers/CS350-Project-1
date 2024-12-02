@@ -212,7 +212,6 @@ class UserRoute {
             }
         });
 
-
         this.router.post('/user/logs', isAuthenticated, async (req, res) => {
             logger.info('/user/logs POST');
             const user = req.user as User;
@@ -418,7 +417,10 @@ class UserRoute {
             ActivityLogs.addActivityLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() })
                 .then((activityLog) => {
                     logger.info('Activity log created');
-                    res.status(201).json(activityLog);
+                    res.status(201).json({
+                        "message": "Activity log created successfully",
+                        "data": activityLog
+                    });
                 })
                 .catch((error) => {
                     logger.error(error);
@@ -485,29 +487,6 @@ class UserRoute {
             }
         });
 
-        this.router.post('/user/recipes', isAuthenticated, (req, res) => {
-            logger.info('/user/recipes POST');
-            const user = req.user as User;
-
-            if (user.id) {
-                logger.info('User authenticated');
-
-                Recipes.addRecipe({ ...req.body, userid: user.id })
-                    .then((Recipe) => {
-                        logger.info('Recipe created');
-                        res.status(201).json(Recipe);
-                    })
-                    .catch((error) => {
-                        logger.error(error);
-                        res.status(500).json({ error: 'An error occurred' });
-                    });
-
-            } else {
-                logger.error('User not authenticated');
-                res.status(400).json({ error: 'User not authenticated' });
-            }
-        });
-
         this.router.get('/user/recipes', isAuthenticated, (req, res) => {
             logger.info('/user/recipes GET');
             const user = req.user as User;
@@ -532,6 +511,29 @@ class UserRoute {
                         logger.error(error);
                         res.status(500).json({ error: 'An error occurred' });
                     });
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
+        this.router.post('/user/recipes', isAuthenticated, (req, res) => {
+            logger.info('/user/recipes POST');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+
+                Recipes.addRecipe({ ...req.body, userid: user.id })
+                    .then((Recipe) => {
+                        logger.info('Recipe created');
+                        res.status(201).json(Recipe);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });
