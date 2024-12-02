@@ -51,6 +51,22 @@ class ConnectToDB {
                                 try {
                                     this.createTable(table.schema);
                                     logger.info(`Created table ${table.name}`);
+                                    
+                                    if (table.name === 'Activities') {
+                                        logger.info('Inserting default activities');
+
+                                        const fs = require('fs');
+                                        const path = require('path');
+                                        const sql = fs.readFileSync(path.join(__dirname, '../../src/models/Activities.sql')).toString();
+                                        this.client.query(sql, (err, res) => {
+                                            if (err) {
+                                                logger.error('Failed to insert default activities:', err);
+                                            } else {
+                                                logger.info('Inserted default activities');
+                                            }
+                                        });
+                                    }
+
                                 } catch (error) {
                                     logger.error(`Failed to create table ${table.name}:`, error);
                                 }
