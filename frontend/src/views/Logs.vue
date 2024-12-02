@@ -225,7 +225,7 @@
                         Description: {{ item.activity?.description }}
                       </li>
                       <li class="list-group-item">
-                        Calories Burned: {{ item.caloriesburned }} kcal
+                        Calories Burned: {{ item.caloriesburned?.toFixed(1) }} kcal
                       </li>
                     </ul>
                   </div>
