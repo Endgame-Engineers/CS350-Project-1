@@ -103,23 +103,28 @@ export function isAuthenticated(req: Request, res: Response, next: NextFunction)
     if (bearerHeader) {
         const bearer = bearerHeader.split(' ');
         const token = bearer[1];
-        
-        AccessTokens.getAccessToken(token).then((accessToken) => {
-            if (accessToken !== null) {
-                if (accessToken.expires && accessToken.expiration) {
-                    if (accessToken.expiration < new Date()) {
-                        return res.status(401).json({ message: 'Access token has expired' });
-                    }
-                }
 
-                Users.getUserById(accessToken.userid).then((user) => {
-                    if (user !== null) {
-                        req.user = user;
-                        return next();
+        AccessTokens.getAccessToken(token)
+            .then((accessToken) => {
+                if (accessToken !== null && accessToken !== undefined) {
+                    if (accessToken.expires && accessToken.expiration) {
+                        if (accessToken.expiration < new Date()) {
+                            return res.status(401).json({ message: 'Access token has expired' });
+                        }
                     }
-                });
-            }
-        });
+
+                    Users.getUserById(accessToken.userid).then((user) => {
+                        if (user !== null) {
+                            req.user = user;
+                            return next();
+                        }
+                    });
+                }
+            })
+            .catch((error) => {
+                return res.status(401).json({ message: 'Invalid access token' });
+            });
+            return res.status(401).json({ message: 'Invalid access token' });
     } else {
         res.redirect('/login');
     }
