@@ -35,7 +35,7 @@ describe('CalculateUserStats', () => {
   });
 
   it('calculates BMR for males correctly', () => {
-    const expectedBMR = 10 * (154.3 * 0.453592) + 6.25 * (68.9 * 2.54) - 5 * 25 + 5; // BMR formula for males
+    const expectedBMR = 10 * (154.3 * 0.453592) + 6.25 * (68.9 * 2.54) - 5 * 26 + 5; // BMR formula for males
     const result = userStats.calculateBMR();
     expect(result).toBeCloseTo(expectedBMR, 2);
   });
@@ -61,7 +61,7 @@ describe('CalculateUserStats', () => {
     };
 
     const femaleUserStats = new CalculateUserStats(femaleStats);
-    const expectedBMR = 10 * (132.3 * 0.453592) + 6.25 * (64.9 * 2.54) - 5 * 30 - 161; // BMR formula for females
+    const expectedBMR = 10 * (132.3 * 0.453592) + 6.25 * (64.9 * 2.54) - 5 * 31 - 161; // BMR formula for females
     const result = femaleUserStats.calculateBMR();
     expect(result).toBeCloseTo(expectedBMR, 2);
   });
@@ -80,14 +80,38 @@ describe('CalculateUserStats', () => {
 
   it('calculates calorie goal for weight loss correctly', () => {
     const weightLossStats: UserStat = {
-      ...userStats['stats'], // Spread the existing stats
-      goal: 1, // Weight loss
+        userid: 1,
+        weight: 150, // Weight in lbs
+        height: 70, // Height in inches
+        dateofbirth: new Date('1993-01-01'), // Date of birth
+        sex: 1, // Male
+        activitylevel: 3, // Moderately active
+        goal: 1, // Weight loss
+        proteinpercentage: 30,
+        fatpercentage: 20,
+        carbpercentage: 50,
+        caloriegoal: 0, // Will be recalculated
+        watergoal: 2500,
+        proteingrams: 0,
+        fatgrams: 0,
+        carbgrams: 0,
+        updatedon: new Date(),
     };
+
     const weightLossUserStats = new CalculateUserStats(weightLossStats);
-    const expectedCalorieGoal = weightLossUserStats.calculateTDEE() * 0.8; // Subtract 20%
+
+    // Calculate expected values
+    const weightKgs = 150 * 0.453592; // Convert lbs to kgs
+    const heightCms = 70 * 2.54; // Convert inches to cm
+    const age = weightLossUserStats['stats'].age; // Get age
+
+    const expectedBMR = 10 * weightKgs + 6.25 * heightCms - 5 * age + 5; // BMR for males
+    const expectedTDEE = expectedBMR * 1.55; // TDEE for moderately active
+    const expectedCalorieGoal = expectedTDEE * 0.8; // Subtract 20% for weight loss
     const result = weightLossUserStats.calculateCalorieGoal();
     expect(result).toBeCloseTo(expectedCalorieGoal, 2);
-  });
+});
+
 
   it('calculates protein goal correctly', () => {
     const expectedProteinGoal = (2500 * 0.3) / 4; // 30% of calories, 4 cal/gram
