@@ -1,3 +1,4 @@
+// TODO: Daniel
 import { CalculateUserStats } from '../../src/utils/CalculateUserStats';
 import { UserStat } from '../../src/models/UserStats';
 
