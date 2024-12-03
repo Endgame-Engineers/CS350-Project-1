@@ -6,7 +6,8 @@
     "serve": "npm run build && serve -s dist",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "buildwatch": "vue-cli-service build --watch"
+    "buildwatch": "vue-cli-service build --watch",
+    "test": "jest"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -34,6 +35,8 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@types/axios": "^0.14.0",
     "@types/bootstrap": "^5.2.10",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
     "@types/vue": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
