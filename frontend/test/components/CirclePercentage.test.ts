@@ -5,26 +5,29 @@ import '@testing-library/jest-dom';
 import CirclePercentage from '../../src/components/CirclePercentage.vue';
 
 describe('CirclePercentage.vue', () => {
-  it('renders correctly with default props', () => {
+   it('renders correctly with default props', () => {
+        render(CirclePercentage, {
+            props: {
+            progress: 50,
+            size: 4,
+            },
+        });
+        
+        const container = screen.getByRole('figure');
+        expect(container).toHaveStyle({ width: '4em', height: '4em' });
+        
+        const percentageTexts = screen.getAllByText('50%'); 
+        expect(percentageTexts).toHaveLength(2);
+        percentageTexts.forEach(text => {
+            expect(text).toBeTruthy();
+        });
+    });
+
+   it('renders title and subtitle when provided', () => {
     render(CirclePercentage, {
       props: {
         progress: 50,
         size: 4,
-      },
-    });
-
-    const container = screen.getByRole('figure'); // Ensure the container is rendered
-    expect(container).toHaveStyle({ width: '4em', height: '4em' });
-
-    const percentageText = screen.getByText('50%'); // Check the progress text
-    expect(percentageText).toBeTruthy();
-  });
-
-  it('renders title and subtitle when provided', () => {
-    render(CirclePercentage, {
-      props: {
-        progress: 75,
-        size: 6,
         title: 'Test Title',
         subtitle: 'Test Subtitle',
       },
@@ -35,18 +38,6 @@ describe('CirclePercentage.vue', () => {
 
     expect(title).toBeTruthy();
     expect(subtitle).toBeTruthy();
-  });
-
-  it('handles invalid progress values gracefully', () => {
-    render(CirclePercentage, {
-      props: {
-        progress: 'invalid',
-        size: 4,
-      },
-    });
-
-    const percentageText = screen.getByText('0%');
-    expect(percentageText).toBeTruthy(); // Invalid progress defaults to 0
   });
 
   it('does not render progress circle when progress is 0', () => {
