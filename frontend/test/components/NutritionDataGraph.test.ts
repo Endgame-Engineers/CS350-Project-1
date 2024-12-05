@@ -1,6 +1,6 @@
 // TODO: Carlos
 //import { render, screen } from '@testing-library/vue';
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom';
 //import NutrtitionDataGraph from '../../src/components/NutritionDataGraph.vue';
 

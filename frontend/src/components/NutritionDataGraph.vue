@@ -5,7 +5,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, onMounted } from 'vue';
 import { Bar, Line } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, PointElement, LineElement, ChartData, ChartOptions } from 'chart.js';
 
@@ -16,8 +16,12 @@ const chartProps = defineProps<{
     goalType: string | null;
     labels: string [];
     data: number[];
-    goalData: number[];
+    goalData: number[] | null;
 }>();
+
+onMounted(() => {
+    console.log(chartProps);
+});
 
 const chartData = computed(() => ({
     labels: chartProps.labels,
@@ -29,13 +33,13 @@ const chartData = computed(() => ({
             borderColor: 'rgba(255, 99, 132, 1)',
             borderWidth: 1,
         },
-        {
+        ...(chartProps.goalData ? [{
             label: chartProps.goalType,
             data: chartProps.goalData,
             backgroundColor: 'rgba(54, 162, 235, 0.2)',
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1,
-        },
+        }] : []),
     ],
 }) as ChartData<'bar'>);
 

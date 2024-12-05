@@ -44,5 +44,6 @@
     "start": "node dist/index.js --color=always",
     "lint": "tslint -c tslint.json src/**/*.ts",
     "test": "jest"
-  }
+  },
+  "type": "commonjs"
 }

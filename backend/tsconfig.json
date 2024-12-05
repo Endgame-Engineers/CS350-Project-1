@@ -1,5 +1,4 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist", // Output directory
     "rootDir": ".", // Source directory

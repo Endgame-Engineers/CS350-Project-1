@@ -9,11 +9,11 @@ export interface ExtendedActivityLog {
 }
 
 export async function getActivityLogs(start?: Date, end?: Date): Promise<ActivityLog[]> {
-    if (!(start instanceof Date) || !(end instanceof Date)) {
+    if (!(start instanceof Date) || isNaN(start.getTime()) || !(end instanceof Date) || isNaN(end.getTime())) {
         logger.error('Invalid date objects');
         return Promise.reject(new Error('Invalid date objects'));
     }
-
+      
     const uri = '/api/user/activity';
     try {
         const response = await axios.get<ActivityLog[]>(uri, {
