@@ -69,7 +69,6 @@ export default defineComponent({
     const isEditing = ref(false);
     const leavingPageTemporarily = ref(false);
 
-    // Macronutrient summary
     const macronutrientSummary = ref({
       caloriesPerServing: 0,
       proteinPerServing: 0,
@@ -77,7 +76,6 @@ export default defineComponent({
       fatPerServing: 0,
     });
 
-    // Navigate to Search Page
     const navigateToSearch = () => {
       leavingPageTemporarily.value = true;
       const recipe = recipeStore.currentRecipe;
@@ -98,7 +96,6 @@ export default defineComponent({
       });
     };
 
-    // Calculate Macronutrient Summary
     const calculateMacronutrients = () => {
       let totalCalories = 0,
         totalProtein = 0,
@@ -121,11 +118,10 @@ export default defineComponent({
         fatPerServing: totalFat / servings || 0,
       };
 
-      // Mark as unsaved changes if recalculating macronutrients
+      // mark that the recipe has unsaved changes if they have edited servings or ingredient servings
       recipeStore.hasUnSavedChanges = true;
     };
 
-    // Save Recipe
     const saveRecipe = async () => {
       if (!recipeStore.currentRecipe.name.trim()) {
         alert('Recipe name is required.');
@@ -171,7 +167,7 @@ export default defineComponent({
         } else {
           await addRecipe(newRecipe);
         }
-        recipeStore.clearStore(); // Clear store on successful save
+        recipeStore.clearStore(); // clear store on successful save
         router.push({ name: 'Search' });
       } catch (error) {
         console.error('Error saving recipe:', error);
@@ -179,7 +175,7 @@ export default defineComponent({
       }
     };
 
-    // Fetch Ingredient Details
+    // this is used to get the names of the ingredients from the barcodes (they are in barcode: servings format)
     const fetchIngredientDetails = async (barcodes: string[]) => {
       try {
         const response = await axios.post('/api/food-items', { barcodes });
@@ -201,7 +197,6 @@ export default defineComponent({
       () => calculateMacronutrients()
     );
 
-    // Handle Component Mount
     onMounted(async () => {
       leavingPageTemporarily.value = false;
 
@@ -237,7 +232,6 @@ export default defineComponent({
       calculateMacronutrients();
     });
 
-    // Handle Component Unmount
     onBeforeUnmount(() => {
       if (leavingPageTemporarily.value) {
         return;

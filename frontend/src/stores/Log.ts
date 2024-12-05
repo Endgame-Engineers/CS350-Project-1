@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { MealLog, MealType } from '../models/Models';
+import { useLocalStorage } from '@vueuse/core';
 
 export const useLogStore = defineStore('mealLog', {
   state: () => ({
@@ -8,7 +9,8 @@ export const useLogStore = defineStore('mealLog', {
       barcode: '',
       servingconsumed: 0,
     } as MealLog,
-    selectedType: 'Breakfast' as string, // Default to a valid MealType
+    selectedType: useLocalStorage<string>('selectedMealType', 'Breakfast' as string), 
+    currentDate: useLocalStorage<Date>('currentDate', new Date() as Date),
   }),
 
   actions: {
@@ -34,6 +36,14 @@ export const useLogStore = defineStore('mealLog', {
 
     getSelectedLogType() {
       return this.selectedType;
+    },
+
+    setCurrentDate(currentDate: Date) {
+      this.currentDate = currentDate;
+    },
+
+    getCurrentDate() {
+      return this.currentDate;
     },
   },
 });

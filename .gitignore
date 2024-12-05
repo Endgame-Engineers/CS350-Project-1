@@ -10,3 +10,4 @@ frontend/core.*
 backend/app.log
 backend/app.log.*
 backend/*.log.gz
+backend/coverage/

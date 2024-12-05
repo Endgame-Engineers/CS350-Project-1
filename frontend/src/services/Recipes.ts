@@ -2,10 +2,17 @@ import { ref } from "vue";
 import axios from "axios";
 import { Recipe } from "../models/Models";
 
-// Create a reactive state to store recipes
 export const recipes = ref<Recipe[]>([]);
 
-// Function to fetch recipes from the backend
+function validateIngredients(ingredients: { [key: string]: number }): void {
+  // if any of the ingredients have "Recipe" as the key (or barcode), throw an error as this should not be allowed
+  for (const key in ingredients) {
+    if (key === "Recipe" || !/^\d+$/.test(key)) {
+      throw new Error(`Invalid ingredient key: ${key}. Recipes cannot be added as ingredients.`);
+    }
+  }
+}
+
 export async function getRecipes(): Promise<Recipe[]> {
   try {
     const response = await axios.get<Recipe[]>('/api/user/recipes');
@@ -19,9 +26,9 @@ export async function getRecipes(): Promise<Recipe[]> {
   }
 }
 
-// Function to add a new recipe
 export async function addRecipe(recipe: Recipe): Promise<void> {
   try {
+    validateIngredients(recipe.ingredients);
     await axios.post('/api/user/recipes', recipe);
     recipes.value.push(recipe);
   } catch (error) {
@@ -30,15 +37,16 @@ export async function addRecipe(recipe: Recipe): Promise<void> {
   }
 }
 
-// Function to update a recipe
+// update an existing recipe - may be changed in favor of creating recipe snapshots
 export async function updateRecipe(recipe: Recipe): Promise<void> {
   try {
+    validateIngredients(recipe.ingredients);
     await axios.put(`/api/user/recipes/${recipe.id}`, recipe);
     const index = recipes.value.findIndex(r => r.id === recipe.id);
     if (index !== -1) {
-      recipes.value[index] = recipe; // Update existing recipe in state
+      recipes.value[index] = recipe;
     } else {
-      recipes.value.push(recipe); // Add to state if not already present
+      recipes.value.push(recipe);
     }
     console.log(`Recipe successfully updated: ${recipe.name}`);
   } catch (error) {
@@ -47,7 +55,6 @@ export async function updateRecipe(recipe: Recipe): Promise<void> {
   }
 }
 
-// Function to delete a recipe
 export async function deleteRecipe(recipeId: number): Promise<void> {
   try {
     await axios.delete(`/api/user/recipes/${recipeId}`);

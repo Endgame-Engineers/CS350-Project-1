@@ -38,8 +38,6 @@ Metabolic conditions, personal preferences, or specific dietary restrictions
 */
 
 /*
-TODO: create end points for calculating and updating user stats (enter goal, enter activity level, enter weight, enter height, enter age, etc.)
-
 1. once the user has entered their sex, weight, height, and age, then we can calculate BMR
 2. Once we have BMR, we then ask for their activity level
 3. Once we have activity level, we can then calculate TDEE -- which is their total daily energy expenditure
@@ -76,11 +74,11 @@ export class CalculateUserStats {
     // if BMR changes, then TDEE changes, if TDEE changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
     public calculateBMR(): number {
         if (this.stats.sex === 1) { // if they are male
-            this.stats.bmr = 10 * this.stats.weightkgs + 6.25 * this.stats.heightcms - 5 * this.stats.age + 5;
-            return 10 * this.stats.weightkgs + 6.25 * this.stats.heightcms - 5 * this.stats.age + 5;
+            this.stats.bmr = (10 * this.stats.weightkgs) + (6.25 * this.stats.heightcms) - (5 * this.stats.age) + 5;
+            return this.stats.bmr;
         } else { // if they are female
-            this.stats.bmr = 10 * this.stats.weightkgs + 6.25 * this.stats.heightcms - 5 * this.stats.age - 161;
-            return 10 * this.stats.weightkgs + 6.25 * this.stats.height - 5 * this.stats.age - 161;
+            this.stats.bmr = (10 * this.stats.weightkgs) + (6.25 * this.stats.heightcms) - (5 * this.stats.age) - 161;
+            return this.stats.bmr;
         }
     }
 
@@ -129,7 +127,6 @@ export class CalculateUserStats {
 
     // Adjust calorie goal based on user goal (weight loss, maintenance, or weight gain)
     // if user goal changes, then calorie goal changes, if calorie goal changes, then macronutrient goals change
-    // TODO: allow the user to change the percentage of the adjustment -- for example, if they want to lose weight but only want to subtract 10% instead of 20%
     public calculateCalorieGoal(): number {
         this.calculateBMR();
         this.calculateTDEE();

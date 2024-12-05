@@ -18,6 +18,10 @@
           <button type="button" class="btn btn-outline-primary" @click="adjustDates(1)">
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </button>
+          <button type="button" class="btn btn-primary" @click="currentDate = new Date(new Date().toDateString())"
+            v-if="currentDate.toDateString() !== new Date().toDateString()">
+            <font-awesome-icon :icon="['fas', 'redo']" />
+          </button>
         </div>
         <div class="d-flex gap-2 justify-content-center flex-wrap flex-md-nowrap w-100">
           <button type="button" class="btn flex-fill d-flex align-items-center justify-content-center"
@@ -54,7 +58,7 @@
         <div class="input-group">
           <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
             aria-expanded="false">
-            <font-awesome-icon :icon="['fas', 'droplet']" />
+            <font-awesome-icon :icon="['fas', 'glass-water-droplet']" />
           </button>
           <ul class="dropdown-menu">
             <template v-if="filteredWaterLogs.length === 0">
@@ -221,7 +225,7 @@
                         Description: {{ item.activity?.description }}
                       </li>
                       <li class="list-group-item">
-                        Calories Burned: {{ item.caloriesburned }} kcal
+                        Calories Burned: {{ item.caloriesburned?.toFixed(1) }} kcal
                       </li>
                     </ul>
                   </div>
@@ -260,18 +264,18 @@
                 </button>
               </div>
               <div class="modal-body">
-                <template v-if="itemToDelete && 'foodItem' in itemToDelete">
-                  <p>Are you sure you want to remove "{{ itemToDelete.foodItem?.foodname }}" from your meal log?
-                  </p>
-                  <img :src="itemToDelete.foodItem?.image" :alt="itemToDelete.foodItem?.foodname"
-                    style="height: 200px; object-fit: cover;" />
+                <template v-if="itemToDelete && 'foodItem' in itemToDelete && itemToDelete.foodItem?.barcode.toLowerCase() === 'water'">
+                  <p>Are you sure you want to remove this water log from your meal log?</p>
                 </template>
                 <template v-else-if="itemToDelete && 'activityid' in itemToDelete">
                   <p>Are you sure you want to remove "{{ itemToDelete.activity?.activity + " - " +
                     itemToDelete.activity?.description }}" from your activity log? </p>
                 </template>
-                <template v-else>
-                  <p>Are you sure you want to remove this water log from your meal log?</p>
+                <template v-else-if="itemToDelete && 'foodItem' in itemToDelete">
+                  <p>Are you sure you want to remove "{{ itemToDelete.foodItem?.foodname }}" from your meal log?
+                  </p>
+                  <img :src="itemToDelete.foodItem?.image" :alt="itemToDelete.foodItem?.foodname"
+                    style="height: 200px; object-fit: cover;" />
                 </template>
               </div>
 
@@ -418,8 +422,8 @@ export default defineComponent({
     const mealLogs = ref<ExtendedMealLog[]>([]);
     const userStatValue = ref<UserStat | null>(null);
     const activityLogs = ref<ActivityLog[]>([]);
-    const currentDate = ref(new Date());
     const userLogStore = useLogStore();
+    const currentDate = ref(userLogStore.getCurrentDate());
     const selectedLogType = ref<string>(userLogStore.getSelectedLogType());
     const itemToDelete = ref<ExtendedMealLog | ActivityLog | null>(null);
     const water = ref<number | null>(null);
@@ -523,6 +527,7 @@ export default defineComponent({
       if (newcurrentDate) {
         updateLogs(newcurrentDate);
         updateUserStat();
+        userLogStore.setCurrentDate(newcurrentDate);
       }
     });
 

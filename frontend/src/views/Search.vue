@@ -124,19 +124,33 @@ export default {
     };
 
     const addFoodItem = (item: FoodItem) => {
+      // if the item is a recipe and they are trying to add it as an ingredient to a recipe, show a warning modal
+      if (item.barcode === 'Recipe' && sourcePage.value === 'createRecipe') {
+        logger.warn('Attempted to add a recipe as an ingredient:', item);
+        const warningModalElement = document.getElementById("warningModal");
+        if (warningModalElement) {
+          const warningModal = new bootstrap.Modal(warningModalElement);
+          warningModal.show();
+        } else {
+          console.error('Warning modal not found');
+        }
+        return;
+      }
+
       selectedFoodItem.value = item;
       console.log('Selected food item:', selectedFoodItem.value);
+
       const modal = new bootstrap.Modal(document.getElementById('servingModal')!);
       modal.show();
     };
+
 
     const confirmAddFoodItem = () => {
       if (selectedFoodItem.value && servingConsumed.value !== null && servingConsumed.value > 0) {
         logger.info('Adding food item:', selectedFoodItem.value);
 
-        // Check the source page
+        // if the source page is createRecipe, add the ingredient to the recipe store and navigate to the create recipe page
         if (sourcePage.value === 'createRecipe') {
-          // Add the item to the Recipe store
           useRecipeStore().addIngredient({
             name: selectedFoodItem.value.foodname,
             barcode: selectedFoodItem.value.barcode,
@@ -156,18 +170,17 @@ export default {
           router.push({
             name: 'CreateRecipe',
             query: {
-              id: route.query.id as string, // Preserve the recipe ID
+              id: route.query.id as string,
               name: recipe.name,
               servings: recipe.servings.toString(),
               ingredients: encodeURIComponent(JSON.stringify(ingredientsMap)),
             },
           });
-          
+
         } else {
-          // Adding to meal logs
           logger.info('Adding food item to meal logs');
 
-          // Determine if the selected item is a recipe
+          // if the search mode is recipes, add the recipe to the meal log
           if (searchMode.value === 'recipes') {
             logger.info('Adding recipe to meal log:', selectedFoodItem.value);
             mealLog.barcode = 'Recipe';
@@ -189,7 +202,6 @@ export default {
           router.push({ path: '/logs' });
         }
 
-        // Close the modal if open
         const modal = bootstrap.Modal.getInstance(document.getElementById('servingModal')!);
         if (modal) {
           modal.hide();
@@ -223,23 +235,21 @@ export default {
       console.log('Converting recipe to food item:', recipe);
       return {
         foodname: recipe.name,
-        barcode: 'Recipe', // Placeholder for recipes
-        image: 'img/No-Image-Placeholder.svg', // Placeholder image
+        barcode: 'Recipe', // placeholder
+        image: 'img/No-Image-Placeholder.svg', // placeholder
         calories_per_serv: recipe.calories_per_serv,
         protein_per_serv: recipe.protein_per_serv,
         carb_per_serv: recipe.carb_per_serv,
         fat_per_serv: recipe.fat_per_serv,
-        recipeid: recipe.id, // Add recipe ID for logging
-        recipeName: recipe.name, // Add recipe name for logging
+        recipeid: recipe.id,
+        recipeName: recipe.name,
       };
     };
 
     const confirmRecipeDelete = async () => {
       if (recipeToDelete.value) {
         try {
-          // Call the API to delete the recipe
           await axios.delete(`api/user/recipes/${recipeToDelete.value.id}`);
-          // Remove the deleted recipe from the UI
           recipeData.value = recipeData.value?.filter((r) => r.id !== recipeToDelete.value?.id) || null;
           logger.info(`Recipe "${recipeToDelete.value.name}" deleted successfully.`);
         } catch (error) {
@@ -354,7 +364,6 @@ export default {
           {{ searchMode === 'food' ? 'Search Recipes' : 'Search Food' }}
         </button>
         <button @click="navigateToCreateRecipe()" class="btn btn-outline-primary">
-          <!-- TODO: this button will need to map to a CreateRecipes.vue that will have a UI to allow the user to enter all the ingredients with their recipe and give it a name and such -->
           Create Recipe
         </button>
       </div>
@@ -435,7 +444,6 @@ export default {
               <button class="btn btn-primary btn-icon ms-auto" @click="addFoodItem(convertRecipeToFoodItem(recipe))">
                 <font-awesome-icon :icon="['fas', 'plus']" />
               </button>
-
             </div>
           </div>
         </div>
@@ -512,5 +520,22 @@ export default {
     </div>
   </div>
 
+  <!-- Warning Modal -->
+  <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="warningModalLabel">Invalid Ingredient</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          You cannot add a recipe as an ingredient. Please select a valid food item.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </template>

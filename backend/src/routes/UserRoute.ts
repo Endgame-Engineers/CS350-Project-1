@@ -82,7 +82,7 @@ class UserRoute {
                 UserStats.addUserStats(userStat, user.id)
                     .then((userStats) => {
                         console.log("User Stat created");
-                        res.status(201).json(userStats);
+                        res.status(201).json(userStat);
                     })
                     .catch((error) => {
                         console.error('Error creating user stat:', error);
@@ -116,10 +116,10 @@ class UserRoute {
             const startDate = start ? new Date(start as string) : undefined;
             const endDate = end ? new Date(end as string) : undefined;
             const user = req.user as User;
-        
+
             if (user.id) {
                 logger.info('User authenticated');
-        
+
                 const handleMealLog = async (mealLog: ExtendedMealLog) => {
                     if (mealLog.barcode === 'Recipe' && mealLog.recipeid) {
                         logger.info('Handling Recipe meal log');
@@ -170,17 +170,17 @@ class UserRoute {
                     }
                     return mealLog;
                 };
-        
+
                 const fetchAndMapMealLogs = (mealLogs: ExtendedMealLog[]) => {
                     const mealLogPromises = mealLogs.map(handleMealLog);
                     return Promise.all(mealLogPromises);
                 };
-        
+
                 const handleLogsRetrieval = (mealLogs: ExtendedMealLog[]) => {
                     logger.info('Meal logs retrieved');
                     return fetchAndMapMealLogs(mealLogs);
                 };
-        
+
                 if (startDate && endDate) {
                     logger.info('Using date range');
                     MealLogs.getMealLogs(user.id, startDate, endDate)
@@ -211,13 +211,12 @@ class UserRoute {
                 res.status(400).json({ error: 'User not authenticated' });
             }
         });
-        
 
         this.router.post('/user/logs', isAuthenticated, async (req, res) => {
             logger.info('/user/logs POST');
             const user = req.user as User;
 
-            console.log(req.body);
+            req.body.mealtype = req.body.mealtype.charAt(0).toUpperCase() + req.body.mealtype.slice(1);
 
             if (!user.id) {
                 logger.error('User not authenticated');
@@ -234,7 +233,12 @@ class UserRoute {
                     logger.info('Meal type is water');
                     const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, barcode: 'Water', dateadded: req.body.dateadded || new Date() });
                     logger.info('Meal log created');
-                    res.status(201).json(mealLog);
+                    res.status(201).json(
+                        {
+                            "message": "Water log created successfully",
+                            "data": mealLog
+                        }
+                    );
                     return;
                 }
                 if (req.body.barcode.toLowerCase() === 'recipe') {
@@ -245,7 +249,7 @@ class UserRoute {
                         logger.error('Recipe not found');
                         return res.status(404).json({ error: 'Recipe not found' });
                     }
-                
+
                     const mealLogData = {
                         ...req.body,
                         userid: user.id,
@@ -253,10 +257,10 @@ class UserRoute {
                         recipeid: recipe.id, // Include the recipe id
                         recipeName: recipe.name, // Include the recipe name
                     };
-                
+
                     await MealLogs.addMealLog(mealLogData);
                     logger.info('Meal log for recipe created');
-                
+
                     const response = {
                         ...mealLogData,
                         foodItem: {
@@ -269,10 +273,13 @@ class UserRoute {
                             image: '/img/No-Image-Placeholder.svg',
                         },
                     };
-                
-                    return res.status(201).json(response);
+
+                    return res.status(201).json({
+                        "message": "Recipe meal log created successfully",
+                        "data": response
+                    });
                 }
-                
+
 
                 logger.info('Checking if food item exists');
                 OpenFoodFacts.fetchProductFromAPI(req.body.barcode)
@@ -283,7 +290,10 @@ class UserRoute {
                             logger.info('Food item is valid');
                             const mealLog = await MealLogs.addMealLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() });
                             logger.info('Meal log created');
-                            res.status(201).json(mealLog);
+                            res.status(201).json({
+                                "message": "Meal log created successfully",
+                                "data": mealLog
+                            });
                         } else {
                             logger.error('Food item is not valid');
                             res.status(404).json({ error: 'Food item not found' });
@@ -407,7 +417,10 @@ class UserRoute {
             ActivityLogs.addActivityLog({ ...req.body, userid: user.id, dateadded: req.body.dateadded || new Date() })
                 .then((activityLog) => {
                     logger.info('Activity log created');
-                    res.status(201).json(activityLog);
+                    res.status(201).json({
+                        "message": "Activity log created successfully",
+                        "data": activityLog
+                    });
                 })
                 .catch((error) => {
                     logger.error(error);
@@ -474,29 +487,6 @@ class UserRoute {
             }
         });
 
-        this.router.post('/user/recipes', isAuthenticated, (req, res) => {
-            logger.info('/user/recipes POST');
-            const user = req.user as User;
-
-            if (user.id) {
-                logger.info('User authenticated');
-
-                Recipes.addRecipe({ ...req.body, userid: user.id })
-                    .then((Recipe) => {
-                        logger.info('Recipe created');
-                        res.status(201).json(Recipe);
-                    })
-                    .catch((error) => {
-                        logger.error(error);
-                        res.status(500).json({ error: 'An error occurred' });
-                    });
-
-            } else {
-                logger.error('User not authenticated');
-                res.status(400).json({ error: 'User not authenticated' });
-            }
-        });
-
         this.router.get('/user/recipes', isAuthenticated, (req, res) => {
             logger.info('/user/recipes GET');
             const user = req.user as User;
@@ -527,11 +517,34 @@ class UserRoute {
             }
         });
 
+        this.router.post('/user/recipes', isAuthenticated, (req, res) => {
+            logger.info('/user/recipes POST');
+            const user = req.user as User;
+
+            if (user.id) {
+                logger.info('User authenticated');
+
+                Recipes.addRecipe({ ...req.body, userid: user.id })
+                    .then((Recipe) => {
+                        logger.info('Recipe created');
+                        res.status(201).json(Recipe);
+                    })
+                    .catch((error) => {
+                        logger.error(error);
+                        res.status(500).json({ error: 'An error occurred' });
+                    });
+
+            } else {
+                logger.error('User not authenticated');
+                res.status(400).json({ error: 'User not authenticated' });
+            }
+        });
+
         this.router.put('/user/recipes/:id', isAuthenticated, async (req, res) => {
             const { id } = req.params;
             const user = req.user as User;
             const recipe = req.body;
-        
+
             try {
                 await Recipes.updateRecipe({ ...recipe, id: parseInt(id, 10) });
                 res.status(200).json({ message: 'Recipe updated successfully' });
@@ -543,11 +556,11 @@ class UserRoute {
         this.router.delete('/user/recipes/:id', isAuthenticated, async (req, res) => {
             const { id } = req.params;
             const user = req.user as User;
-        
+
             try {
                 const recipe = await Recipes.getRecipeById(parseInt(id, 10));
                 console.log(recipe);
-        
+
                 await Recipes.deleteRecipe(parseInt(id, 10));
                 res.status(200).json({ message: 'Recipe deleted successfully' });
             } catch (error) {
@@ -555,7 +568,7 @@ class UserRoute {
                 res.status(500).json({ error: 'Failed to delete recipe' });
             }
         });
-        
+
         this.router.get('/user/accesstokens', isAuthenticated, (req, res) => {
             logger.info('/user/accesstokens GET');
             const user = req.user as User;
@@ -596,21 +609,21 @@ class UserRoute {
                 if (new Date(req.body.expiration).getTime() < Date.now()) {
                     logger.error('Expiration date must be in the future');
                     return res.status(400).json({ error: 'Expiration date must be in the future' });
-                } 
+                }
                 if (new Date(req.body.expiration).getTime() > Date.now() + 30 * 24 * 60 * 60 * 1000) {
                     logger.error('Expiration date must be within 30 days');
                     return res.status(400).json({ error: 'Expiration date must be within 30 days' });
                 }
 
                 AccessTokens.addAccessToken({ ...req.body, userid: user.id, token })
-                .then((accessToken) => {
-                    logger.info('Access token created');
-                    res.status(201).json({
-                        token: accessToken.token,
-                        expires: accessToken.expires,
-                        expiration: accessToken.expiration
+                    .then((accessToken) => {
+                        logger.info('Access token created');
+                        res.status(201).json({
+                            token: accessToken.token,
+                            expires: accessToken.expires,
+                            expiration: accessToken.expiration
+                        });
                     });
-                });
             } else {
                 logger.error('User not authenticated');
                 res.status(400).json({ error: 'User not authenticated' });

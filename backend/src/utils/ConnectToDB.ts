@@ -51,6 +51,22 @@ class ConnectToDB {
                                 try {
                                     this.createTable(table.schema);
                                     logger.info(`Created table ${table.name}`);
+                                    
+                                    if (table.name === 'Activities') {
+                                        logger.info('Inserting default activities');
+
+                                        const fs = require('fs');
+                                        const path = require('path');
+                                        const sql = fs.readFileSync(path.join(__dirname, '../../src/models/Activities.sql')).toString();
+                                        this.client.query(sql, (err, res) => {
+                                            if (err) {
+                                                logger.error('Failed to insert default activities:', err);
+                                            } else {
+                                                logger.info('Inserted default activities');
+                                            }
+                                        });
+                                    }
+
                                 } catch (error) {
                                     logger.error(`Failed to create table ${table.name}:`, error);
                                 }
@@ -63,53 +79,6 @@ class ConnectToDB {
                         });
                     }
                 });
-            // Check and add missing columns
-            
-            tablesToCreate.forEach(table => {
-                this.client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = '${table.name}'`, (err, res) => {
-                    if (err) {
-                        logger.error(`Failed to list columns for table ${table.name}:`, err);
-                    } else {
-                        const existingColumns = res.rows.map(row => row.column_name);
-
-                        const schemaMatch = tablesToCreate.find(t => t.name === table.name)?.schema.match(/"([^"]+)"/g);
-                        const schemaColumns = schemaMatch ? schemaMatch.map((match: string) => match.replace(/"/g, '')) : [];
-
-                        const columnsToIgnore = tablesToCreate.map(table => `${table.name}_id_seq`).concat(tablesToCreate.map(table => table.name));
-
-                        schemaColumns.forEach(column => {
-                            if (!existingColumns.includes(column) && !columnsToIgnore.includes(column)) {
-                                logger.error(`Column ${column} is missing from table ${table.name}`);
-
-                                const columnMatch = table.schema.match(new RegExp(`"${column}"[^,]+`));
-                                const columnDefinition = columnMatch ? columnMatch[0] : '';
-                                const columnQuery = `ALTER TABLE "${table.name}" ADD COLUMN ${columnDefinition}`;
-
-                                this.client.query(columnQuery, (err, res) => {
-                                    if (err) {
-                                        logger.error(`Failed to add column ${column} to table ${table.name}:`, err);
-                                    } else {
-                                        logger.info(`Added column ${column} to table ${table.name}`);
-                                    }
-                                });
-                            }
-
-                            if(existingColumns.includes(column) && columnsToIgnore.includes(column)) {
-                                logger.error(`Column ${column} is not needed in table ${table.name}`);
-
-                                const columnQuery = `ALTER TABLE "${table.name}" DROP COLUMN ${column}`;
-                                this.client.query(columnQuery, (err, res) => {
-                                    if (err) {
-                                        logger.error(`Failed to drop column ${column} from table ${table.name}:`, err);
-                                    } else {
-                                        logger.info(`Dropped column ${column} from table ${table.name}`);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            });
             }
         });
     }
@@ -123,7 +92,7 @@ class ConnectToDB {
             }
         });
     }
-    
+
     /**
      * Get the database client
      * @returns Client
