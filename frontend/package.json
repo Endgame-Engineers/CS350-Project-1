@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "buildwatch": "vue-cli-service build --watch",
-    "test": "jest"
+    "test": "vitest"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -33,25 +33,32 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/vue": "^8.1.0",
     "@types/axios": "^0.14.0",
     "@types/bootstrap": "^5.2.10",
     "@types/jest": "^29.5.14",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.1",
     "@types/vue": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
+    "@vitejs/plugin-vue": "^5.2.1",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-plugin-pwa": "^5.0.8",
     "@vue/cli-plugin-typescript": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/test-utils": "^2.4.6",
     "css-loader": "^7.1.2",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.28.0",
+    "jsdom": "^25.0.1",
     "rollup": "^4.22.5",
     "sass": "^1.79.4",
     "sass-loader": "^16.0.2",
-    "typescript": "~5.6.2"
+    "typescript": "~5.6.2",
+    "vitest": "^2.1.8"
   }
 }
