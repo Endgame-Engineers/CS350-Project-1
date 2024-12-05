@@ -100,11 +100,12 @@
               :goalData="waterGoals" />
           </div>
           <div v-else-if="selectedChart === 'calburned'">
-            <div class="d-flex justify-content-center">
-              <h2 class="pb-1">Calories Burned</h2>
-            </div>
-            <nutrition-data :type="'Calories Burned'" :goalType="null" :labels="labels" :data="caloriesBurned"
-              :goalData="null" />
+            <div class="d-flex justify-content-center"><h2 class="pb-1">Calories Burned</h2></div>
+            <nutrition-data :type="'Calories Burned'" :goalType="null" :labels="calBurnedLabels"
+              :data="caloriesBurned" :goalData="null" />
+          </div>
+          <div v-else class="alert alert-warning text-center">
+            No meal logs found for the selected date range.
           </div>
         </div>
         <div v-else class="alert alert-warning text-center">
@@ -138,6 +139,7 @@ export default defineComponent({
       activityLogs: ref([] as ActivityLog[]),
       userStats: ref([] as UserStat[]),
       labels: [] as string[],
+      calBurnedLabels: [] as string[],
       caloriesConsumed: [] as number[],
       proteinConsumed: [] as number[],
       carbsConsumed: [] as number[],
@@ -198,6 +200,7 @@ export default defineComponent({
 
     updateChartData() {
       this.labels = [];
+      this.calBurnedLabels = [];
       this.caloriesConsumed = [];
       this.calorieGoals = [];
       this.proteinGoals = [];
@@ -277,6 +280,11 @@ export default defineComponent({
         logger.info(dailyCaloriesBurned[date]);
       });
 
+      Object.keys(dailyCaloriesBurned).forEach((date) => {
+        this.calBurnedLabels.push(date);
+        this.caloriesBurned.push(dailyCaloriesBurned[date]);
+      });
+
       logger.info('Calories Consumed Calculated');
       logger.info('Protein Consumed Calculated');
       logger.info('Carbs Consumed Calculated');
@@ -310,9 +318,17 @@ export default defineComponent({
           carbs: this.carbsConsumed[index],
           fats: this.fatsConsumed[index],
           water: this.waterConsumed[index],
+        }))
+        .sort((a, b) => new Date(a.label).getTime() - new Date(b.label).getTime());
+
+        const sortedCalBurnedData = this.calBurnedLabels
+        .map((label, index) => ({
+          label,
           calBurned: this.caloriesBurned[index],
         }))
         .sort((a, b) => new Date(a.label).getTime() - new Date(b.label).getTime());
+
+      logger.info('Chart data sorted and updated');
 
       this.labels = sortedData.map((item) => item.label);
       this.caloriesConsumed = sortedData.map((item) => item.calories);
@@ -321,9 +337,8 @@ export default defineComponent({
       this.carbsConsumed = sortedData.map((item) => item.carbs);
       this.fatsConsumed = sortedData.map((item) => item.fats);
       this.waterConsumed = sortedData.map((item) => item.water);
-      this.caloriesBurned = sortedData.map((item) => item.calBurned);
+      this.calBurnedLabels = sortedCalBurnedData.map((item) => item.label);
 
-      logger.info('Chart data sorted and updated');
     },
 
     resetDates() {
