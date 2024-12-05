@@ -1,6 +1,7 @@
 // TODO: Carlos
 import { render, fireEvent, screen } from '@testing-library/vue';
 import UserStatsPercentage from '../../src/components/UserStatsPercentages.vue';
+import '@testing-library/jest-dom';
 
 describe('UserStatsPercentage.vue', () => {
   it('displays a warning when the total percentage is not 100%', async () => {
@@ -16,7 +17,7 @@ describe('UserStatsPercentage.vue', () => {
     const fatInput = screen.getByLabelText('Fat Percentage');
     const carbInput = screen.getByLabelText('Carb Percentage');
 
-    await fireEvent.input(proteinInput, { target: { value: 60 } });
+    await fireEvent.update(proteinInput, '60');
 
     expect(screen.getByRole('alert')).toHaveTextContent('The total percentage must add up to 100%');
   });
@@ -32,10 +33,10 @@ describe('UserStatsPercentage.vue', () => {
     const proteinInput = screen.getByLabelText('Protein Percentage');
     const fatInput = screen.getByLabelText('Fat Percentage');
     const carbInput = screen.getByLabelText('Carb Percentage');
-  
-    await fireEvent.input(proteinInput, { target: { value: 40 } });
-    await fireEvent.input(fatInput, { target: { value: 30 } });
-    await fireEvent.input(carbInput, { target: { value: 30 } });
+
+    await fireEvent.update(proteinInput, '40');
+    await fireEvent.update(fatInput, '30');
+    await fireEvent.update(carbInput, '30');
   
     expect(screen.queryByRole('alert')).toBeNull();
   });

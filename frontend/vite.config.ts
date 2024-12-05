@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -11,6 +12,11 @@ export default defineConfig({
         reporter: ['text', 'json', 'html'], // Enable coverage reporting
       },
     },
-    plugins: [vue()]
+    plugins: [vue()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'), // Ensure this alias exists
+      },
+    },
   },
 );
