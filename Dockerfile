@@ -20,5 +20,7 @@ RUN cd /app/backend && npm run build
 # Expose port
 EXPOSE 3000
 
+WORKDIR /
+
 # Start the app
 CMD ["node", "/app/backend/dist/index.js"]
