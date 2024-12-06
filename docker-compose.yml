@@ -1,5 +1,6 @@
 services:
   web:
+    # image: reg.kevinsyk.es/sirbomble/cs350-project-1/main:latest
     build: .
     container_name: carbio-web
     env_file:
