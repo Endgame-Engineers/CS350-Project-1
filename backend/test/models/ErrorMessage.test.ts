@@ -1,5 +1,4 @@
 // TODO: Daniel
-import { before } from 'node:test';
 import { ErrorMessage } from '../../src/models/ErrorMessage';
 
 describe('ErrorMessage Model', () => {
