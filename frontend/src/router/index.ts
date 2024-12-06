@@ -1,15 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import home from '../views/Home.vue';
-import search from '../views/Search.vue';
-import history from '../views/History.vue';
-import barscanner from '../views/BarScanner.vue';
-import login from '../views/Login.vue';
-import Profile from '@/views/Profile.vue';
-import welcomescreen from '@/views/WelcomeScreen.vue';
 import { createPinia } from 'pinia';
 import { useUserStore } from '@/stores/User';
-import UserLogs from '@/views/Logs.vue';
-import Recipe from '@/views/CreateRecipe.vue';
 
 const pinia = createPinia();
 const userStore = useUserStore(pinia);
@@ -19,42 +10,43 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: home,
+    component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
   },
   {
     path: '/search',
     name: 'Search',
-    component: search,
+    component: () => import(/* webpackChunkName: "search" */ '../views/Search.vue'),
+
   },
   {
     path: '/history',
     name: 'History',
-    component: history,
+    component: () => import(/* webpackChunkName: "history" */ '../views/History.vue'),
   },
   {
     path: '/logs',
     name: 'UserLogs',
-    component: UserLogs
+    component: () => import(/* webpackChunkName: "logs" */ '../views/Logs.vue'),
   },
   {
     path: '/barscanner',
     name: 'BarScanner',
-    component: barscanner,
+    component: () => import(/* webpackChunkName: "barscanner" */ '../views/BarScanner.vue'),
   },
   {
     path: '/login',
     name: 'Login',
-    component: login,
+    component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: Profile,
+    component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue'),
   },
   {
     path: '/welcomescreen',
     name: 'WelcomeScreen',
-    component: welcomescreen,
+    component: () => import(/* webpackChunkName: "welcomescreen" */ '../views/WelcomeScreen.vue'),
     // eslint-disable-next-line
     beforeEnter: (to: any, from: any, next: any) => {
       const userStore = useUserStore();
@@ -68,7 +60,7 @@ const routes = [
   {
     path: '/recipe',
     name: 'CreateRecipe',
-    component: Recipe,
+    component: () => import(/* webpackChunkName: "recipe" */ '../views/CreateRecipe.vue'),
   }
 ];
 
