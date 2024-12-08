@@ -52,8 +52,7 @@
           <span class="d-none d-md-inline">Water</span>
         </button>
         <button type="button" class="btn flex-fill d-flex align-items-center justify-content-center"
-          :class="selectedChart === 'CaloriesBurned' ? 'btn-primary' : 'btn-outline-primary'"
-          @click="selectedChart = 'calburned'">
+          :class="selectedChart === 'calburned' ? 'btn-primary' : 'btn-outline-primary'" @click="selectedChart = 'calburned'">
           <font-awesome-icon icon="fire" class="me-2" alt="Calories Burned" />
           <span class="d-none d-md-inline">Calories Burned</span>
         </button>
@@ -99,18 +98,20 @@
             <nutrition-data :type="'Water Consumed'" :goalType="'Water Goal'" :labels="labels" :data="waterConsumed"
               :goalData="waterGoals" />
           </div>
-          <div v-else-if="selectedChart === 'calburned'">
+        </div>
+        <div v-else-if="selectedChart!=='calburned'" class="alert alert-warning text-center">
+            No meal logs found for the selected date range.
+        </div>
+        <div v-else-if="activityLogs.length > 0">
+          <div v-if="selectedChart === 'calburned'">
             <div class="d-flex justify-content-center"><h2 class="pb-1">Calories Burned</h2></div>
             <nutrition-data :type="'Calories Burned'" :goalType="null" :labels="calBurnedLabels"
               :data="caloriesBurned" :goalData="null" />
           </div>
-          <div v-else class="alert alert-warning text-center">
-            No meal logs found for the selected date range.
-          </div>
         </div>
         <div v-else class="alert alert-warning text-center">
-          No meal logs found for the selected date range.
-        </div>
+            No activity logs logs found for the selected date range.
+          </div>
       </div>
     </div>
   </div>
