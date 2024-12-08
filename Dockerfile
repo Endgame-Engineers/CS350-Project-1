@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:20-alpine
 
 # Create app directory
 WORKDIR /app
@@ -19,6 +19,8 @@ RUN cd /app/backend && npm run build
 
 # Expose port
 EXPOSE 3000
+
+WORKDIR /
 
 # Start the app
 CMD ["node", "/app/backend/dist/index.js"]

@@ -52,8 +52,7 @@
           <span class="d-none d-md-inline">Water</span>
         </button>
         <button type="button" class="btn flex-fill d-flex align-items-center justify-content-center"
-          :class="selectedChart === 'CaloriesBurned' ? 'btn-primary' : 'btn-outline-primary'"
-          @click="selectedChart = 'calburned'">
+          :class="selectedChart === 'calburned' ? 'btn-primary' : 'btn-outline-primary'" @click="selectedChart = 'calburned'">
           <font-awesome-icon icon="fire" class="me-2" alt="Calories Burned" />
           <span class="d-none d-md-inline">Calories Burned</span>
         </button>
@@ -99,17 +98,19 @@
             <nutrition-data :type="'Water Consumed'" :goalType="'Water Goal'" :labels="labels" :data="waterConsumed"
               :goalData="waterGoals" />
           </div>
-          <div v-else-if="selectedChart === 'calburned'">
+        </div>
+        <div v-else-if="selectedChart!=='calburned'" class="alert alert-warning text-center">
+            No meal logs found for the selected date range.
+        </div>
+        <div v-if="selectedChart === 'calburned' && activityLogs.length > 0">
+          <div v-if="selectedChart === 'calburned'">
             <div class="d-flex justify-content-center"><h2 class="pb-1">Calories Burned</h2></div>
             <nutrition-data :type="'Calories Burned'" :goalType="null" :labels="calBurnedLabels"
               :data="caloriesBurned" :goalData="null" />
           </div>
-          <div v-else class="alert alert-warning text-center">
-            No meal logs found for the selected date range.
-          </div>
         </div>
-        <div v-else class="alert alert-warning text-center">
-          No meal logs found for the selected date range.
+        <div v-else-if="selectedChart === 'calburned'" class="alert alert-warning text-center">
+            No activity logs found for the selected date range.
         </div>
       </div>
     </div>
@@ -123,18 +124,22 @@ import { getMealLogs } from '@/services/MealLogs';
 import { getActivityLogs } from '@/services/ActivityLogs';
 import { getUserStats } from '@/services/UserStats';
 import { logger } from '@/services/Logger';
-
+import { useLogStore } from '@/stores/Log';
 
 export default defineComponent({
   name: 'HistoryPage',
   components: {
   },
 
+
   data() {
+    const logStore = useLogStore();
+
+
     return {
-      selectedChart: 'calories',
-      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1) as Date,
-      endDate: new Date() as Date,
+      selectedChart: logStore.getSelectedGraphType(),
+      startDate: logStore.getSelectedGraphStartDate(),
+      endDate: logStore.getSelectedGraphEndDate(),
       mealLogs: ref([] as ExtendedMealLog[]),
       activityLogs: ref([] as ActivityLog[]),
       userStats: ref([] as UserStat[]),
@@ -160,6 +165,24 @@ export default defineComponent({
     },
     endDateFormatted(): string {
       return this.endDate.toISOString().split('T')[0];
+    },
+  },
+
+  watch: {
+    selectedChart(newVal: string) {
+      logger.info('Selected Chart Updated:', newVal);
+      const logStore = useLogStore();
+      logStore.setSelectedGraphType(newVal);
+    },
+    startDate(newVal: Date) {
+      logger.info('Start Date Updated:', newVal);
+      const logStore = useLogStore();
+      logStore.setSelectedGraphStartDate(newVal);
+    },
+    endDate(newVal: Date) {
+      logger.info('End Date Updated:', newVal);
+      const logStore = useLogStore();
+      logStore.setSelectedGraphEndDate(newVal);
     },
   },
 
@@ -276,8 +299,6 @@ export default defineComponent({
         this.carbsConsumed.push(dailyCarbs[date]);
         this.fatsConsumed.push(dailyFats[date]);
         this.waterConsumed.push(dailyWater[date]);
-        this.caloriesBurned.push(dailyCaloriesBurned[date]);
-        logger.info(dailyCaloriesBurned[date]);
       });
 
       Object.keys(dailyCaloriesBurned).forEach((date) => {
