@@ -46,7 +46,10 @@ Profit????
 ## Profile Page
 ![Profile Page](images/Screenshot8.png)
 
-# List of features that we plan to implement for the rest of the semester
-- Allow the user to create their own food items and add them to their meals
-- Read Health Data and Activity Data from Google Fit API
-- Implement the tracking of micronutrients
+# Key Changes Made in the Second Half of the Semester
+- Allow user to create custom recipes to log
+- Allow user to track activities and the calories they have burned
+- General frontend improvements (UI and stores)
+
+# Video of Project Functionality
+ <iframe width="560" height="315" src="https://www.youtube.com/embed/ykFu61GNMnY?si=y-j9XxGFDYpCo-s4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
