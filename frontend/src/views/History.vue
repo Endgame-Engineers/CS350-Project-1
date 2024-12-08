@@ -110,7 +110,7 @@
           </div>
         </div>
         <div v-else class="alert alert-warning text-center">
-            No activity logs logs found for the selected date range.
+            No activity logs found for the selected date range.
           </div>
       </div>
     </div>
