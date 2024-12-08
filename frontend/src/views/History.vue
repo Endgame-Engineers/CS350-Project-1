@@ -276,8 +276,6 @@ export default defineComponent({
         this.carbsConsumed.push(dailyCarbs[date]);
         this.fatsConsumed.push(dailyFats[date]);
         this.waterConsumed.push(dailyWater[date]);
-        this.caloriesBurned.push(dailyCaloriesBurned[date]);
-        logger.info(dailyCaloriesBurned[date]);
       });
 
       Object.keys(dailyCaloriesBurned).forEach((date) => {
