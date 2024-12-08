@@ -11,6 +11,9 @@ export const useLogStore = defineStore('mealLog', {
     } as MealLog,
     selectedType: useLocalStorage<string>('selectedMealType', 'Breakfast' as string), 
     currentDate: useLocalStorage<Date>('currentDate', new Date() as Date),
+    selectedGraphType: useLocalStorage<string>('selectedGraphType', 'calories' as string),
+    selectedGraphStartDate: useLocalStorage<Date>('selectedGraphStartDate', new Date(new Date().getFullYear(), new Date().getMonth(), 1) as Date),
+    selectedGraphEndDate: useLocalStorage<Date>('selectedGraphEndDate', new Date() as Date),
   }),
 
   actions: {
@@ -44,6 +47,30 @@ export const useLogStore = defineStore('mealLog', {
 
     getCurrentDate() {
       return this.currentDate;
+    },
+
+    setSelectedGraphType(selectedGraphType: string) {
+      this.selectedGraphType = selectedGraphType;
+    },
+
+    getSelectedGraphType() {
+      return this.selectedGraphType;
+    },
+
+    setSelectedGraphStartDate(selectedGraphStartDate: Date) {
+      this.selectedGraphStartDate = selectedGraphStartDate;
+    },
+
+    getSelectedGraphStartDate() {
+      return this.selectedGraphStartDate;
+    },
+
+    setSelectedGraphEndDate(selectedGraphEndDate: Date) {
+      this.selectedGraphEndDate = selectedGraphEndDate;
+    },
+
+    getSelectedGraphEndDate() {
+      return this.selectedGraphEndDate;
     },
   },
 });

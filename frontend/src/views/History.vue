@@ -124,18 +124,22 @@ import { getMealLogs } from '@/services/MealLogs';
 import { getActivityLogs } from '@/services/ActivityLogs';
 import { getUserStats } from '@/services/UserStats';
 import { logger } from '@/services/Logger';
-
+import { useLogStore } from '@/stores/Log';
 
 export default defineComponent({
   name: 'HistoryPage',
   components: {
   },
 
+
   data() {
+    const logStore = useLogStore();
+
+
     return {
-      selectedChart: 'calories',
-      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1) as Date,
-      endDate: new Date() as Date,
+      selectedChart: logStore.getSelectedGraphType(),
+      startDate: logStore.getSelectedGraphStartDate(),
+      endDate: logStore.getSelectedGraphEndDate(),
       mealLogs: ref([] as ExtendedMealLog[]),
       activityLogs: ref([] as ActivityLog[]),
       userStats: ref([] as UserStat[]),
@@ -161,6 +165,24 @@ export default defineComponent({
     },
     endDateFormatted(): string {
       return this.endDate.toISOString().split('T')[0];
+    },
+  },
+
+  watch: {
+    selectedChart(newVal: string) {
+      logger.info('Selected Chart Updated:', newVal);
+      const logStore = useLogStore();
+      logStore.setSelectedGraphType(newVal);
+    },
+    startDate(newVal: Date) {
+      logger.info('Start Date Updated:', newVal);
+      const logStore = useLogStore();
+      logStore.setSelectedGraphStartDate(newVal);
+    },
+    endDate(newVal: Date) {
+      logger.info('End Date Updated:', newVal);
+      const logStore = useLogStore();
+      logStore.setSelectedGraphEndDate(newVal);
     },
   },
 
