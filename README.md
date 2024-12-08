@@ -1,6 +1,15 @@
 # Carbio - Nutrition Tracker
 [![Open in Coder](https://coder.galifrey.dev/open-in-coder.svg)](https://coder.galifrey.dev/templates/coder/DockerRepoClone/workspace?mode=manual&param.Git+repo+http+URL=https%3A%2F%2Fgithub.com%2FEndgame-Engineers%2FCS350-Project-1)
-## Prereqs
+
+# Video of Project Functionality
+[Project Functionality Video](https://www.youtube.com/watch?v=ykFu61GNMnY)
+
+# Key Changes Made in the Second Half of the Semester
+- Allow user to create custom recipes to log
+- Allow user to track activities and the calories they have burned
+- General frontend improvements (UI and stores)
+
+# Prereqs
 - Must have Docker (https://docs.docker.com/get-started/get-docker/)
 - Google Console API ClientID and ClientSecret (https://developers.google.com/workspace/guides/create-project)
 - Add callback to Google API: `http://localhost:3000/api/auth/google/callback`
@@ -45,11 +54,3 @@ Profit????
 
 ## Profile Page
 ![Profile Page](images/Screenshot8.png)
-
-# Key Changes Made in the Second Half of the Semester
-- Allow user to create custom recipes to log
-- Allow user to track activities and the calories they have burned
-- General frontend improvements (UI and stores)
-
-# Video of Project Functionality
- <iframe width="560" height="315" src="https://www.youtube.com/embed/ykFu61GNMnY?si=y-j9XxGFDYpCo-s4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
