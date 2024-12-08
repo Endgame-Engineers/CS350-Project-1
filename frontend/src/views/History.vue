@@ -102,16 +102,16 @@
         <div v-else-if="selectedChart!=='calburned'" class="alert alert-warning text-center">
             No meal logs found for the selected date range.
         </div>
-        <div v-else-if="activityLogs.length > 0">
+        <div v-if="selectedChart === 'calburned' && activityLogs.length > 0">
           <div v-if="selectedChart === 'calburned'">
             <div class="d-flex justify-content-center"><h2 class="pb-1">Calories Burned</h2></div>
             <nutrition-data :type="'Calories Burned'" :goalType="null" :labels="calBurnedLabels"
               :data="caloriesBurned" :goalData="null" />
           </div>
         </div>
-        <div v-else class="alert alert-warning text-center">
+        <div v-else-if="selectedChart === 'calburned'" class="alert alert-warning text-center">
             No activity logs found for the selected date range.
-          </div>
+        </div>
       </div>
     </div>
   </div>
